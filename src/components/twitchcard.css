@@ -1,0 +1,102 @@
+/* ── TwitchCard.css ───────────────────────────────── */
+
+.tc-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #18181b;
+  border: 1px solid #2a2a2e;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+/* ── Live card hover ── */
+.tc-card:not(.tc-card--offline):hover {
+  transform: translateY(-2px);
+  border-color: #9147ff;
+  box-shadow: 0 4px 14px rgba(145, 71, 255, 0.25);
+}
+
+/* ── Offline card ── */
+.tc-card--offline {
+  opacity: 0.75;
+}
+
+.tc-card--offline:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+/* ── Foto de perfil (arriba de la card) ── */
+.tc-avatar-wrap {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+}
+
+.tc-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: filter 0.2s;
+}
+
+/* Grayscale para canales offline */
+.tc-avatar--offline {
+  filter: grayscale(100%);
+}
+
+/* Fallback cuando no hay foto */
+.tc-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #9147ff, #6441a5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.tc-avatar-fallback--offline {
+  background: linear-gradient(135deg, #555, #333);
+}
+
+/* ── Info (debajo de la foto) ── */
+.tc-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 6px 7px;
+}
+
+.tc-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #efeff1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tc-game {
+  font-size: 9.5px;
+  color: #adadb8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tc-viewers {
+  font-size: 9.5px;
+  color: #adadb8;
+}
+
+.tc-offline-label {
+  font-size: 9.5px;
+  color: #57575e;
+}

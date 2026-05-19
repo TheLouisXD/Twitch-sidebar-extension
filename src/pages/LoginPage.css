@@ -1,0 +1,219 @@
+/* ── LoginPage.css ────────────────────────────────── */
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.login-root {
+  width: 100%;
+  min-height: 100vh;
+  background: #0e0e10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ── Background blobs ── */
+.login-blob-1 {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(145, 71, 255, 0.25) 0%, transparent 70%);
+  top: -60px;
+  left: -60px;
+  pointer-events: none;
+}
+
+.login-blob-2 {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(169, 112, 255, 0.18) 0%, transparent 70%);
+  bottom: -40px;
+  right: -40px;
+  pointer-events: none;
+}
+
+/* ── Card ── */
+.login-card {
+  position: relative;
+  z-index: 1;
+  background: rgba(24, 24, 27, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(145, 71, 255, 0.2);
+  border-radius: 20px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: calc(100% - 32px);
+  max-width: 320px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+}
+
+/* ── Logo ── */
+.login-logo-wrap {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #9147ff, #6441a5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(145, 71, 255, 0.4);
+  margin-bottom: 4px;
+}
+
+/* ── Text ── */
+.login-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #efeff1;
+  letter-spacing: -0.3px;
+}
+
+.login-subtitle {
+  margin: 0;
+  font-size: 12.5px;
+  color: #adadb8;
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* ── Error box ── */
+.login-error-box {
+  width: 100%;
+  background: rgba(235, 4, 0, 0.12);
+  border: 1px solid rgba(235, 4, 0, 0.3);
+  color: #f87171;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* ── Debug panel ── */
+.login-debug-box {
+  width: 100%;
+  background: rgba(255, 180, 0, 0.06);
+  border: 1px solid rgba(255, 180, 0, 0.25);
+  border-radius: 10px;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.login-debug-title {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fbbf24;
+}
+
+.login-debug-text {
+  margin: 0 0 6px;
+  font-size: 11px;
+  color: #adadb8;
+  line-height: 1.5;
+}
+
+.login-debug-text--mt {
+  margin-top: 4px;
+}
+
+.login-url-box {
+  background: #0e0e10;
+  border: 1px solid #3a3a3d;
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  margin-bottom: 4px;
+  transition: border-color 0.1s;
+}
+
+.login-url-box:hover {
+  border-color: #9147ff;
+}
+
+.login-url-text {
+  flex: 1;
+  font-size: 10px;
+  color: #a970ff;
+  word-break: break-all;
+  font-family: monospace;
+}
+
+.login-copy-hint {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.login-link {
+  color: #a970ff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ── Login button ── */
+.login-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #9147ff, #772ce8);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 20px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+  box-shadow: 0 4px 16px rgba(145, 71, 255, 0.35);
+  margin-top: 4px;
+  box-sizing: border-box;
+}
+
+.login-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(145, 71, 255, 0.5);
+}
+
+.login-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.login-btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* ── Spinner (inside button) ── */
+.login-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+/* ── Footer note ── */
+.login-privacy-note {
+  margin: 0;
+  font-size: 10.5px;
+  color: #57575e;
+  text-align: center;
+}
