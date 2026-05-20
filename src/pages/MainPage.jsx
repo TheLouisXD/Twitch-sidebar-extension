@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react"
 import { CLIENT_ID } from "../auth"
+import { useI18n } from "../i18n"
 import TwitchCard from "../components/twitchcard"
 import { SearchBar, search } from "../components/search"
 import {
@@ -141,7 +142,8 @@ async function fetchAllFollowed(token) {
 
 // ── Component ────────────────────────────────────────────────
 
-export default function MainPage({ token, onLogout, onTokenRefresh }) {
+export default function MainPage({ token, onLogout, onTokenRefresh, onSettings }) {
+  const { t } = useI18n()
   const [liveChannels, setLiveChannels]       = useState([])
   const [offlineChannels, setOfflineChannels] = useState([])
   const [loading, setLoading]       = useState(true)   // full-screen spinner
@@ -149,6 +151,11 @@ export default function MainPage({ token, onLogout, onTokenRefresh }) {
   const [error, setError]           = useState(null)
   const [query, setQuery]           = useState("")
   const mountedRef = useRef(true)
+
+  // Update extension badge with live channel count
+  useEffect(() => {
+    chrome.runtime.sendMessage({ type: "SET_BADGE", count: liveChannels.length })
+  }, [liveChannels])
 
   useEffect(() => {
     mountedRef.current = true
@@ -230,8 +237,10 @@ export default function MainPage({ token, onLogout, onTokenRefresh }) {
           </svg>
           <span>Twitch Sidebar</span>
         </div>
-        <button id="logout-btn" className="main-logout-btn" onClick={onLogout}>
-          Salir
+        <button id="settings-btn" className="main-settings-btn" onClick={onSettings} aria-label={t("main.settings")}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.04 7.04 0 0 0-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84a.48.48 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87a.48.48 0 0 0 .12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z" />
+          </svg>
         </button>
       </header>
 
@@ -248,19 +257,19 @@ export default function MainPage({ token, onLogout, onTokenRefresh }) {
       {loading ? (
         <div className="main-center">
           <div className="main-spinner" />
-          <span className="main-loading-text">Cargando canales...</span>
+          <span className="main-loading-text">{t("main.loading")}</span>
         </div>
       ) : (
         <div className="main-scroll">
           {/* ── En vivo ── */}
           <div className="main-section-row">
-            <span className="main-section-title">En vivo ahora</span>
+            <span className="main-section-title">{t("main.live")}</span>
             <span className="main-badge">{liveChannels.length}</span>
           </div>
 
           {filteredLive.length === 0 ? (
             <div className="main-empty-inline">
-              {query ? `Sin resultados para "${query}".` : "Ningún canal en vivo ahora."}
+              {query ? t("main.noResults", query) : t("main.noLive")}
             </div>
           ) : (
             <div className="main-grid">
@@ -279,7 +288,7 @@ export default function MainPage({ token, onLogout, onTokenRefresh }) {
           {filteredOffline.length > 0 && (
             <>
               <div className="main-section-row main-section-row--offline">
-                <span className="main-section-title">Offline</span>
+                <span className="main-section-title">{t("main.offline")}</span>
                 <span className="main-badge main-badge--offline">{filteredOffline.length}</span>
               </div>
               <div className="main-grid">

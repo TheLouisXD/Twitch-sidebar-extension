@@ -34,19 +34,22 @@
   color: #a970ff;
 }
 
-.main-logout-btn {
-  background: transparent;
-  border: 1px solid #3a3a3d;
+.main-settings-btn {
+  background: none;
+  border: none;
   color: #adadb8;
-  border-radius: 6px;
-  padding: 3px 10px;
-  font-size: 11px;
   cursor: pointer;
-  transition: background 0.1s;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
 }
 
-.main-logout-btn:hover {
-  background: #2a2a2e;
+.main-settings-btn:hover {
+  color: #efeff1;
+  background: #26262c;
 }
 
 /* ── Refresh bar (stale-while-revalidate indicator) ── */
@@ -103,7 +106,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 14px 6px;
+  padding: 5px 14px 6px;
 }
 
 .main-section-title {

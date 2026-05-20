@@ -1,7 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Twitch live sidebar",
+    "name": "Twitch Live Sidebar",
     "version": "1.1",
+    "description": "See which Twitch channels you follow are live — right from your browser sidebar. Quick, lightweight, and always one click away.",
     "permissions": ["storage", "identity", "sidePanel"],
     "host_permissions": [
         "https://api.twitch.tv/*",
@@ -12,7 +13,18 @@
     "content_security_policy": {
         "extension_pages": "script-src 'self'; object-src 'none'; connect-src https://api.twitch.tv https://id.twitch.tv https://twitch-auth-worker.thelouisxd.workers.dev; img-src 'self' https://static-cdn.jtvnw.net"
     },
+    "icons": {
+        "16": "icons/icon16.png",
+        "32": "icons/icon32.png",
+        "48": "icons/icon48.png"
+    },
     "side_panel": {"default_path": "index.html"},
-    "background": { "service_worker": "background.js"},
-    "action": {}
+    "background": {"service_worker": "background.js"},
+    "action": {
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "32": "icons/icon32.png",
+            "48": "icons/icon48.png"
+        }
+    }
 }

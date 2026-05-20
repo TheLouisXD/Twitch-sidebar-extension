@@ -1,3 +1,4 @@
+import { useI18n } from "../i18n"
 import "./TwitchCard.css"
 
 /**
@@ -9,6 +10,7 @@ import "./TwitchCard.css"
  *   onClick  → función a llamar al hacer clic, recibe user_login
  */
 export default function TwitchCard({ channel, isLive, onClick }) {
+  const { t } = useI18n()
   const { user_name, user_login, game_name, profile_image_url, viewer_count } = channel
 
   function formatViewers(n) {
@@ -47,7 +49,7 @@ export default function TwitchCard({ channel, isLive, onClick }) {
             <div className="tc-viewers">👁 {formatViewers(viewer_count)}</div>
           </>
         ) : (
-          <div className="tc-offline-label">Offline</div>
+          <div className="tc-offline-label">{t("card.offline")}</div>
         )}
       </div>
     </div>

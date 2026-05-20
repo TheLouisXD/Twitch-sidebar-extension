@@ -1,3 +1,4 @@
+import { useI18n } from "../i18n"
 import "./search.css"
 
 function search(liveChannels, offlineChannels, query) {
@@ -12,12 +13,13 @@ function search(liveChannels, offlineChannels, query) {
 }
 
 const SearchBar = ({ query, setQuery }) => {
+    const { t } = useI18n()
     return (
         <div className="search-bar">
             <input
                 className="search-bar-input"
                 type="text"
-                placeholder="Buscar canal..."
+                placeholder={t("search.placeholder")}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
             />

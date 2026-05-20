@@ -9,7 +9,10 @@
 // NOT accepted from messages to prevent parameter injection.
 
 const CLIENT_ID = "7wvduf9b5669znfl36ey3oraencfv8";
-const SCOPES    = "user:read:follows";
+const SCOPES    = "user:read:follows moderator:read:followers";
+
+// Badge styling — purple Twitch accent
+chrome.action.setBadgeBackgroundColor({ color: "#9147ff" });
 
 // Open the side panel when the action button is clicked
 chrome.action.onClicked.addListener((tab) => {
@@ -18,6 +21,14 @@ chrome.action.onClicked.addListener((tab) => {
 
 // Handle messages from the side panel
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+
+  // ── Update badge with live channel count ──
+  if (message.type === "SET_BADGE") {
+    const count = message.count;
+    chrome.action.setBadgeText({ text: count > 0 ? String(count) : "" });
+    sendResponse({ ok: true });
+    return false;
+  }
 
   // ── Return the redirect URL ──
   if (message.type === "TWITCH_GET_REDIRECT_URL") {
@@ -33,7 +44,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     const params = new URLSearchParams({
       client_id:             CLIENT_ID,
       redirect_uri:          redirectUri,
-      response_type:         "code",              // ← Auth Code, not token
+      response_type:         "code",
       scope:                 SCOPES,
       force_verify:          "false",
       code_challenge:        message.code_challenge,
@@ -42,26 +53,18 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
     const authUrl = `https://id.twitch.tv/oauth2/authorize?${params.toString()}`;
 
-    console.log("[Twitch Auth] Launching auth flow...");
-    console.log("[Twitch Auth] Redirect URI:", redirectUri);
-
     try {
       chrome.identity.launchWebAuthFlow(
         { url: authUrl, interactive: true },
         (redirect) => {
           if (chrome.runtime.lastError) {
-            const msg = chrome.runtime.lastError.message ?? "Unknown error";
-            console.error("[Twitch Auth] lastError:", msg);
-            sendResponse({ error: msg });
+            sendResponse({ error: chrome.runtime.lastError.message ?? "Unknown error" });
             return;
           }
           if (!redirect) {
-            console.error("[Twitch Auth] No redirect URL returned");
             sendResponse({ error: "Auth cancelled or no redirect" });
             return;
           }
-
-          console.log("[Twitch Auth] Redirect received:", redirect);
 
           try {
             // Auth Code comes in the query string (?code=...), NOT the hash
@@ -69,24 +72,19 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
             const code = url.searchParams.get("code");
 
             if (code) {
-              console.log("[Twitch Auth] Code received successfully");
               sendResponse({ code });
             } else {
-              // Check for error from Twitch
               const error = url.searchParams.get("error_description")
                          || url.searchParams.get("error")
                          || "No code in redirect";
-              console.error("[Twitch Auth] Error:", error);
               sendResponse({ error });
             }
-          } catch (parseErr) {
-            console.error("[Twitch Auth] Parse error:", parseErr);
+          } catch (_) {
             sendResponse({ error: "Failed to parse redirect URL" });
           }
         }
       );
     } catch (e) {
-      console.error("[Twitch Auth] Exception:", e);
       sendResponse({ error: e.message });
     }
 

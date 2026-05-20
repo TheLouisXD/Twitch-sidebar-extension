@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react"
 import LoginPage from "./pages/LoginPage"
 import MainPage from "./pages/MainPage"
+import SettingsPage from "./pages/SettingsPage"
 import { refreshAccessToken } from "./auth"
 import { clearAllCache } from "./cache"
 
 export default function App() {
   const [token, setToken]               = useState(undefined) // undefined = still loading
   const [refreshToken, setRefreshToken] = useState(null)
+  const [page, setPage]                 = useState("main")     // "main" | "settings"
 
   /** Validate a token with Twitch's OAuth endpoint (lightweight, no API quota) */
   async function validateToken(accessToken) {
@@ -79,8 +81,11 @@ export default function App() {
     chrome.storage.local.remove("twitch_refresh_token")
     // Clear cached channel/profile data (security: no user data lingers)
     clearAllCache()
+    // Clear badge
+    chrome.runtime.sendMessage({ type: "SET_BADGE", count: 0 })
     setToken(null)
     setRefreshToken(null)
+    setPage("main")
   }
 
   // Handle token refresh from MainPage (when API returns 401)
@@ -117,11 +122,18 @@ export default function App() {
     return <LoginPage onLogin={handleLogin} />
   }
 
-  return (
+  return page === "settings" ? (
+    <SettingsPage
+      token={token}
+      onLogout={handleLogout}
+      onBack={() => setPage("main")}
+    />
+  ) : (
     <MainPage
       token={token}
       onLogout={handleLogout}
       onTokenRefresh={handleTokenRefresh}
+      onSettings={() => setPage("settings")}
     />
   )
 }
