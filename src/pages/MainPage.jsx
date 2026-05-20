@@ -23,10 +23,16 @@ function chunk(arr, size) {
 
 // ── Fetch helpers ────────────────────────────────────────────
 
+/** Custom error for expired/revoked tokens (401) */
+class TokenExpiredError extends Error {
+  constructor() { super("Token expired") }
+}
+
 /** Get the authenticated user's ID */
 async function fetchUserId(token) {
   const res = await fetch(`${API}/users`, { headers: hdrs(token) })
-  if (!res.ok) throw new Error("Invalid token")
+  if (res.status === 401) throw new TokenExpiredError()
+  if (!res.ok) throw new Error("API error")
   return (await res.json()).data[0].id
 }
 
@@ -36,9 +42,9 @@ async function fetchFollowedIds(token, userId) {
   let cursor = null
 
   do {
-    const url = `${API}/channels/followed?user_id=${userId}&first=100`
-      + (cursor ? `&after=${cursor}` : "")
-    const res  = await fetch(url, { headers: hdrs(token) })
+    const params = new URLSearchParams({ user_id: userId, first: "100" })
+    if (cursor) params.set("after", cursor)
+    const res  = await fetch(`${API}/channels/followed?${params}`, { headers: hdrs(token) })
     const json = await res.json()
     allFollows.push(...(json.data ?? []))
     cursor = json.pagination?.cursor ?? null
@@ -51,10 +57,12 @@ async function fetchFollowedIds(token, userId) {
 async function fetchStreams(token, broadcasterIds) {
   const idChunks = chunk(broadcasterIds, 100)
   const pages = await Promise.all(
-    idChunks.map((ids) =>
-      fetch(`${API}/streams?user_id=${ids.join("&user_id=")}`, { headers: hdrs(token) })
+    idChunks.map((ids) => {
+      const params = new URLSearchParams()
+      ids.forEach((id) => params.append("user_id", id))
+      return fetch(`${API}/streams?${params}`, { headers: hdrs(token) })
         .then((r) => r.json()).then((j) => j.data ?? [])
-    )
+    })
   )
   return pages.flat()
 }
@@ -63,10 +71,12 @@ async function fetchStreams(token, broadcasterIds) {
 async function fetchProfiles(token, userIds) {
   const idChunks = chunk(userIds, 100)
   const pages = await Promise.all(
-    idChunks.map((ids) =>
-      fetch(`${API}/users?id=${ids.join("&id=")}`, { headers: hdrs(token) })
+    idChunks.map((ids) => {
+      const params = new URLSearchParams()
+      ids.forEach((id) => params.append("id", id))
+      return fetch(`${API}/users?${params}`, { headers: hdrs(token) })
         .then((r) => r.json()).then((j) => j.data ?? [])
-    )
+    })
   )
   return pages.flat()
 }
@@ -131,7 +141,7 @@ async function fetchAllFollowed(token) {
 
 // ── Component ────────────────────────────────────────────────
 
-export default function MainPage({ token, onLogout }) {
+export default function MainPage({ token, onLogout, onTokenRefresh }) {
   const [liveChannels, setLiveChannels]       = useState([])
   const [offlineChannels, setOfflineChannels] = useState([])
   const [loading, setLoading]       = useState(true)   // full-screen spinner
@@ -176,7 +186,30 @@ export default function MainPage({ token, onLogout }) {
         await setCachedChannels({ live, offline })
       } catch (e) {
         console.error(e)
-        if (mountedRef.current) onLogout()
+        if (!mountedRef.current) return
+
+        // If token expired, try refreshing it automatically
+        if (e instanceof TokenExpiredError && onTokenRefresh) {
+          try {
+            const newToken = await onTokenRefresh()
+            if (newToken && mountedRef.current) {
+              // Retry with the refreshed token
+              const { live, offline } = await fetchAllFollowed(newToken)
+              if (!mountedRef.current) return
+              setLiveChannels(live)
+              setOfflineChannels(offline)
+              setLoading(false)
+              setRefreshing(false)
+              await setCachedChannels({ live, offline })
+              return
+            }
+          } catch (refreshErr) {
+            console.error("Auto-refresh failed:", refreshErr)
+          }
+        }
+
+        // If refresh failed or error wasn't 401 → logout
+        onLogout()
       }
     }
 

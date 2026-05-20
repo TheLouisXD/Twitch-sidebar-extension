@@ -19,9 +19,9 @@ export default function LoginPage({ onLogin }) {
     setLoading(true)
     setError(null)
     launchTwitchAuth()
-      .then((token) => {
-        chrome.storage.local.set({ twitch_token: token })
-        onLogin(token)
+      .then(({ access_token, refresh_token }) => {
+        // Token storage is handled by App.jsx's handleLogin
+        onLogin(access_token, refresh_token)
       })
       .catch((e) => {
         console.error("Auth error:", e)

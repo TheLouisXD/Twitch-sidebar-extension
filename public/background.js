@@ -1,32 +1,49 @@
+// ── Background Service Worker ────────────────────────────────
+//
+// Handles:
+//   1. Opening the side panel when the extension icon is clicked
+//   2. Launching the Twitch OAuth popup (Authorization Code + PKCE)
+//   3. Returning the redirect URL to the side panel
+//
+// Security: CLIENT_ID and SCOPES are hardcoded here — they are
+// NOT accepted from messages to prevent parameter injection.
+
+const CLIENT_ID = "7wvduf9b5669znfl36ey3oraencfv8";
+const SCOPES    = "user:read:follows";
+
 // Open the side panel when the action button is clicked
 chrome.action.onClicked.addListener((tab) => {
   chrome.sidePanel.open({ tabId: tab.id });
 });
 
-// Handle auth requests from the side panel.
-// launchWebAuthFlow MUST run in the background service worker.
+// Handle messages from the side panel
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+
+  // ── Return the redirect URL ──
   if (message.type === "TWITCH_GET_REDIRECT_URL") {
-    // Let the side panel know the redirect URL so the user can verify it
     sendResponse({ redirectUrl: chrome.identity.getRedirectURL() });
     return false;
   }
 
+  // ── Authorization Code + PKCE flow ──
   if (message.type === "TWITCH_AUTH") {
     const redirectUri = chrome.identity.getRedirectURL();
 
-    console.log("[Twitch Auth] Redirect URI:", redirectUri);
-
+    // Build the authorization URL with PKCE params
     const params = new URLSearchParams({
-      client_id: message.clientId,
-      redirect_uri: redirectUri,
-      response_type: "token",
-      scope: message.scopes,
-      force_verify: "false",
+      client_id:             CLIENT_ID,
+      redirect_uri:          redirectUri,
+      response_type:         "code",              // ← Auth Code, not token
+      scope:                 SCOPES,
+      force_verify:          "false",
+      code_challenge:        message.code_challenge,
+      code_challenge_method: "S256",
     });
+
     const authUrl = `https://id.twitch.tv/oauth2/authorize?${params.toString()}`;
 
-    console.log("[Twitch Auth] Auth URL:", authUrl);
+    console.log("[Twitch Auth] Launching auth flow...");
+    console.log("[Twitch Auth] Redirect URI:", redirectUri);
 
     try {
       chrome.identity.launchWebAuthFlow(
@@ -45,14 +62,22 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
           }
 
           console.log("[Twitch Auth] Redirect received:", redirect);
+
           try {
-            const hash = new URL(redirect).hash.substring(1);
-            const p = Object.fromEntries(new URLSearchParams(hash));
-            if (p.access_token) {
-              sendResponse({ token: p.access_token });
+            // Auth Code comes in the query string (?code=...), NOT the hash
+            const url  = new URL(redirect);
+            const code = url.searchParams.get("code");
+
+            if (code) {
+              console.log("[Twitch Auth] Code received successfully");
+              sendResponse({ code });
             } else {
-              console.error("[Twitch Auth] No access_token in hash:", hash);
-              sendResponse({ error: "No access_token in redirect" });
+              // Check for error from Twitch
+              const error = url.searchParams.get("error_description")
+                         || url.searchParams.get("error")
+                         || "No code in redirect";
+              console.error("[Twitch Auth] Error:", error);
+              sendResponse({ error });
             }
           } catch (parseErr) {
             console.error("[Twitch Auth] Parse error:", parseErr);
