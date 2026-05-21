@@ -72,6 +72,8 @@
   flex-direction: column;
   gap: 2px;
   padding: 6px 6px 7px;
+  border-top: 2px solid transparent; /* Reserve space to prevent layout shifts */
+  transition: border-color 0.25s ease, background 0.25s ease;
 }
 
 .tc-name {
