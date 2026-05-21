@@ -4,7 +4,7 @@ import { useI18n } from "../i18n"
 import "./LoginPage.css"
 
 export default function LoginPage({ onLogin }) {
-  const { t } = useI18n()
+  const { t, lang, changeLang } = useI18n()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [redirectUrl, setRedirectUrl] = useState(null)
@@ -94,6 +94,14 @@ export default function LoginPage({ onLogin }) {
               </span>
             )}
           </button>
+          <select
+            className="settings-lang-select"
+            value={lang}
+            onChange={(e) => changeLang(e.target.value)}
+            >
+            <option value="es">Español</option>
+            <option value="en">English</option>
+          </select>
         </div>
     </div>
   )

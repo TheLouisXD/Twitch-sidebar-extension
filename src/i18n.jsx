@@ -116,7 +116,7 @@ export function I18nProvider({ children }) {
 
   // Translation function — supports string keys and function keys (for interpolation)
   function t(key, ...args) {
-    const val = translations[lang]?.[key] ?? translations.es[key] ?? key
+    const val = translations[lang]?.[key] ?? translations.en[key] ?? key
     return typeof val === "function" ? val(...args) : val
   }
 
