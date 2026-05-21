@@ -97,7 +97,7 @@ const translations = {
 const I18nContext = createContext()
 
 export function I18nProvider({ children }) {
-  const [lang, setLang] = useState("en") // default English
+  const [lang, setLang] = useState("es") // default English
 
   // Load saved language preference on mount
   useEffect(() => {

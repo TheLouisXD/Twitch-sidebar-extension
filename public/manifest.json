@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Twitch Live Sidebar",
-    "version": "1.1",
+    "version": "1.0",
     "description": "Check what of your followed channels are live right from your sidebar, just like opera GX >⩊<",
     "permissions": ["storage", "identity", "sidePanel"],
     "host_permissions": [
