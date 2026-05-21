@@ -34,8 +34,10 @@ export default function LoginPage({ onLogin }) {
 
   return (
     <div className="login-root">
-        <h1 className="login-title">Twitch Sidebar</h1>
-        <p className="login-subtitle">{t("login.subtitle")}</p>
+        <div className="login-box">
+            <img className="login-logo" src="/icons/icon128.png" alt="Twitch Sidebar Icon" />
+            <h1 className="login-title">Twitch Sidebar</h1>
+            <p className="login-subtitle">{t("login.subtitle")}</p>
 
         {/* Error box
         {error && (
@@ -76,28 +78,23 @@ export default function LoginPage({ onLogin }) {
         )} */}
 
         {/* Login button */}
-        <button
-          id="login-btn"
-          className="login-btn"
-          onClick={handleLogin}
-          disabled={loading}
-        >
-          {loading ? (
-            <span className="login-btn-content">
-              <span className="login-spinner" /> {t("login.connecting")}
-            </span>
-          ) : (
-            <span className="login-btn-content">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z" />
-              </svg>
-              {t("login.button")}
-            </span>
-          )}
-        </button>
-
-        <p className="login-privacy-note">{t("login.privacy")}</p>
-      </div>
+          <button
+              id="login-btn"
+              className="login-btn"
+              onClick={handleLogin}
+              disabled={loading}
+          >
+            {loading ? (
+              <span className="login-btn-content">
+                <span className="login-spinner" /> {t("login.connecting")}
+              </span>
+            ) : (
+              <span className="login-btn-content">
+                {t("login.button")}
+              </span>
+            )}
+          </button>
+        </div>
     </div>
   )
 }

@@ -6,7 +6,7 @@ const translations = {
   es: {
     // Login
     "login.subtitle": "Conecta tu cuenta para ver los canales que sigues en vivo.",
-    "login.button": "Iniciar sesión en Twitch",
+    "login.button": "Iniciar sesión",
     "login.connecting": "Conectando...",
     "login.error": "No se pudo iniciar sesión.",
     "login.privacy": "Solo se solicita acceso de lectura a tus follows.",
@@ -50,7 +50,7 @@ const translations = {
   en: {
     // Login
     "login.subtitle": "Connect your account to see the channels you follow that are live.",
-    "login.button": "Sign in with Twitch",
+    "login.button": "Sign in",
     "login.connecting": "Connecting...",
     "login.error": "Could not sign in.",
     "login.privacy": "Only read access to your follows is requested.",
