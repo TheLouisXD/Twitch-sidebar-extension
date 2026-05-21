@@ -34,21 +34,10 @@ export default function LoginPage({ onLogin }) {
 
   return (
     <div className="login-root">
-      <div className="login-blob-1" />
-      <div className="login-blob-2" />
-
-      <div className="login-card">
-        {/* Logo */}
-        <div className="login-logo-wrap">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="#fff">
-            <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z" />
-          </svg>
-        </div>
-
         <h1 className="login-title">Twitch Sidebar</h1>
         <p className="login-subtitle">{t("login.subtitle")}</p>
 
-        {/* Error box */}
+        {/* Error box
         {error && (
           <div className="login-error-box">
             <span>⚠ {error}</span>
@@ -56,7 +45,7 @@ export default function LoginPage({ onLogin }) {
         )}
 
         {/* Debug panel — shown after failure */}
-        {showDebug && redirectUrl && (
+        {/* {showDebug && redirectUrl && (
           <div className="login-debug-box">
             <p className="login-debug-title">{t("login.debug.title")}</p>
             <p className="login-debug-text">
@@ -84,7 +73,7 @@ export default function LoginPage({ onLogin }) {
               {t("login.debug.verify")}
             </p>
           </div>
-        )}
+        )} */}
 
         {/* Login button */}
         <button
