@@ -43,6 +43,8 @@ const translations = {
     "settings.standard": "Estándar",
     "settings.language": "Idioma",
     "settings.preferences": "Preferencias",
+    "settings.showOffline": "Mostrar canales offline",
+    "settings.showOfflineTooltip": "(Puede aumentar tiempos de carga)",
   },
 
   en: {
@@ -85,6 +87,8 @@ const translations = {
     "settings.standard": "Standard",
     "settings.language": "Language",
     "settings.preferences": "Preferences",
+    "settings.showOffline": "Show offline channels",
+    "settings.showOfflineTooltip": "(May increase load times)",
   },
 }
 

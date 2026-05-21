@@ -9,6 +9,7 @@ export default function App() {
   const [token, setToken]               = useState(undefined) // undefined = still loading
   const [refreshToken, setRefreshToken] = useState(null)
   const [page, setPage]                 = useState("main")     // "main" | "settings"
+  const [showOffline, setShowOffline]   = useState(false)       // show offline channels
 
   /** Validate a token with Twitch's OAuth endpoint (lightweight, no API quota) */
   async function validateToken(accessToken) {
@@ -42,6 +43,12 @@ export default function App() {
   // - access_token  → chrome.storage.session (cleared when browser closes)
   // - refresh_token → chrome.storage.local   (persists for silent re-auth)
   useEffect(() => {
+    // Load showOffline preference
+    chrome.storage.local.get("showOffline", (res) => {
+      // Default to true if not set
+      setShowOffline(res.showOffline !== undefined ? res.showOffline : false)
+    })
+
     Promise.all([
       new Promise((r) => chrome.storage.session.get("twitch_access_token",  (res) => r(res.twitch_access_token  ?? null))),
       new Promise((r) => chrome.storage.local.get("twitch_refresh_token",   (res) => r(res.twitch_refresh_token ?? null))),
@@ -127,6 +134,8 @@ export default function App() {
       token={token}
       onLogout={handleLogout}
       onBack={() => setPage("main")}
+      showOffline={showOffline}
+      onShowOfflineChange={setShowOffline}
     />
   ) : (
     <MainPage
@@ -134,6 +143,7 @@ export default function App() {
       onLogout={handleLogout}
       onTokenRefresh={handleTokenRefresh}
       onSettings={() => setPage("settings")}
+      showOffline={showOffline}
     />
   )
 }

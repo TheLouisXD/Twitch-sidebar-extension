@@ -44,7 +44,7 @@ function extractDominantColor(imageUrl) {
   })
 }
 
-export default function SettingsPage({ token, onLogout, onBack }) {
+export default function SettingsPage({ token, onLogout, onBack, showOffline, onShowOfflineChange }) {
   const { t, lang, changeLang } = useI18n()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -116,6 +116,12 @@ export default function SettingsPage({ token, onLogout, onBack }) {
     })
   }
 
+  function handleToggleOffline() {
+    const newValue = !showOffline
+    chrome.storage.local.set({ showOffline: newValue })
+    onShowOfflineChange(newValue)
+  }
+
   return (
     <div className="settings-root" style={bgGradient ? { background: bgGradient } : undefined}>
       {/* Header with back button */}
@@ -181,7 +187,7 @@ export default function SettingsPage({ token, onLogout, onBack }) {
             </div>
           </div>
 
-          {/* Language selector */}
+          {/* Preferences */}
           <div className="settings-section" style={{ marginTop: "16px" }}>
             <div className="settings-section-title">{t("settings.preferences")}</div>
             <div className="settings-info-list">
@@ -195,6 +201,22 @@ export default function SettingsPage({ token, onLogout, onBack }) {
                   <option value="es">Español</option>
                   <option value="en">English</option>
                 </select>
+              </div>
+              <div className="settings-info-item">
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span className="settings-info-label">{t("settings.showOffline")}</span>
+                  <span className="settings-info-label">{t("settings.showOfflineTooltip")}</span>
+                </div>
+                <button
+                  id="settings-offline-toggle"
+                  className={`settings-toggle ${showOffline ? "settings-toggle--on" : ""}`}
+                  onClick={handleToggleOffline}
+                  role="switch"
+                  aria-checked={showOffline}
+                  aria-label={t("settings.showOffline")}
+                >
+                  <span className="settings-toggle-knob" />
+                </button>
               </div>
             </div>
           </div>

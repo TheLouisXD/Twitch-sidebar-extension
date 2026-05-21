@@ -142,7 +142,7 @@ async function fetchAllFollowed(token) {
 
 // ── Component ────────────────────────────────────────────────
 
-export default function MainPage({ token, onLogout, onTokenRefresh, onSettings }) {
+export default function MainPage({ token, onLogout, onTokenRefresh, onSettings, showOffline }) {
   const { t } = useI18n()
   const [liveChannels, setLiveChannels]       = useState([])
   const [offlineChannels, setOfflineChannels] = useState([])
@@ -285,7 +285,7 @@ export default function MainPage({ token, onLogout, onTokenRefresh, onSettings }
           )}
 
           {/* ── Offline ── */}
-          {filteredOffline.length > 0 && (
+          {showOffline && filteredOffline.length > 0 && (
             <>
               <div className="main-section-row main-section-row--offline">
                 <span className="main-section-title">{t("main.offline")}</span>

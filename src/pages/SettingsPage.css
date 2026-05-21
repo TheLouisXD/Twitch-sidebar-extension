@@ -131,6 +131,7 @@
 
 .settings-info-label {
   color: #adadb8;
+  text-align: start;
 }
 
 .settings-info-value {
@@ -155,6 +156,40 @@
 .settings-lang-select:hover,
 .settings-lang-select:focus {
   border-color: #9147ff;
+}
+
+/* ── Toggle switch ── */
+.settings-toggle {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  background: #3a3a3d;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.settings-toggle--on {
+  background: #9147ff;
+}
+
+.settings-toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: #efeff1;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  pointer-events: none;
+}
+
+.settings-toggle--on .settings-toggle-knob {
+  transform: translateX(18px);
 }
 
 /* ── Logout button ── */
