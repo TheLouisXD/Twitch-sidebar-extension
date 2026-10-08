@@ -12,8 +12,8 @@ export default function LoginPage({ onLogin, initialError }) {
     setLoading(true)
     setError(null)
     try {
-      const { access_token } = await launchTwitchAuth()
-      await onLogin(access_token)
+      await launchTwitchAuth()
+      onLogin()
     } catch (failure) {
       console.error("Auth error:", failure.message)
       setError(failure.message)
@@ -29,7 +29,9 @@ export default function LoginPage({ onLogin, initialError }) {
         <h1 className="login-title">Twitch Sidebar</h1>
         <p className="login-subtitle">{t("login.subtitle")}</p>
         {(error || initialError) && (
-          <div className="login-error-box" role="alert"><span>⚠ {t("login.error")}</span></div>
+          <div className="login-error-box" role="alert">
+            <span>⚠ {t("login.error")}</span>
+          </div>
         )}
         <p className="login-subtitle">{t("login.dataUse")}</p>
         <button id="login-btn" className="login-btn" onClick={handleLogin} disabled={loading}>
@@ -39,8 +41,12 @@ export default function LoginPage({ onLogin, initialError }) {
           </span>
         </button>
         <p className="login-subtitle">{t("login.privacy")}</p>
-        <select className="settings-lang-select" value={lang} aria-label={t("settings.language")}
-          onChange={(event) => changeLang(event.target.value)}>
+        <select
+          className="settings-lang-select"
+          value={lang}
+          aria-label={t("settings.language")}
+          onChange={(event) => changeLang(event.target.value)}
+        >
           <option value="es">Español</option>
           <option value="en">English</option>
         </select>

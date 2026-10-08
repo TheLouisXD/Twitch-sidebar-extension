@@ -1,54 +1,60 @@
 import { useEffect, useState } from "react"
-import LoginPage from "./pages/LoginPage"
-import MainPage from "./pages/MainPage"
-import SettingsPage from "./pages/SettingsPage"
-import NotificationsPage from "./pages/NotificationsPage"
-import { extension, localGet, sendMessage } from "./platform.js"
+import LoginPage from "./pages/LoginPage.jsx"
+import MainPage from "./pages/MainPage.jsx"
+import SettingsPage from "./pages/SettingsPage.jsx"
+import NotificationsPage from "./pages/NotificationsPage.jsx"
+import { extension, sendMessage } from "./platform.js"
 import { useI18n } from "./i18n-context.js"
+import SessionStatus from "./components/SessionStatus.jsx"
+import { useStoredValue, asBoolean } from "./hooks/useStoredValue.js"
 
 export default function App() {
   const { t } = useI18n()
-  const [token, setToken] = useState(undefined)
+  const [authenticated, setAuthenticated] = useState(undefined)
   const [page, setPage] = useState("main")
-  const [showOffline, setShowOffline] = useState(false)
+  const { value: showOffline } = useStoredValue("showOffline", false, asBoolean)
   const [error, setError] = useState(null)
+  const [restoreAttempt, setRestoreAttempt] = useState(0)
 
   useEffect(() => {
     let active = true
+    let sessionChanged = false
     const onStorageChanged = (changes, area) => {
       if (area === "session" && changes.twitch_access_token) {
-        setToken(changes.twitch_access_token.newValue ?? null)
+        sessionChanged = true
+        setAuthenticated(Boolean(changes.twitch_access_token.newValue))
+        setError(null)
+        if (!changes.twitch_access_token.oldValue || !changes.twitch_access_token.newValue)
+          setPage("main")
       }
-      if (area === "local" && changes.showOffline) setShowOffline(Boolean(changes.showOffline.newValue))
     }
     extension.storage.onChanged.addListener(onStorageChanged)
-    localGet("showOffline").then((result) => {
-      if (active) setShowOffline(Boolean(result.showOffline))
-    }).catch(console.error)
-    sendMessage({ type: "SESSION_RESTORE" }).then((result) => {
-      if (active) setToken(result.access_token)
-    }).catch((failure) => {
-      if (active) {
-        setError(failure.message)
-        setToken(null)
-      }
-    })
+    sendMessage({ type: "SESSION_RESTORE" })
+      .then((result) => {
+        if (active && !sessionChanged) setAuthenticated(result.authenticated)
+      })
+      .catch((failure) => {
+        if (active && !sessionChanged) {
+          if (failure.code === "AUTH_REQUIRED") setAuthenticated(false)
+          setError(failure.message)
+        }
+      })
     return () => {
       active = false
       extension.storage.onChanged.removeListener(onStorageChanged)
     }
-  }, [])
+  }, [restoreAttempt])
 
-  function handleLogin(accessToken) {
+  function handleLogin() {
     setError(null)
     setPage("main")
-    setToken(accessToken)
+    setAuthenticated(true)
   }
 
   async function handleLogout() {
     try {
       await sendMessage({ type: "SESSION_LOGOUT" })
-      setToken(null)
+      setAuthenticated(false)
       setPage("main")
       setError(null)
     } catch (failure) {
@@ -56,32 +62,39 @@ export default function App() {
     }
   }
 
-  if (token === undefined) {
-    return <div style={loadingStyle}><div style={spinnerStyle} /></div>
+  if (authenticated === undefined) {
+    return (
+      <SessionStatus
+        error={error}
+        onLogout={handleLogout}
+        onRetry={() => {
+          setError(null)
+          setRestoreAttempt((attempt) => attempt + 1)
+        }}
+      />
+    )
   }
-  if (!token) return <LoginPage onLogin={handleLogin} initialError={error} />
+  if (!authenticated) return <LoginPage onLogin={handleLogin} initialError={error} />
 
   return (
     <>
-      {error && <div className="main-error-banner" role="alert">{t("session.error")}</div>}
+      {error && (
+        <div className="main-error-banner" role="alert">
+          {t("session.error")}
+        </div>
+      )}
       {page === "notifications" ? (
         <NotificationsPage onBack={() => setPage("settings")} />
       ) : page === "settings" ? (
-        <SettingsPage onLogout={handleLogout} onBack={() => setPage("main")}
-          showOffline={showOffline} onShowOfflineChange={setShowOffline}
-          onNotifications={() => setPage("notifications")} />
+        <SettingsPage
+          onLogout={handleLogout}
+          onBack={() => setPage("main")}
+          showOffline={showOffline}
+          onNotifications={() => setPage("notifications")}
+        />
       ) : (
         <MainPage onSettings={() => setPage("settings")} showOffline={showOffline} />
       )}
     </>
   )
-}
-
-const loadingStyle = {
-  width: "100%", height: "100vh", background: "#0e0e10", display: "flex",
-  alignItems: "center", justifyContent: "center",
-}
-const spinnerStyle = {
-  width: 32, height: 32, borderRadius: "50%", border: "3px solid #1f1f23",
-  borderTop: "3px solid #9147ff", animation: "spin 0.8s linear infinite",
 }

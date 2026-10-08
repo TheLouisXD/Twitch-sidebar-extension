@@ -5,6 +5,7 @@ export const CHANNELS_KEY = "twitch_channels_cache"
 export const PROFILES_KEY = "twitch_profiles_cache"
 export const NOTIFICATIONS_KEY = "notification_streamers"
 export const PREV_LIVE_KEY = "previously_live"
+export const EMPTY_NOTIFICATION_IDS = []
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
 
 function isFresh(timestamp, maxAge) {
@@ -13,9 +14,24 @@ function isFresh(timestamp, maxAge) {
 }
 
 export async function getCachedChannels() {
-  const { [CHANNELS_KEY]: entry, [POLL_INTERVAL_KEY]: interval } = await localGet([CHANNELS_KEY, POLL_INTERVAL_KEY])
-  if (!Array.isArray(entry?.data?.live) || !Array.isArray(entry?.data?.offline)) return null
-  return { data: entry.data, ts: entry.ts, fresh: isFresh(entry.ts, normalizePollInterval(interval) * 60 * 1000) }
+  const { [CHANNELS_KEY]: entry, [POLL_INTERVAL_KEY]: interval } = await localGet([
+    CHANNELS_KEY,
+    POLL_INTERVAL_KEY
+  ])
+  if (!decodeChannelCache(entry)) return null
+  return {
+    data: entry.data,
+    ts: entry.ts,
+    fresh: isFresh(entry.ts, normalizePollInterval(interval) * 60 * 1000)
+  }
+}
+
+export function decodeChannelCache(entry) {
+  return Array.isArray(entry?.data?.live) && Array.isArray(entry?.data?.offline) ? entry : null
+}
+
+export function decodeNotificationIds(ids) {
+  return Array.isArray(ids) ? ids.filter((id) => typeof id === "string" && /^\d+$/.test(id)) : []
 }
 
 export function setCachedChannels(data) {
@@ -37,7 +53,7 @@ export function clearAllCache() {
 
 export async function getNotificationStreamers() {
   const { [NOTIFICATIONS_KEY]: ids } = await localGet(NOTIFICATIONS_KEY)
-  return new Set(Array.isArray(ids) ? ids : [])
+  return new Set(decodeNotificationIds(ids))
 }
 
 // All read/modify/write operations run in the background, shared by all sidebars.

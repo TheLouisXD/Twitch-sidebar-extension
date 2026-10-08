@@ -2,16 +2,35 @@ import { CLIENT_ID, SCOPES } from "./config.js"
 import { AuthError, requestTokens } from "./auth.js"
 import { extension, callExtension, isFirefox, localGet, localSet, openChannel } from "./platform.js"
 import {
-  CHANNELS_KEY, NOTIFICATIONS_KEY, PREV_LIVE_KEY, clearAllCache,
-  getCachedChannels, getNotificationStreamers, setCachedChannels, setCachedProfiles,
+  CHANNELS_KEY,
+  NOTIFICATIONS_KEY,
+  PREV_LIVE_KEY,
+  clearAllCache,
+  getCachedChannels,
+  getNotificationStreamers,
+  setCachedChannels,
+  setCachedProfiles
 } from "./cache.js"
 import {
-  getSessionRevision, invalidateSession, assertSession, restoreSession,
-  saveTokens, clearTokens, withSession, waitForSessionTasks,
+  getSessionRevision,
+  invalidateSession,
+  assertSession,
+  restoreSession,
+  saveTokens,
+  clearTokens,
+  withSession,
+  waitForSessionTasks,
+  guardSession,
+  setRememberSession
 } from "./session.js"
 import { fetchAllFollowed, fetchUser, fetchTwitch } from "./twitch.js"
 import { randomState, parseAuthRedirect } from "./oauth.js"
-import { getPreferences, POLL_INTERVAL_KEY, FAVORITES_FIRST_KEY, POLL_INTERVAL_OPTIONS } from "./preferences.js"
+import {
+  getPreferences,
+  POLL_INTERVAL_KEY,
+  FAVORITES_FIRST_KEY,
+  POLL_INTERVAL_OPTIONS
+} from "./preferences.js"
 
 const ALARM_NAME = "twitch_poll_streams"
 let pollTask
@@ -22,7 +41,14 @@ let alarmQueue = Promise.resolve()
 let badgeQueue = Promise.resolve()
 
 function report(error) {
+  if (error.code === "SESSION_CHANGED") return
   console.error("[Twitch Sidebar]", error.message)
+}
+
+function signOutIfCurrent(error) {
+  if (error instanceof AuthError && error.sessionRevision === getSessionRevision()) {
+    return signOut()
+  }
 }
 
 function ensureAlarm() {
@@ -58,8 +84,10 @@ export function notificationOptions(stream, language) {
     title: spanish ? `🔴 ¡${stream.user_name} está en vivo!` : `🔴 ${stream.user_name} is live!`,
     message: stream.game_name
       ? `${spanish ? "Jugando" : "Playing"}: ${stream.game_name}`
-      : (spanish ? "En vivo ahora" : "Live now"),
-    ...(isFirefox ? {} : { priority: 2, silent: true }),
+      : spanish
+        ? "En vivo ahora"
+        : "Live now",
+    ...(isFirefox ? {} : { priority: 2, silent: true })
   }
 }
 
@@ -87,15 +115,20 @@ function pollStreams() {
       for (const stream of data.live) {
         assertSession(expected)
         if (watched.has(stream.user_id) && !previousIds.has(stream.user_id)) {
-          await callExtension("notifications.create", `twitch-live-${stream.user_id}`,
-            notificationOptions(stream, language)).catch(report)
+          await callExtension(
+            "notifications.create",
+            `twitch-live-${stream.user_id}`,
+            notificationOptions(stream, language)
+          ).catch(report)
         }
       }
     }
     assertSession(expected)
     await localSet({ [PREV_LIVE_KEY]: data.live.map((stream) => stream.user_id) })
     return data
-  })().finally(() => { pollTask = null })
+  })().finally(() => {
+    pollTask = null
+  })
   return pollTask
 }
 
@@ -109,7 +142,9 @@ function signOut() {
     await clearAllCache()
     await syncBadgeFromCache()
     return { ok: true }
-  })().finally(() => { logoutTask = null })
+  })().finally(() => {
+    logoutTask = null
+  })
   return logoutTask
 }
 
@@ -117,31 +152,39 @@ function authenticate() {
   if (authTask) return authTask
   invalidateSession()
   const expected = getSessionRevision()
-  authTask = (async () => {
+  authTask = guardSession(expected, async () => {
     const redirectUri = extension.identity.getRedirectURL()
     const state = randomState()
     const params = new URLSearchParams({
-      client_id: CLIENT_ID, redirect_uri: redirectUri, response_type: "code",
-      scope: SCOPES, state, force_verify: "false",
+      client_id: CLIENT_ID,
+      redirect_uri: redirectUri,
+      response_type: "code",
+      scope: SCOPES,
+      state,
+      force_verify: "false"
     })
     const redirect = await callExtension("identity.launchWebAuthFlow", {
-      url: `https://id.twitch.tv/oauth2/authorize?${params}`, interactive: true,
+      url: `https://id.twitch.tv/oauth2/authorize?${params}`,
+      interactive: true
     })
     assertSession(expected)
     const code = parseAuthRedirect(redirect, redirectUri, state)
     const tokens = await requestTokens("exchange", {
-      code, redirect_uri: redirectUri,
+      code,
+      redirect_uri: redirectUri,
       // Compatibility with the deployed Worker, which requires but ignores
       // this field. Twitch's documented code grant uses the server secret.
-      code_verifier: state,
+      code_verifier: state
     })
     assertSession(expected)
     await Promise.allSettled([pollTask, waitForSessionTasks()].filter(Boolean))
     assertSession(expected)
     await clearAllCache()
-    const accessToken = await saveTokens(tokens, expected)
-    return { access_token: accessToken }
-  })().finally(() => { authTask = null })
+    await saveTokens(tokens, expected)
+    return { authenticated: true }
+  }).finally(() => {
+    authTask = null
+  })
   return authTask
 }
 
@@ -165,8 +208,11 @@ async function getProfile() {
   return withSession(async (token) => {
     const profile = await fetchUser(token)
     try {
-      const result = await fetchTwitch(token, "channels/followers",
-        new URLSearchParams({ broadcaster_id: profile.id, first: "1" }))
+      const result = await fetchTwitch(
+        token,
+        "channels/followers",
+        new URLSearchParams({ broadcaster_id: profile.id, first: "1" })
+      )
       profile.followers = result.total
     } catch (error) {
       // Follower count is optional; do not request moderator access for it.
@@ -176,14 +222,19 @@ async function getProfile() {
   })
 }
 
+/** @param {import("./types.js").ExtensionMessage} message */
 async function route(message) {
   if (message.type === "SESSION_LOGOUT") return signOut()
   if (logoutTask) await logoutTask
   switch (message.type) {
-    case "TWITCH_AUTH": return authenticate()
-    case "TWITCH_GET_REDIRECT_URL": return { redirectUrl: extension.identity.getRedirectURL() }
-    case "SESSION_RESTORE": return { access_token: await restoreSession() }
-    case "GET_PROFILE": return getProfile()
+    case "TWITCH_AUTH":
+      return authenticate()
+    case "TWITCH_GET_REDIRECT_URL":
+      return { redirectUrl: extension.identity.getRedirectURL() }
+    case "SESSION_RESTORE":
+      return { authenticated: Boolean(await restoreSession()) }
+    case "GET_PROFILE":
+      return getProfile()
     case "LOAD_CHANNELS":
     case "POLL_NOW": {
       await ensureAlarm()
@@ -193,29 +244,45 @@ async function route(message) {
       return { channels: cached?.data ?? channels, updatedAt: cached?.ts ?? 0 }
     }
     case "SET_POLL_INTERVAL": {
-      if (!POLL_INTERVAL_OPTIONS.includes(message.minutes)) throw new Error("Invalid refresh interval")
+      if (!POLL_INTERVAL_OPTIONS.includes(message.minutes))
+        throw new Error("Invalid refresh interval")
       await localSet({ [POLL_INTERVAL_KEY]: message.minutes })
       await ensureAlarm()
       return { pollIntervalMinutes: (await getPreferences()).pollIntervalMinutes }
     }
     case "SET_FAVORITES_FIRST": {
-      if (typeof message.enabled !== "boolean") throw new Error("Invalid favorite sorting preference")
+      if (typeof message.enabled !== "boolean")
+        throw new Error("Invalid favorite sorting preference")
       await localSet({ [FAVORITES_FIRST_KEY]: message.enabled })
       return { favoritesFirst: message.enabled }
     }
-    case "TOGGLE_NOTIFICATION": return changeStreamerPreference(NOTIFICATIONS_KEY, message.broadcasterId)
-    case "REMOVE_NOTIFICATION": return changeStreamerPreference(NOTIFICATIONS_KEY, message.broadcasterId, true)
-    default: return { error: "Unknown message" }
+    case "SET_REMEMBER_SESSION": {
+      if (typeof message.enabled !== "boolean")
+        throw new Error("Invalid session persistence preference")
+      return setRememberSession(message.enabled)
+    }
+    case "TOGGLE_NOTIFICATION":
+      return changeStreamerPreference(NOTIFICATIONS_KEY, message.broadcasterId)
+    case "REMOVE_NOTIFICATION":
+      return changeStreamerPreference(NOTIFICATIONS_KEY, message.broadcasterId, true)
+    default:
+      return { error: "Unknown message" }
   }
 }
 
 // Keep a synchronous listener + true for asynchronous responses on both browsers.
 extension.runtime.onMessage.addListener((message, sender, respond) => {
-  if (sender.id !== extension.runtime.id || !message || typeof message.type !== "string") return false
-  route(message).then(respond).catch(async (error) => {
-    if (error instanceof AuthError) await signOut().catch(report)
-    respond({ error: error.message })
-  })
+  if (sender.id !== extension.runtime.id || !message || typeof message.type !== "string")
+    return false
+  route(message)
+    .then(respond)
+    .catch(async (error) => {
+      await signOutIfCurrent(error)?.catch(report)
+      respond({
+        error: error.message,
+        code: error instanceof AuthError ? "AUTH_REQUIRED" : error.code
+      })
+    })
   return true
 })
 
@@ -230,8 +297,8 @@ extension.action.onClicked.addListener((tab) => {
 function runPoll() {
   if (logoutTask) return
   return pollStreams().catch(async (error) => {
-    if (error instanceof AuthError) await signOut().catch(report)
-    else report(error)
+    await signOutIfCurrent(error)?.catch(report)
+    if (!(error instanceof AuthError)) report(error)
   })
 }
 
@@ -254,12 +321,18 @@ extension.alarms.onAlarm.addListener((alarm) => {
 })
 extension.notifications.onClicked.addListener((id) => {
   if (!id.startsWith("twitch-live-")) return
-  localGet(CHANNELS_KEY).then(async (result) => {
-    const data = result[CHANNELS_KEY]?.data
-    const channel = [...(data?.live ?? []), ...(data?.offline ?? [])]
-      .find((item) => item.user_id === id.slice("twitch-live-".length))
-    if (channel) await openChannel(channel.user_login)
-  }).catch(report).finally(() => { callExtension("notifications.clear", id).catch(report) })
+  localGet(CHANNELS_KEY)
+    .then(async (result) => {
+      const data = result[CHANNELS_KEY]?.data
+      const channel = [...(data?.live ?? []), ...(data?.offline ?? [])].find(
+        (item) => item.user_id === id.slice("twitch-live-".length)
+      )
+      if (channel) await openChannel(channel.user_login)
+    })
+    .catch(report)
+    .finally(() => {
+      callExtension("notifications.clear", id).catch(report)
+    })
 })
 
 callExtension("action.setBadgeBackgroundColor", { color: "#9147ff" }).catch(report)

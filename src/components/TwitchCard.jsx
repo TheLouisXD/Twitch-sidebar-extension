@@ -1,18 +1,15 @@
 import React from "react"
 import { useI18n } from "../i18n-context.js"
-import "./twitchcard.css"
+import "./TwitchCard.css"
 
-/**
- * TwitchCard — muestra un canal como tarjeta compacta.
- *
- * Props:
- *   channel          → objeto unificado (live o offline) con profile_image_url
- *   isLive           → boolean: true = en vivo (color), false = offline (grayscale)
- *   onClick          → función a llamar al hacer clic, recibe user_login
- *   isNotified       → boolean: true = campana activa (notificaciones on)
- *   onToggleNotify   → (broadcasterId: string) => void
- */
-const TwitchCard = React.memo(function TwitchCard({ channel, isLive, onClick, isNotified = false, onToggleNotify }) {
+/** @param {import("../types.js").TwitchCardProps} props */
+const TwitchCard = React.memo(function TwitchCard({
+  channel,
+  isLive,
+  onClick,
+  isNotified = false,
+  onToggleNotify
+}) {
   const { t } = useI18n()
   const { user_name, user_login, game_name, profile_image_url, viewer_count, user_id } = channel
 
@@ -35,10 +32,19 @@ const TwitchCard = React.memo(function TwitchCard({ channel, isLive, onClick, is
   return (
     <div
       className={`tc-card${isLive ? "" : " tc-card--offline"}`}
-      onClick={() => onClick(user_login)}
       title={`${user_name}${game_name ? ` — ${game_name}` : ""}`}
     >
-      {/* Profile picture */}
+      <a
+        className="tc-channel-link"
+        href={`https://www.twitch.tv/${user_login}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={t("card.openChannel", user_name)}
+        onClick={(event) => {
+          event.preventDefault()
+          onClick(user_login)
+        }}
+      />
       <div className="tc-avatar-wrap">
         {profile_image_url ? (
           <img
@@ -52,21 +58,19 @@ const TwitchCard = React.memo(function TwitchCard({ channel, isLive, onClick, is
           </div>
         )}
       </div>
-
-      {/* Info */}
       <div className={`tc-info${isLive && profile_image_url ? " tc-info--ambient" : ""}`}>
         {isLive && profile_image_url && (
           <div className="tc-ambient" aria-hidden="true">
             <img className="tc-ambient-image" src={profile_image_url} alt="" />
           </div>
         )}
-        {/* Name row with bell button */}
         <div className="tc-name-row">
           <span className="tc-name">{user_name}</span>
           <button
             className={`tc-bell-btn${isNotified ? " tc-bell-btn--active" : ""}`}
             onClick={handleBellClick}
-            aria-label={bellLabel}
+            aria-label={`${bellLabel}: ${user_name}`}
+            aria-pressed={isNotified}
             title={bellLabel}
           >
             <svg

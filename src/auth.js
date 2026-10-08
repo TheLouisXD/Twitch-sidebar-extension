@@ -13,7 +13,7 @@ export async function requestTokens(endpoint, body) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(30000),
+    signal: AbortSignal.timeout(30000)
   })
   const data = await response.json()
   if (!response.ok || data.error) {
@@ -21,8 +21,12 @@ export async function requestTokens(endpoint, body) {
     if (response.status === 400 || response.status === 401) throw new AuthError(message)
     throw new Error(message)
   }
-  if (typeof data.access_token !== "string" || !data.access_token ||
-      typeof data.refresh_token !== "string" || !data.refresh_token) {
+  if (
+    typeof data.access_token !== "string" ||
+    !data.access_token ||
+    typeof data.refresh_token !== "string" ||
+    !data.refresh_token
+  ) {
     throw new Error("Invalid token response")
   }
   return data

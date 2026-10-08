@@ -1,13 +1,20 @@
 /* ── LoginPage.css ────────────────────────────────── */
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .login-root {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(0deg, var(--tw-accent-dark) 0%, var(--tw-accent) 50%, var(--tw-accent-dark) 100%);
+  background: linear-gradient(
+    0deg,
+    var(--tw-accent-dark) 0%,
+    var(--tw-accent) 50%,
+    var(--tw-accent-dark) 100%
+  );
   display: flex;
   align-items: center;
   justify-content: center;
@@ -22,7 +29,6 @@
   gap: 16px;
   width: 100%;
   padding: 24px clamp(16px, 6vw, 40px);
-
 }
 
 .login-logo {
@@ -53,78 +59,14 @@
 /* ── Error box ── */
 .login-error-box {
   width: 100%;
-  background: rgba(235, 4, 0, 0.12);
-  border: 1px solid rgba(235, 4, 0, 0.3);
-  color: #f87171;
+  background: var(--tw-error-bg);
+  border: 1px solid var(--tw-error-border);
+  color: var(--tw-error-text);
   border-radius: 8px;
   padding: 8px 12px;
   font-size: 12px;
   text-align: center;
   box-sizing: border-box;
-}
-
-/* ── Debug panel ── */
-.login-debug-box {
-  width: 100%;
-  background: rgba(255, 180, 0, 0.06);
-  border: 1px solid rgba(255, 180, 0, 0.25);
-  border-radius: 10px;
-  padding: 12px;
-  box-sizing: border-box;
-}
-
-.login-debug-title {
-  margin: 0 0 6px;
-  font-size: 12px;
-  font-weight: 700;
-  color: #fbbf24;
-}
-
-.login-debug-text {
-  margin: 0 0 6px;
-  font-size: 11px;
-  color: var(--tw-text-secondary);
-  line-height: 1.5;
-}
-
-.login-debug-text--mt {
-  margin-top: 4px;
-}
-
-.login-url-box {
-  background: var(--tw-bg);
-  border: 1px solid #3a3a3d;
-  border-radius: 6px;
-  padding: 6px 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  margin-bottom: 4px;
-  transition: border-color 0.1s;
-}
-
-.login-url-box:hover {
-  border-color: var(--tw-accent);
-}
-
-.login-url-text {
-  flex: 1;
-  font-size: 10px;
-  color: var(--tw-accent-light);
-  word-break: break-all;
-  font-family: monospace;
-}
-
-.login-copy-hint {
-  font-size: 13px;
-  flex-shrink: 0;
-}
-
-.login-link {
-  color: var(--tw-accent-light);
-  text-decoration: underline;
-  cursor: pointer;
 }
 
 /* ── Login button ── */
@@ -138,13 +80,16 @@
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s,
+    opacity 0.15s;
   box-sizing: border-box;
 }
 
 .login-btn:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(145, 71, 255, 0.5);
+  box-shadow: 0 6px 20px var(--tw-accent-glow-strong);
 }
 
 .login-btn:disabled {
@@ -164,8 +109,8 @@
   display: inline-block;
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #fff;
+  border: 2px solid var(--tw-spinner-border);
+  border-top-color: var(--tw-on-accent);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }

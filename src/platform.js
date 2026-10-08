@@ -35,7 +35,11 @@ export const { api: extension, call: callExtension, isFirefox } = createPlatform
 export async function sendMessage(message) {
   const response = await callExtension("runtime.sendMessage", message)
   if (!response) throw new Error("No response from background")
-  if (response.error) throw new Error(response.error)
+  if (response.error) {
+    const error = new Error(response.error)
+    error.code = response.code
+    throw error
+  }
   return response
 }
 

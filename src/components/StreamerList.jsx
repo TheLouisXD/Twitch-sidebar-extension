@@ -1,6 +1,6 @@
 import { useI18n } from "../i18n-context.js"
-import TwitchCard from "./twitchcard"
-import EmptyState from "./EmptyState"
+import TwitchCard from "./TwitchCard.jsx"
+import EmptyState from "./EmptyState.jsx"
 
 export default function StreamerList({
   query,
@@ -16,17 +16,15 @@ export default function StreamerList({
 
   return (
     <div className="main-scroll">
-      {/* ── En vivo ── */}
       <div className="main-section-row">
         <span className="main-section-title">{t("main.live")}</span>
-        <span className="main-badge" title={t("main.liveCount")}>{liveCount}</span>
+        <span className="main-badge" title={t("main.liveCount")}>
+          {liveCount}
+        </span>
       </div>
 
       {filteredLive.length === 0 ? (
-        <EmptyState
-          icon="🎮"
-          message={query ? t("main.noResults", query) : t("main.noLive")}
-        />
+        <EmptyState icon="🎮" message={query ? t("main.noResults", query) : t("main.noLive")} />
       ) : (
         <div className="main-grid">
           {filteredLive.map((ch) => (
@@ -41,8 +39,6 @@ export default function StreamerList({
           ))}
         </div>
       )}
-
-      {/* ── Offline ── */}
       {showOffline && filteredOffline.length > 0 && (
         <>
           <div className="main-section-row main-section-row--offline">

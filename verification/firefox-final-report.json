@@ -1,0 +1,191 @@
+{
+  "results": [
+    {
+      "name": "Session restore exposes only authenticated boolean",
+      "result": {
+        "authenticated": true
+      }
+    },
+    {
+      "name": "Native Tab traversal and Enter/Space activation with visible card focus",
+      "result": {
+        "tabOrder": [
+          "Alpha link",
+          "Alpha bell",
+          "Beta link"
+        ],
+        "spaceAndEnterToggleBell": true,
+        "enterOpensChannel": true,
+        "visibleFocus": true,
+        "trustedEvents": true
+      }
+    },
+    {
+      "name": "Native coordinate clicks reach avatar/name/info channel link and independent bell",
+      "result": {
+        "probes": [
+          {
+            "area": ".tc-avatar",
+            "hit": "tc-channel-link"
+          },
+          {
+            "area": ".tc-name",
+            "hit": "tc-channel-link"
+          },
+          {
+            "area": ".tc-game",
+            "hit": "tc-channel-link"
+          },
+          {
+            "area": ".tc-viewers",
+            "hit": "tc-channel-link"
+          }
+        ],
+        "bellIndependent": true,
+        "trustedEvents": true
+      }
+    },
+    {
+      "name": "Preferences and sign-out are usable while profile response is held",
+      "result": {
+        "profileHeld": true,
+        "controlsEnabled": true,
+        "intervalChangedBeforeProfile": 10,
+        "sortingChangedBeforeProfile": true
+      }
+    },
+    {
+      "name": "Preferences remain usable while account avatar is held",
+      "result": {
+        "avatarHeld": true,
+        "controlsEnabled": true,
+        "intervalChangedBeforeAvatar": 5
+      }
+    },
+    {
+      "name": "Notification additions/removals synchronize across two live extension panels",
+      "result": {
+        "added": [
+          "Beta",
+          "Alpha"
+        ],
+        "remaining": [
+          "Alpha"
+        ],
+        "mainBellUpdatesOnOtherPanelRemove": true,
+        "unfollowedPreferenceRemovable": true
+      }
+    },
+    {
+      "name": "320px layout and focused card screenshot",
+      "result": [
+        {
+          "panel": "main",
+          "width": 320,
+          "scrollWidth": 320
+        },
+        {
+          "panel": "settings",
+          "width": 320,
+          "scrollWidth": 320
+        }
+      ]
+    },
+    {
+      "name": "Remember session moves refresh credentials local to session and back",
+      "result": {
+        "default": true,
+        "disabled": {
+          "localRefresh": false,
+          "sessionRefresh": true
+        },
+        "enabled": {
+          "localRefresh": true,
+          "sessionRefresh": false
+        }
+      }
+    },
+    {
+      "name": "Remembered session restores after session storage reset; disabled session requires sign-in",
+      "result": {
+        "remembered": {
+          "authenticated": true
+        },
+        "forgotten": {
+          "authenticated": false
+        },
+        "refreshRequest": true,
+        "browserCloseSimulatedBySessionStorageClear": true
+      }
+    },
+    {
+      "name": "OAuth completion contract remains boolean without credentials",
+      "result": {
+        "response": {
+          "authenticated": true
+        },
+        "refreshStoredOnlyInSession": true,
+        "identityRedirectAndTokenExchangeMocked": true
+      }
+    },
+    {
+      "name": "Logout clears local and session credentials",
+      "result": {
+        "localRefresh": false,
+        "sessionCredentials": false
+      }
+    }
+  ],
+  "failures": [],
+  "browser": {
+    "acceptInsecureCerts": false,
+    "browserName": "firefox",
+    "browserVersion": "157.0.1",
+    "platformName": "windows",
+    "setWindowRect": true,
+    "unhandledPromptBehavior": "dismiss and notify",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:157.0) Gecko/20100101 Firefox/157.0",
+    "moz:buildID": "20261005135250",
+    "moz:headless": true,
+    "moz:platformVersion": "10.0",
+    "moz:processID": 35872,
+    "moz:profile": "C:\\Users\\huiri\\AppData\\Local\\Temp\\firefox-profileDKshfb",
+    "moz:shutdownTimeout": 60000,
+    "pageLoadStrategy": "normal",
+    "timeouts": {
+      "implicit": 0,
+      "pageLoad": 300000,
+      "script": 30000
+    },
+    "strictFileInteractability": false,
+    "moz:accessibilityChecks": false,
+    "moz:webdriverClick": true,
+    "moz:windowless": false,
+    "proxy": {}
+  },
+  "source": "D:\\Projects\\Twitch sidebar extension\\twitch-sidebar\\dist-firefox",
+  "harnessPath": "/C:/Users/huiri/AppData/Local/Temp/codex-twitch-firefox-final/run-final.mjs",
+  "backgroundSha256": "04f72e6b0c91d9287518ed83f64c3d46a1e3f5a4fa4796a5a7ff7ed8b270f7db",
+  "assets": [
+    "index-BLXxhhEP.js",
+    "index-CKWQX-yM.css"
+  ],
+  "screenshots": [
+    "C:\\Users\\huiri\\AppData\\Local\\Temp\\codex-twitch-firefox-final-1791423315423\\firefox-profile-loading.png",
+    "C:\\Users\\huiri\\AppData\\Local\\Temp\\codex-twitch-firefox-final-1791423315423\\firefox-accessibility-notifications.png",
+    "C:\\Users\\huiri\\AppData\\Local\\Temp\\codex-twitch-firefox-final-1791423315423\\firefox-remember-session.png"
+  ],
+  "fixtures": {
+    "twitchApi": true,
+    "worker": true,
+    "identity": true,
+    "externalTabOpeningCaptured": true,
+    "profileAndAvatarHeld": true
+  },
+  "nativeInput": "Firefox Marionette WebDriver:PerformActions",
+  "limitations": [
+    "Real Twitch authorization and backend not contacted; fixtures return fake tokens",
+    "Browser restart represented by storage.session.clear, not full process restart",
+    "Firefox 115 minimum reviewed statically; runtime tested Firefox157.0.1"
+  ]
+}

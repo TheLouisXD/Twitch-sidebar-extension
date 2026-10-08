@@ -3,13 +3,23 @@ import assert from "node:assert/strict"
 
 const originalFetch = globalThis.fetch
 let profilesCache
-globalThis.browser = { runtime: { id: "test" }, storage: { local: {
-  async get() { return { twitch_profiles_cache: profilesCache } },
-} } }
+globalThis.browser = {
+  runtime: { id: "test" },
+  storage: {
+    local: {
+      async get() {
+        return { twitch_profiles_cache: profilesCache }
+      }
+    }
+  }
+}
 const { fetchBatch, fetchAllFollowed, fetchTwitch } = await import("../src/twitch.js")
 const { AuthError } = await import("../src/auth.js")
 const json = (body, status = 200) => new Response(JSON.stringify(body), { status })
-afterEach(() => { globalThis.fetch = originalFetch; profilesCache = undefined })
+afterEach(() => {
+  globalThis.fetch = originalFetch
+  profilesCache = undefined
+})
 
 test("stream batches request 100, follow pagination and split IDs", async () => {
   const ids = Array.from({ length: 125 }, (_, i) => String(i + 1))
@@ -20,9 +30,15 @@ test("stream batches request 100, follow pagination and split IDs", async () => 
     assert.equal(params.get("first"), "100")
     const pageIds = params.getAll("user_id")
     if (pageIds.length === 100 && !params.has("after")) {
-      return json({ data: pageIds.slice(0, 60).map((user_id) => ({ user_id })), pagination: { cursor: "second" } })
+      return json({
+        data: pageIds.slice(0, 60).map((user_id) => ({ user_id })),
+        pagination: { cursor: "second" }
+      })
     }
-    return json({ data: (pageIds.length === 100 ? pageIds.slice(60) : pageIds).map((user_id) => ({ user_id })), pagination: {} })
+    return json({
+      data: (pageIds.length === 100 ? pageIds.slice(60) : pageIds).map((user_id) => ({ user_id })),
+      pagination: {}
+    })
   }
   const streams = await fetchBatch("token", "streams", "user_id", ids)
   assert.equal(streams.length, 125)
@@ -54,7 +70,7 @@ test("no follows produces a fresh empty channel snapshot without unfiltered stre
 })
 
 test("follow pagination is complete and an expired profile cache is refreshed", async () => {
-  profilesCache = { map: { "1": "old-image" }, ts: Date.now() - 25 * 60 * 60 * 1000 }
+  profilesCache = { map: { 1: "old-image" }, ts: Date.now() - 25 * 60 * 60 * 1000 }
   let profileRequests = 0
   globalThis.fetch = async (url) => {
     const { pathname, searchParams } = new URL(url)
@@ -67,8 +83,16 @@ test("follow pagination is complete and an expired profile cache is refreshed", 
     if (pathname.endsWith("/channels/followed")) {
       const secondPage = searchParams.has("after")
       const id = secondPage ? "2" : "1"
-      return json({ data: [{ broadcaster_id: id, broadcaster_login: `channel${id}`, broadcaster_name: `Channel ${id}` }],
-        pagination: secondPage ? {} : { cursor: "second" } })
+      return json({
+        data: [
+          {
+            broadcaster_id: id,
+            broadcaster_login: `channel${id}`,
+            broadcaster_name: `Channel ${id}`
+          }
+        ],
+        pagination: secondPage ? {} : { cursor: "second" }
+      })
     }
     return json({ data: [{ user_id: "1", viewer_count: 100 }], pagination: {} })
   }

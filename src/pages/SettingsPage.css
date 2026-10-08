@@ -3,9 +3,14 @@
 .settings-root {
   width: 100%;
   min-height: 100vh;
-  background: var(--tw-bg);
+  background: linear-gradient(
+    to bottom,
+    var(--profile-tint, var(--tw-bg)) 0%,
+    var(--profile-dark, var(--tw-bg)) 50%,
+    var(--tw-bg) 100%
+  );
   color: var(--tw-text-primary);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--tw-font-family);
   display: flex;
   flex-direction: column;
 }
@@ -31,7 +36,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  transition: color 0.15s, background 0.15s;
+  transition:
+    color 0.15s,
+    background 0.15s;
 }
 
 .settings-back-btn:hover {
@@ -60,7 +67,7 @@
   height: 200px;
   border-radius: 5%;
   overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 10px var(--tw-shadow);
 }
 
 .settings-avatar {
@@ -74,13 +81,18 @@
   height: 100%;
   background: var(--tw-surface-hover);
   border-radius: 50%;
-  border: 3px solid #3a3a3d;
+  border: 3px solid var(--tw-border);
   animation: pulse 1.5s ease-in-out infinite;
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .settings-username {
@@ -131,13 +143,18 @@
 
 /* Clickable nav items (e.g. Live Notifications) */
 .settings-info-item--clickable {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  text-align: start;
   cursor: pointer;
   transition: background 0.15s;
   user-select: none;
 }
 
 .settings-info-item--clickable:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--tw-overlay-hover);
 }
 
 .settings-info-label {
@@ -181,11 +198,11 @@
 .settings-lang-select {
   background: var(--tw-surface-hover);
   color: var(--tw-text-primary);
-  border: 1px solid #3a3a3d;
+  border: 1px solid var(--tw-border);
   border-radius: 6px;
   padding: 6px 10px;
   font-size: 13px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--tw-font-family);
   cursor: pointer;
   outline: none;
   transition: border-color 0.15s;
@@ -201,7 +218,7 @@
   position: relative;
   width: 42px;
   height: 24px;
-  background: #3a3a3d;
+  background: var(--tw-border);
   border: none;
   border-radius: 12px;
   cursor: pointer;
@@ -239,19 +256,21 @@
 .settings-logout-btn {
   width: 100%;
   padding: 12px;
-  background-color: #e91916;
-  color: white;
+  background-color: var(--tw-danger);
+  color: var(--tw-on-accent);
   font-size: 14px;
   font-weight: 600;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
   border: none;
 }
 
 .settings-logout-btn:hover {
-  background-color: #ff6b6b;
-  color: white;
+  background-color: var(--tw-danger-hover);
+  color: var(--tw-on-accent);
 }
 
 /* ── Loading state ── */
@@ -273,5 +292,7 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }

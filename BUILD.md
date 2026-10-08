@@ -2,12 +2,13 @@
 
 ## Requirements
 
-- Node.js 20.19+ on the 20.x branch, or Node.js 22.12+.
+- Node.js 22.22.2+ on the 22.x branch, 24.15+ on the 24.x branch, or 26+. JSDOM's UI tests require these versions.
 - npm and the committed `package-lock.json`.
 
 ```sh
 npm ci
 npm run lint
+npm run format:check
 npm test
 npm run build:firefox
 ```
@@ -22,7 +23,9 @@ Vite bundles the React panel using the corresponding JavaScript target (`firefox
 
 ## Validation
 
-The 47-test regression suite includes both Firefox Promise APIs and Chrome callbacks, OAuth state/redirect rejection, concurrent refreshes and notification preference changes, restart restoration, logout while refreshing, transient HTTP errors, complete stream/follow pagination and expired profile caches. It also checks refreshing a fresh cached list on opening, scheduled updates without a panel, badge restoration, configurable alarm replacement and restart persistence, interval validation, and stable live-favorite sorting based on bell preferences. HTTP responses and browser APIs are simulated in automated tests; these do not replace a successful OAuth login against Twitch.
+The 72-test regression suite includes both Firefox Promise APIs and Chrome callbacks, OAuth state/redirect rejection, concurrent refreshes and notification preference changes, restart restoration, logout while refreshing, transient HTTP errors, complete stream/follow pagination and expired profile caches. It also checks refreshing a fresh cached list on opening, scheduled updates without a panel, badge restoration, configurable alarm replacement and restart persistence, interval validation, and stable live-favorite sorting based on bell preferences. New session regressions cover rejected stale refreshes during login, atomic credential reads/migrations, session-only persistence, migration write failures and logout during migration. Nine tests mount the actual React components in JSDOM to check recovery, delayed profile/image work, synchronized preferences/notifications, unfollowed channels and keyboard activation. HTTP responses and browser APIs are simulated in these tests; they do not replace a successful OAuth login against Twitch.
+
+The final correction pass also passed 11 checks in installed Firefox 157.0.1 with an isolated profile and native Marionette keyboard/pointer actions. It checked independent channel/bell activation, visible focus, settings during delayed profile/avatar loading, notification changes between two panels, remembered-session migration and 320-pixel layouts. [verification/firefox-final-report.json](verification/firefox-final-report.json) records the final panel asset names and background SHA256, with screenshots. Twitch, Worker and identity responses were fixtures; restart was simulated by clearing `storage.session`. The earlier phase reports below remain historical records.
 
 Firefox 115 is the declared minimum because [storage.session became available in Firefox 115](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/session). Chrome 116 is the minimum for [sidePanel.open](https://developer.chrome.com/docs/extensions/reference/api/sidePanel#method-open). Firefox uses `sidebar_action` and `background.scripts`; Chrome uses `side_panel` and `background.service_worker`. Native function arity is never used to choose callback or Promise behavior.
 
@@ -36,7 +39,7 @@ The configurable refresh and live-favorite changes passed ten focused checks in 
 
 `web-ext lint` reports no errors. Four warnings remain: two React runtime `innerHTML` checks and two version notices for the data-consent manifest key (native support starts in Firefox 140 desktop / 142 Android). That metadata does not lower the runtime minimum of the APIs used by the desktop extension; older versions ignore it.
 
-An authenticated OAuth success, the Twitch application's registered redirect list, delivery of native OS notifications, a physical toolbar click, and Firefox 115 itself require additional manual verification. The automated suite checks the corresponding logic. Chrome was verified by build and simulated API tests, not by a live Chrome session.
+An authenticated OAuth success, delivery of native OS notifications, a physical toolbar click, and Firefox 115 itself require additional manual verification. The four registered callbacks supplied by the owner are configured and covered by Worker tests; the Twitch application settings were not accessed independently. The automated suite checks the corresponding logic. Chrome was verified by build and simulated API tests, not by a live Chrome session.
 
 The Firefox redirect observed for the fixed Gecko ID is documented in README.md. [Twitch requires the registered redirect and recommends validating state](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#authorization-code-grant-flow). The full authentication flow runs in the background so the sidebar can close without interrupting token persistence.
 
@@ -48,6 +51,6 @@ The login panel explains transmission before sign-in. Firefox versions predating
 
 ## Worker validation
 
-From `../twitch-auth-worker/`, run `npm ci`, `npm test` and `npx wrangler deploy --dry-run`. The Worker tests cover malformed JSON and field types, Firefox redirect/code exchange, refresh-token encoding, unavailable upstream responses, and CORS-enabled errors. The dry run bundles locally without deployment. Updating this service in production is a separate step; the extension retains the legacy request field needed by the currently deployed service.
+From `../twitch-auth-worker/`, run `npm ci`, `npm run format:check`, `npm test` and `npx wrangler deploy --dry-run`. The 15 Worker tests cover malformed JSON and field types, the four permitted callbacks and rejected variants, bounded streaming bodies, shared rate limits and failures, Firefox redirect/code exchange, refresh-token encoding, unavailable upstream responses, and CORS-enabled errors. The dry run bundles locally and recognizes `AUTH_RATE_LIMITER` without deployment. Updating this service in production is a separate step; the extension retains the legacy request field needed by the currently deployed service.
 
-Use Node.js 22.12+ for the installed Wrangler toolchain. The extension-only build also supports the Node.js 20 versions listed above.
+Use the Node.js versions listed above to run both projects and the UI test suite.

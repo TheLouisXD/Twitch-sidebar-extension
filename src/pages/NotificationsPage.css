@@ -1,7 +1,9 @@
 /* ── NotificationsPage.css ─────────────────────────────────── */
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .notif-root {
@@ -9,7 +11,7 @@
   min-height: 100vh;
   background: var(--tw-bg);
   color: var(--tw-text-primary);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--tw-font-family);
   display: flex;
   flex-direction: column;
 }
@@ -35,7 +37,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  transition: color 0.15s, background 0.15s;
+  transition:
+    color 0.15s,
+    background 0.15s;
   flex-shrink: 0;
 }
 
@@ -127,7 +131,7 @@
 }
 
 .notif-item:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--tw-overlay-subtle);
 }
 
 /* ── Avatar ── */
@@ -151,13 +155,13 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--tw-accent), #6441a5);
+  background: var(--tw-accent-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
   font-weight: 700;
-  color: #fff;
+  color: var(--tw-on-accent);
 }
 
 /* Live dot badge */
@@ -200,12 +204,12 @@
 
 /* ── Remove button ── */
 .notif-remove-btn {
-  background: rgba(245, 197, 24, 0.08);
-  border: 1px solid rgba(245, 197, 24, 0.2);
+  background: var(--tw-warning-bg);
+  border: 1px solid var(--tw-warning-border);
   color: var(--tw-warning);
   font-size: 11px;
   font-weight: 600;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--tw-font-family);
   cursor: pointer;
   padding: 5px 10px;
   border-radius: 6px;
@@ -213,13 +217,16 @@
   align-items: center;
   gap: 5px;
   flex-shrink: 0;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
   line-height: 1;
 }
 
 .notif-remove-btn:hover {
-  background: rgba(245, 197, 24, 0.18);
-  border-color: rgba(245, 197, 24, 0.5);
+  background: var(--tw-warning-hover-bg);
+  border-color: var(--tw-warning-hover-border);
 }
 
 .notif-remove-btn svg {

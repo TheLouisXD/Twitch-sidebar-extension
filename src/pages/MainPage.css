@@ -1,7 +1,9 @@
 /* ── MainPage.css ─────────────────────────────────── */
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .main-root {
@@ -9,7 +11,7 @@
   min-height: 100vh;
   background: var(--tw-bg);
   color: var(--tw-text-primary);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--tw-font-family);
   display: flex;
   flex-direction: column;
 }
@@ -44,7 +46,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  transition: color 0.15s, background 0.15s;
+  transition:
+    color 0.15s,
+    background 0.15s;
 }
 
 .main-settings-btn:hover {
@@ -54,8 +58,12 @@
 
 /* ── Refresh bar (stale-while-revalidate indicator) ── */
 @keyframes refresh-slide {
-  0%   { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .main-refresh-bar {
@@ -69,9 +77,9 @@
 /* ── Error banner ── */
 .main-error-banner {
   margin: 10px 12px 0;
-  background: rgba(235, 4, 0, 0.1);
-  border: 1px solid rgba(235, 4, 0, 0.3);
-  color: #f87171;
+  background: var(--tw-error-bg);
+  border: 1px solid var(--tw-error-border);
+  color: var(--tw-error-text);
   border-radius: 6px;
   padding: 7px 10px;
   font-size: 12px;
@@ -119,7 +127,7 @@
 
 .main-badge {
   background: var(--tw-accent);
-  color: #fff;
+  color: var(--tw-on-accent);
   font-size: 10px;
   font-weight: 700;
   border-radius: 20px;
@@ -127,7 +135,7 @@
   line-height: 16px;
 }
 .main-badge--offline {
-  background: #3a3a3d;
+  background: var(--tw-border);
   color: var(--tw-text-secondary);
 }
 
@@ -152,7 +160,6 @@
   color: var(--tw-text-muted);
 }
 
-
 /* ── Channel grid ── */
 .main-grid {
   display: grid;
@@ -161,7 +168,6 @@
   padding: 4px 10px 12px;
   align-content: start;
 }
-
 
 /* ── Empty state ── */
 .main-empty {

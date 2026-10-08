@@ -5,7 +5,7 @@ import { getCachedProfiles } from "./cache.js"
 export async function fetchTwitch(token, path, params = new URLSearchParams()) {
   const response = await fetch(`${API_URL}/${path}?${params}`, {
     headers: { "Client-ID": CLIENT_ID, Authorization: `Bearer ${token}` },
-    signal: AbortSignal.timeout(30000),
+    signal: AbortSignal.timeout(30000)
   })
   if (response.status === 401) throw new AuthError("Token expired")
   if (!response.ok) throw new Error(`Twitch API error: ${response.status}`)
@@ -77,15 +77,17 @@ export async function fetchAllFollowed(token) {
       viewer_count: null,
       ...stream,
       profile_image_url: profileMap[follow.broadcaster_id] ?? null,
-      isLive: Boolean(stream),
+      isLive: Boolean(stream)
     }
   })
   return {
     data: {
-      live: channels.filter((channel) => channel.isLive).sort((a, b) => b.viewer_count - a.viewer_count),
-      offline: channels.filter((channel) => !channel.isLive),
+      live: channels
+        .filter((channel) => channel.isLive)
+        .sort((a, b) => b.viewer_count - a.viewer_count),
+      offline: channels.filter((channel) => !channel.isLive)
     },
     profileMap,
-    profilesChanged: !fresh || missing.length > 0,
+    profilesChanged: !fresh || missing.length > 0
   }
 }

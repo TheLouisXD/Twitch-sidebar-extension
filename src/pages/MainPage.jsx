@@ -1,11 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { useI18n } from "../i18n-context.js"
-import Header from "../components/Header"
-import StreamerList from "../components/StreamerList"
-import { SearchBar } from "../components/search"
+import Header from "../components/Header.jsx"
+import StreamerList from "../components/StreamerList.jsx"
+import { SearchBar } from "../components/SearchBar.jsx"
 import { search } from "../search.js"
-import { CHANNELS_KEY, NOTIFICATIONS_KEY, getCachedChannels,
-  getNotificationStreamers, toggleNotificationStreamer } from "../cache.js"
+import {
+  CHANNELS_KEY,
+  NOTIFICATIONS_KEY,
+  getCachedChannels,
+  getNotificationStreamers,
+  toggleNotificationStreamer
+} from "../cache.js"
 import { extension, sendMessage, openChannel } from "../platform.js"
 import { getPreferences, FAVORITES_FIRST_KEY, orderLiveChannels } from "../preferences.js"
 import "./MainPage.css"
@@ -32,6 +37,7 @@ export default function MainPage({ onSettings, showOffline }) {
       updatedAtRef.current = updatedAt
       setChannels(data)
       setLoading(false)
+      setError(null)
     }
     const onStorageChanged = (changes, area) => {
       if (area !== "local") return
@@ -49,7 +55,11 @@ export default function MainPage({ onSettings, showOffline }) {
     extension.storage.onChanged.addListener(onStorageChanged)
     async function load() {
       try {
-        const [cached, ids, preferences] = await Promise.all([getCachedChannels(), getNotificationStreamers(), getPreferences()])
+        const [cached, ids, preferences] = await Promise.all([
+          getCachedChannels(),
+          getNotificationStreamers(),
+          getPreferences()
+        ])
         if (!active) return
         if (!notificationsChanged) setNotifiedIds(ids)
         if (!preferencesChanged) setFavoritesFirst(preferences.favoritesFirst)
@@ -96,17 +106,26 @@ export default function MainPage({ onSettings, showOffline }) {
       {refreshing && <div className="main-refresh-bar" />}
       {error && (
         <div className="main-error-banner" role="alert">
-          ⚠ {t("main.loadError")} <button onClick={() => setAttempt((value) => value + 1)}>{t("common.retry")}</button>
+          ⚠ {t("main.loadError")}{" "}
+          <button onClick={() => setAttempt((value) => value + 1)}>{t("common.retry")}</button>
         </div>
       )}
       {loading ? (
-        <div className="main-center"><div className="main-spinner" />
-          <span className="main-loading-text">{t("main.loading")}</span></div>
+        <div className="main-center">
+          <div className="main-spinner" />
+          <span className="main-loading-text">{t("main.loading")}</span>
+        </div>
       ) : (
-        <StreamerList query={query} filteredLive={filteredLive} filteredOffline={filteredOffline}
+        <StreamerList
+          query={query}
+          filteredLive={filteredLive}
+          filteredOffline={filteredOffline}
           liveCount={channels.live.length}
-          showOffline={showOffline} notifiedIds={notifiedIds}
-          handleToggleNotify={handleToggleNotify} handleCardClick={handleCardClick} />
+          showOffline={showOffline}
+          notifiedIds={notifiedIds}
+          handleToggleNotify={handleToggleNotify}
+          handleCardClick={handleCardClick}
+        />
       )}
     </div>
   )

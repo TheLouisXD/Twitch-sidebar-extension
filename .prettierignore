@@ -1,0 +1,7 @@
+node_modules/
+dist*/
+verification/
+audit_report.html
+eslint-report.json
+file_stats.json
+*.zip
