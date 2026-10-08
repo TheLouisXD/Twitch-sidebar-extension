@@ -112,6 +112,7 @@ const deferred = () => {
 beforeEach(() => {
   local = {
     language: "en",
+    theme: "default",
     rememberSession: true,
     pollIntervalMinutes: 3,
     favoritesFirst: false,
@@ -320,6 +321,7 @@ test("preferences and language react to changes from another panel", async () =>
 test("changing theme updates storage", async () => {
   mount(SettingsPage, { showOffline: false })
   const themeSelect = await screen.findByRole("combobox", { name: /Theme/ })
+  await waitFor(() => assert.equal(themeSelect.disabled, false))
   await userEvent.selectOptions(themeSelect, "gx")
   assert.equal(local.theme, "gx")
 })

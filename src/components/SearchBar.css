@@ -10,7 +10,7 @@
   flex: 1;
   background: var(--tw-surface);
   border: 1px solid var(--tw-surface-hover-light);
-  border-radius: 100px;
+  border-radius: 3px;
   color: var(--tw-text-primary);
   font-size: 13px;
   padding: 10px 10px;
