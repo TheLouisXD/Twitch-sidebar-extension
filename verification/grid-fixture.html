@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twitch Sidebar Responsive Grid Fixture</title>
+  <link rel="stylesheet" href="../src/index.css">
+  <link rel="stylesheet" href="../src/pages/MainPage.css">
+  <link rel="stylesheet" href="../src/components/SearchBar.css">
+  <link rel="stylesheet" href="../src/components/TwitchCard.css">
+  <style>
+    /* Ensure clean rendering in headless browser test */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+      background: var(--tw-bg);
+      font-family: var(--tw-font-family);
+    }
+  </style>
+</head>
+<body>
+  <div class="main-root">
+    <!-- Header -->
+    <header class="main-header">
+      <div class="main-logo">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--tw-accent-light)">
+          <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
+        </svg>
+        <span>Twitch Sidebar</span>
+      </div>
+      <button id="settings-btn" class="main-settings-btn" aria-label="Ajustes">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.04 7.04 0 0 0-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84a.48.48 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87a.48.48 0 0 0 .12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Search bar -->
+    <div class="search-bar">
+      <input class="search-bar-input" type="text" placeholder="Buscar canal..." aria-label="Buscar canal...">
+    </div>
+
+    <!-- Scrollable content area -->
+    <div class="main-scroll">
+      <!-- Live Section -->
+      <div class="main-section-row">
+        <span class="main-section-title">En vivo ahora</span>
+        <span class="main-badge">8</span>
+      </div>
+
+      <div class="main-grid" id="live-grid">
+        <!-- Card 1: Ibai (Notified, Live, Avatar, High Viewers) -->
+        <div class="tc-card" title="Ibai — Charlando">
+          <a class="tc-channel-link" href="https://www.twitch.tv/ibai" target="_blank" rel="noopener noreferrer" aria-label="Abrir canal de Ibai"></a>
+          <div class="tc-avatar-wrap">
+            <img class="tc-avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><defs><linearGradient id='g1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%239146FF'/><stop offset='100%25' stop-color='%23F15F79'/></linearGradient></defs><rect width='120' height='120' fill='url(%23g1)'/><circle cx='60' cy='48' r='24' fill='%23ffffff' opacity='0.9'/><path d='M25 105 C25 80, 95 80, 95 105 Z' fill='%23ffffff' opacity='0.9'/></svg>" alt="Ibai">
+          </div>
+          <div class="tc-info tc-info--ambient">
+            <div class="tc-ambient" aria-hidden="true">
+              <img class="tc-ambient-image" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><defs><linearGradient id='g1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%239146FF'/><stop offset='100%25' stop-color='%23F15F79'/></linearGradient></defs><rect width='120' height='120' fill='url(%23g1)'/><circle cx='60' cy='48' r='24' fill='%23ffffff' opacity='0.9'/><path d='M25 105 C25 80, 95 80, 95 105 Z' fill='%23ffffff' opacity='0.9'/></svg>" alt="">
+            </div>
+            <div class="tc-name-row">
+              <span class="tc-name">Ibai</span>
+              <button class="tc-bell-btn tc-bell-btn--active" aria-label="Desactivar notificaciones: Ibai" aria-pressed="true" title="Desactivar notificaciones">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--tw-warning)" stroke="var(--tw-warning)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="tc-game">Charlando</div>
+            <div class="tc-viewers">👁 54.2K</div>
+          </div>
+        </div>
+
+        <!-- Card 2: AuronPlay (Not Notified, Live, Avatar) -->
+        <div class="tc-card" title="AuronPlay — Grand Theft Auto V">
+          <a class="tc-channel-link" href="https://www.twitch.tv/auronplay" target="_blank" rel="noopener noreferrer" aria-label="Abrir canal de AuronPlay"></a>
+          <div class="tc-avatar-wrap">
+            <img class="tc-avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><defs><linearGradient id='g2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%2300b4db'/><stop offset='100%25' stop-color='%230083b0'/></linearGradient></defs><rect width='120' height='120' fill='url(%23g2)'/><circle cx='60' cy='48' r='24' fill='%23ffffff' opacity='0.9'/><path d='M25 105 C25 80, 95 80, 95 105 Z' fill='%23ffffff' opacity='0.9'/></svg>" alt="AuronPlay">
+          </div>
+          <div class="tc-info tc-info--ambient">
+            <div class="tc-ambient" aria-hidden="true">
+              <img class="tc-ambient-image" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><defs><linearGradient id='g2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%2300b4db'/><stop offset='100%25' stop-color='%230083b0'/></linearGradient></defs><rect width='120' height='120' fill='url(%23g2)'/><circle cx='60' cy='48' r='24' fill='%23ffffff' opacity='0.9'/><path d='M25 105 C25 80, 95 80, 95 105 Z' fill='%23ffffff' opacity='0.9'/></svg>" alt="">
+            </div>
+            <div class="tc-name-row">
+              <span class="tc-name">AuronPlay</span>
+              <button class="tc-bell-btn" aria-label="Activar notificaciones: AuronPlay" aria-pressed="false" title="Activar notificaciones">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--tw-text-secondary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="tc-game">Grand Theft Auto V</div>
+            <div class="tc-viewers">👁 38.9K</div>
+          </div>
+        </div>
+
+        <!-- Card 3: Rubius (Notified, Live, Avatar) -->
+        <div class="tc-card" title="Rubius — Minecraft">
+          <a class="tc-channel-link" href="https://www.twitch.tv/rubius" target="_blank" rel="noopener noreferrer" aria-label="Abrir canal de Rubius"></a>
+          <div class="tc-avatar-wrap">
+            <img class="tc-avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><defs><linearGradient id='g3' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23f857a6'/><stop offset='100%25' stop-color='%23ff5858'/></linearGradient></defs><rect width='120' height='120' fill='url(%23g3)'/><circle cx='60' cy='48' r='24' fill='%23ffffff' opacity='0.9'/><path d='M25 105 C25 80, 95 80, 95 105 Z' fill='%23ffffff' opacity='0.9'/></svg>" alt="Rubius">
+          </div>
+          <div class="tc-info tc-info--ambient">
+            <div class="tc-ambient" aria-hidden="true">
+              <img class="tc-ambient-image" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><defs><linearGradient id='g3' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23f857a6'/><stop offset='100%25' stop-color='%23ff5858'/></linearGradient></defs><rect width='120' height='120' fill='url(%23g3)'/><circle cx='60' cy='48' r='24' fill='%23ffffff' opacity='0.9'/><path d='M25 105 C25 80, 95 80, 95 105 Z' fill='%23ffffff' opacity='0.9'/></svg>" alt="">
+            </div>
+            <div class="tc-name-row">
+              <span class="tc-name">Rubius</span>
+              <button class="tc-bell-btn tc-bell-btn--active" aria-label="Desactivar notificaciones: Rubius" aria-pressed="true" title="Desactivar notificaciones">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--tw-warning)" stroke="var(--tw-warning)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="tc-game">Minecraft</div>
+            <div class="tc-viewers">👁 24.1K</div>
+          </div>
+        </div>
+
+        <!-- Card 4: elxokas (Not Notified, Live, Avatar) -->
+        <div class="tc-card" title="elxokas — World of Warcraft">
+          <a class="tc-channel-link" href="https://www.twitch.tv/elxokas" target="_blank" rel="noopener noreferrer" aria-label="Abrir canal de elxokas"></a>
+          <div class="tc-avatar-wrap">
+            <img class="tc-avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><defs><linearGradient id='g4' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%2311998e'/><stop offset='100%25' stop-color='%2338ef7d'/></linearGradient></defs><rect width='120' height='120' fill='url(%23g4)'/><circle cx='60' cy='48' r='24' fill='%23ffffff' opacity='0.9'/><path d='M25 105 C25 80, 95 80, 95 105 Z' fill='%23ffffff' opacity='0.9'/></svg>" alt="elxokas">
+          </div>
+          <div class="tc-info tc-info--ambient">
+            <div class="tc-ambient" aria-hidden="true">
+              <img class="tc-ambient-image" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><defs><linearGradient id='g4' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%2311998e'/><stop offset='100%25' stop-color='%2338ef7d'/></linearGradient></defs><rect width='120' height='120' fill='url(%23g4)'/><circle cx='60' cy='48' r='24' fill='%23ffffff' opacity='0.9'/><path d='M25 105 C25 80, 95 80, 95 105 Z' fill='%23ffffff' opacity='0.9'/></svg>" alt="">
+            </div>
+            <div class="tc-name-row">
+              <span class="tc-name">elxokas</span>
+              <button class="tc-bell-btn" aria-label="Activar notificaciones: elxokas" aria-pressed="false" title="Activar notificaciones">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--tw-text-secondary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="tc-game">World of Warcraft</div>
+            <div class="tc-viewers">👁 18.9K</div>
+          </div>
+        </div>
+
+        <!-- Card 5: IlloJuan (Long game name for truncation check) -->
+        <div class="tc-card" title="IlloJuan — ELDEN RING SHADOW OF THE ERDTREE">
+          <a class="tc-channel-link" href="https://www.twitch.tv/illojuan" target="_blank" rel="noopener noreferrer" aria-label="Abrir canal de IlloJuan"></a>
+          <div class="tc-avatar-wrap">
+            <img class="tc-avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><defs><linearGradient id='g5' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23FC5C7D'/><stop offset='100%25' stop-color='%236A82FB'/></linearGradient></defs><rect width='120' height='120' fill='url(%23g5)'/><circle cx='60' cy='48' r='24' fill='%23ffffff' opacity='0.9'/><path d='M25 105 C25 80, 95 80, 95 105 Z' fill='%23ffffff' opacity='0.9'/></svg>" alt="IlloJuan">
+          </div>
+          <div class="tc-info tc-info--ambient">
+            <div class="tc-ambient" aria-hidden="true">
+              <img class="tc-ambient-image" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><defs><linearGradient id='g5' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23FC5C7D'/><stop offset='100%25' stop-color='%236A82FB'/></linearGradient></defs><rect width='120' height='120' fill='url(%23g5)'/><circle cx='60' cy='48' r='24' fill='%23ffffff' opacity='0.9'/><path d='M25 105 C25 80, 95 80, 95 105 Z' fill='%23ffffff' opacity='0.9'/></svg>" alt="">
+            </div>
+            <div class="tc-name-row">
+              <span class="tc-name">IlloJuan</span>
+              <button class="tc-bell-btn" aria-label="Activar notificaciones: IlloJuan" aria-pressed="false" title="Activar notificaciones">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--tw-text-secondary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="tc-game">ELDEN RING SHADOW OF THE ERDTREE</div>
+            <div class="tc-viewers">👁 22.4K</div>
+          </div>
+        </div>
+
+        <!-- Card 6: SuperLongStreamerName_123 (Long streamer name to verify truncation + bell position) -->
+        <div class="tc-card" title="SuperLongStreamerName_123 — Software and Game Development">
+          <a class="tc-channel-link" href="https://www.twitch.tv/superlongstreamername" target="_blank" rel="noopener noreferrer" aria-label="Abrir canal de SuperLongStreamerName_123"></a>
+          <div class="tc-avatar-wrap">
+            <img class="tc-avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><defs><linearGradient id='g6' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%234568DC'/><stop offset='100%25' stop-color='%23B06AB3'/></linearGradient></defs><rect width='120' height='120' fill='url(%23g6)'/><circle cx='60' cy='48' r='24' fill='%23ffffff' opacity='0.9'/><path d='M25 105 C25 80, 95 80, 95 105 Z' fill='%23ffffff' opacity='0.9'/></svg>" alt="SuperLongStreamerName_123">
+          </div>
+          <div class="tc-info tc-info--ambient">
+            <div class="tc-ambient" aria-hidden="true">
+              <img class="tc-ambient-image" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><defs><linearGradient id='g6' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%234568DC'/><stop offset='100%25' stop-color='%23B06AB3'/></linearGradient></defs><rect width='120' height='120' fill='url(%23g6)'/><circle cx='60' cy='48' r='24' fill='%23ffffff' opacity='0.9'/><path d='M25 105 C25 80, 95 80, 95 105 Z' fill='%23ffffff' opacity='0.9'/></svg>" alt="">
+            </div>
+            <div class="tc-name-row">
+              <span class="tc-name">SuperLongStreamerName_123</span>
+              <button class="tc-bell-btn tc-bell-btn--active" aria-label="Desactivar notificaciones: SuperLongStreamerName_123" aria-pressed="true" title="Desactivar notificaciones">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--tw-warning)" stroke="var(--tw-warning)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="tc-game">Software and Game Development</div>
+            <div class="tc-viewers">👁 2.1K</div>
+          </div>
+        </div>
+
+        <!-- Card 7: midudev (Avatar fallback letter 'M') -->
+        <div class="tc-card" title="midudev — Programación Web">
+          <a class="tc-channel-link" href="https://www.twitch.tv/midudev" target="_blank" rel="noopener noreferrer" aria-label="Abrir canal de midudev"></a>
+          <div class="tc-avatar-wrap">
+            <div class="tc-avatar-fallback">M</div>
+          </div>
+          <div class="tc-info">
+            <div class="tc-name-row">
+              <span class="tc-name">midudev</span>
+              <button class="tc-bell-btn" aria-label="Activar notificaciones: midudev" aria-pressed="false" title="Activar notificaciones">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--tw-text-secondary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="tc-game">Programación Web</div>
+            <div class="tc-viewers">👁 1.5K</div>
+          </div>
+        </div>
+
+        <!-- Card 8: BaityBait (Avatar, viewers) -->
+        <div class="tc-card" title="BaityBait — Dark Souls III">
+          <a class="tc-channel-link" href="https://www.twitch.tv/baitybait" target="_blank" rel="noopener noreferrer" aria-label="Abrir canal de BaityBait"></a>
+          <div class="tc-avatar-wrap">
+            <img class="tc-avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><defs><linearGradient id='g7' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%238A2387'/><stop offset='50%25' stop-color='%23E94057'/><stop offset='100%25' stop-color='%23F27121'/></linearGradient></defs><rect width='120' height='120' fill='url(%23g7)'/><circle cx='60' cy='48' r='24' fill='%23ffffff' opacity='0.9'/><path d='M25 105 C25 80, 95 80, 95 105 Z' fill='%23ffffff' opacity='0.9'/></svg>" alt="BaityBait">
+          </div>
+          <div class="tc-info tc-info--ambient">
+            <div class="tc-ambient" aria-hidden="true">
+              <img class="tc-ambient-image" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><defs><linearGradient id='g7' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%238A2387'/><stop offset='50%25' stop-color='%23E94057'/><stop offset='100%25' stop-color='%23F27121'/></linearGradient></defs><rect width='120' height='120' fill='url(%23g7)'/><circle cx='60' cy='48' r='24' fill='%23ffffff' opacity='0.9'/><path d='M25 105 C25 80, 95 80, 95 105 Z' fill='%23ffffff' opacity='0.9'/></svg>" alt="">
+            </div>
+            <div class="tc-name-row">
+              <span class="tc-name">BaityBait</span>
+              <button class="tc-bell-btn" aria-label="Activar notificaciones: BaityBait" aria-pressed="false" title="Activar notificaciones">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--tw-text-secondary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="tc-game">Dark Souls III</div>
+            <div class="tc-viewers">👁 8.7K</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Offline Section -->
+      <div class="main-section-row main-section-row--offline">
+        <span class="main-section-title">Canales seguidos desconectados</span>
+        <span class="main-badge main-badge--offline">4</span>
+      </div>
+
+      <div class="main-grid" id="offline-grid">
+        <!-- Card 9: TheGrefg (Offline, Avatar) -->
+        <div class="tc-card tc-card--offline" title="TheGrefg">
+          <a class="tc-channel-link" href="https://www.twitch.tv/thegrefg" target="_blank" rel="noopener noreferrer" aria-label="Abrir canal de TheGrefg"></a>
+          <div class="tc-avatar-wrap">
+            <img class="tc-avatar tc-avatar--offline" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><defs><linearGradient id='g8' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23f12711'/><stop offset='100%25' stop-color='%23f5af19'/></linearGradient></defs><rect width='120' height='120' fill='url(%23g8)'/><circle cx='60' cy='48' r='24' fill='%23ffffff' opacity='0.9'/><path d='M25 105 C25 80, 95 80, 95 105 Z' fill='%23ffffff' opacity='0.9'/></svg>" alt="TheGrefg">
+          </div>
+          <div class="tc-info">
+            <div class="tc-name-row">
+              <span class="tc-name">TheGrefg</span>
+              <button class="tc-bell-btn tc-bell-btn--active" aria-label="Desactivar notificaciones: TheGrefg" aria-pressed="true" title="Desactivar notificaciones">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--tw-warning)" stroke="var(--tw-warning)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="tc-offline-label">Desconectado</div>
+          </div>
+        </div>
+
+        <!-- Card 10: rivers_gg (Offline, Avatar) -->
+        <div class="tc-card tc-card--offline" title="rivers_gg">
+          <a class="tc-channel-link" href="https://www.twitch.tv/rivers_gg" target="_blank" rel="noopener noreferrer" aria-label="Abrir canal de rivers_gg"></a>
+          <div class="tc-avatar-wrap">
+            <img class="tc-avatar tc-avatar--offline" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><defs><linearGradient id='g9' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23b92b27'/><stop offset='100%25' stop-color='%231565C0'/></linearGradient></defs><rect width='120' height='120' fill='url(%23g9)'/><circle cx='60' cy='48' r='24' fill='%23ffffff' opacity='0.9'/><path d='M25 105 C25 80, 95 80, 95 105 Z' fill='%23ffffff' opacity='0.9'/></svg>" alt="rivers_gg">
+          </div>
+          <div class="tc-info">
+            <div class="tc-name-row">
+              <span class="tc-name">rivers_gg</span>
+              <button class="tc-bell-btn" aria-label="Activar notificaciones: rivers_gg" aria-pressed="false" title="Activar notificaciones">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--tw-text-secondary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="tc-offline-label">Desconectado</div>
+          </div>
+        </div>
+
+        <!-- Card 11: alexelcapo (Offline, Avatar) -->
+        <div class="tc-card tc-card--offline" title="alexelcapo">
+          <a class="tc-channel-link" href="https://www.twitch.tv/alexelcapo" target="_blank" rel="noopener noreferrer" aria-label="Abrir canal de alexelcapo"></a>
+          <div class="tc-avatar-wrap">
+            <img class="tc-avatar tc-avatar--offline" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><defs><linearGradient id='g10' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%232c3e50'/><stop offset='100%25' stop-color='%233498db'/></linearGradient></defs><rect width='120' height='120' fill='url(%23g10)'/><circle cx='60' cy='48' r='24' fill='%23ffffff' opacity='0.9'/><path d='M25 105 C25 80, 95 80, 95 105 Z' fill='%23ffffff' opacity='0.9'/></svg>" alt="alexelcapo">
+          </div>
+          <div class="tc-info">
+            <div class="tc-name-row">
+              <span class="tc-name">alexelcapo</span>
+              <button class="tc-bell-btn" aria-label="Activar notificaciones: alexelcapo" aria-pressed="false" title="Activar notificaciones">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--tw-text-secondary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="tc-offline-label">Desconectado</div>
+          </div>
+        </div>
+
+        <!-- Card 12: Offline User Fallback (Offline, Avatar Fallback) -->
+        <div class="tc-card tc-card--offline" title="Knekro">
+          <a class="tc-channel-link" href="https://www.twitch.tv/knekro" target="_blank" rel="noopener noreferrer" aria-label="Abrir canal de Knekro"></a>
+          <div class="tc-avatar-wrap">
+            <div class="tc-avatar-fallback tc-avatar-fallback--offline">K</div>
+          </div>
+          <div class="tc-info">
+            <div class="tc-name-row">
+              <span class="tc-name">Knekro</span>
+              <button class="tc-bell-btn" aria-label="Activar notificaciones: Knekro" aria-pressed="false" title="Activar notificaciones">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--tw-text-secondary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="tc-offline-label">Desconectado</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
