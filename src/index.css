@@ -134,20 +134,6 @@ body {
   color-scheme: dark;
 }
 
-/* Opera GX Top Accent Line */
-[data-theme="gx"] body::before {
-  content: "";
-  display: block;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(to right, #fa1e4e, #1f060b);
-  z-index: 9999;
-  pointer-events: none;
-}
-
 input,
 button,
 select,
