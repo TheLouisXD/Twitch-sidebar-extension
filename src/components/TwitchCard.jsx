@@ -1,5 +1,6 @@
 import React from "react"
 import { useI18n } from "../i18n-context.js"
+import { formatAvatarUrl } from "../twitch.js"
 import "./TwitchCard.css"
 
 /** @param {import("../types.js").TwitchCardProps} props */
@@ -12,6 +13,7 @@ const TwitchCard = React.memo(function TwitchCard({
 }) {
   const { t } = useI18n()
   const { user_name, user_login, game_name, profile_image_url, viewer_count, user_id } = channel
+  const avatarUrl = formatAvatarUrl(profile_image_url)
 
   function formatViewers(n) {
     if (!Number.isFinite(n)) return "0"
@@ -46,11 +48,13 @@ const TwitchCard = React.memo(function TwitchCard({
         }}
       />
       <div className="tc-avatar-wrap">
-        {profile_image_url ? (
+        {avatarUrl ? (
           <img
             className={`tc-avatar${isLive ? "" : " tc-avatar--offline"}`}
-            src={profile_image_url}
+            src={avatarUrl}
             alt={user_name}
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className={`tc-avatar-fallback${isLive ? "" : " tc-avatar-fallback--offline"}`}>
@@ -58,10 +62,10 @@ const TwitchCard = React.memo(function TwitchCard({
           </div>
         )}
       </div>
-      <div className={`tc-info${isLive && profile_image_url ? " tc-info--ambient" : ""}`}>
-        {isLive && profile_image_url && (
+      <div className={`tc-info${isLive && avatarUrl ? " tc-info--ambient" : ""}`}>
+        {isLive && avatarUrl && (
           <div className="tc-ambient" aria-hidden="true">
-            <img className="tc-ambient-image" src={profile_image_url} alt="" />
+            <img className="tc-ambient-image" src={avatarUrl} alt="" decoding="async" />
           </div>
         )}
         <div className="tc-name-row">

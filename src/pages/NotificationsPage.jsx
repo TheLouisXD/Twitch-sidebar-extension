@@ -9,6 +9,7 @@ import {
   removeNotificationStreamer
 } from "../cache.js"
 import { useStoredValue } from "../hooks/useStoredValue.js"
+import { formatAvatarUrl } from "../twitch.js"
 import EmptyState from "../components/EmptyState.jsx"
 import "./NotificationsPage.css"
 
@@ -93,7 +94,13 @@ export default function NotificationsPage({ onBack }) {
             <div key={ch.user_id} className="notif-item">
               <div className="notif-avatar-wrap">
                 {ch.profile_image_url ? (
-                  <img className="notif-avatar" src={ch.profile_image_url} alt={ch.user_name} />
+                  <img
+                    className="notif-avatar"
+                    src={formatAvatarUrl(ch.profile_image_url)}
+                    alt={ch.user_name}
+                    loading="lazy"
+                    decoding="async"
+                  />
                 ) : (
                   <div className="notif-avatar-fallback">
                     {ch.user_name?.[0]?.toUpperCase() ?? "?"}

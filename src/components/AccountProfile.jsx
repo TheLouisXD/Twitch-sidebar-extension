@@ -1,4 +1,5 @@
 import { useI18n } from "../i18n-context.js"
+import { formatAvatarUrl } from "../twitch.js"
 
 export default function AccountProfile({ user, loading, error }) {
   const { t, lang } = useI18n()
@@ -28,7 +29,12 @@ export default function AccountProfile({ user, loading, error }) {
       <div className="settings-profile">
         <div className="settings-avatar-wrap">
           {user?.profile_image_url ? (
-            <img className="settings-avatar" src={user.profile_image_url} alt={user.display_name} />
+            <img
+              className="settings-avatar"
+              src={formatAvatarUrl(user.profile_image_url)}
+              alt={user.display_name}
+              decoding="async"
+            />
           ) : (
             <div className="settings-avatar-placeholder" />
           )}

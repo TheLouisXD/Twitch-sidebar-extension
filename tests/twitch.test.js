@@ -13,7 +13,8 @@ globalThis.browser = {
     }
   }
 }
-const { fetchBatch, fetchAllFollowed, fetchTwitch } = await import("../src/twitch.js")
+const { fetchBatch, fetchAllFollowed, fetchTwitch, formatAvatarUrl } =
+  await import("../src/twitch.js")
 const { AuthError } = await import("../src/auth.js")
 const json = (body, status = 200) => new Response(JSON.stringify(body), { status })
 afterEach(() => {
@@ -101,4 +102,29 @@ test("follow pagination is complete and an expired profile cache is refreshed", 
   assert.equal(result.data.offline[0].user_id, "2")
   assert.equal(profileRequests, 1)
   assert.equal(result.profilesChanged, true)
+})
+
+test("formatAvatarUrl optimizes 300x300 URLs and preserves other sources", () => {
+  assert.equal(
+    formatAvatarUrl(
+      "https://static-cdn.jtvnw.net/jtv_user_pictures/abc-profile_image-300x300.png"
+    ),
+    "https://static-cdn.jtvnw.net/jtv_user_pictures/abc-profile_image-150x150.png"
+  )
+  assert.equal(
+    formatAvatarUrl(
+      "https://static-cdn.jtvnw.net/user-default-pictures-uv/xyz-profile_image-300x300.png"
+    ),
+    "https://static-cdn.jtvnw.net/user-default-pictures-uv/xyz-profile_image-150x150.png"
+  )
+  assert.equal(
+    formatAvatarUrl(
+      "https://static-cdn.jtvnw.net/jtv_user_pictures/abc-profile_image-300x300.png",
+      "70x70"
+    ),
+    "https://static-cdn.jtvnw.net/jtv_user_pictures/abc-profile_image-70x70.png"
+  )
+  assert.equal(formatAvatarUrl("https://example.com/custom.png"), "https://example.com/custom.png")
+  assert.equal(formatAvatarUrl(null), null)
+  assert.equal(formatAvatarUrl(undefined), null)
 })

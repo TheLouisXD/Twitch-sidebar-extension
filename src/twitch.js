@@ -14,6 +14,18 @@ export async function fetchTwitch(token, path, params = new URLSearchParams()) {
   return result
 }
 
+/**
+ * Reduces avatar image resolution from 300x300 to 150x150 for faster network transfer.
+ * Preserves the original URL if not matching the standard pattern.
+ * @param {string|null} url
+ * @param {string} [size="150x150"]
+ * @returns {string|null}
+ */
+export function formatAvatarUrl(url, size = "150x150") {
+  if (!url || typeof url !== "string") return url ?? null
+  return url.replace("300x300", size)
+}
+
 export async function fetchUser(token) {
   const user = (await fetchTwitch(token, "users")).data[0]
   if (!user?.id) throw new Error("Twitch user missing")
@@ -64,7 +76,7 @@ export async function fetchAllFollowed(token) {
   const profileMap = fresh ? { ...cachedProfiles } : {}
   const missing = ids.filter((id) => !Object.hasOwn(profileMap, id))
   const profiles = await fetchBatch(token, "users", "id", missing)
-  for (const profile of profiles) profileMap[profile.id] = profile.profile_image_url
+  for (const profile of profiles) profileMap[profile.id] = formatAvatarUrl(profile.profile_image_url)
   const streams = await fetchBatch(token, "streams", "user_id", ids)
   const liveMap = new Map(streams.map((stream) => [stream.user_id, stream]))
   const channels = follows.map((follow) => {
@@ -76,7 +88,7 @@ export async function fetchAllFollowed(token) {
       game_name: null,
       viewer_count: null,
       ...stream,
-      profile_image_url: profileMap[follow.broadcaster_id] ?? null,
+      profile_image_url: formatAvatarUrl(profileMap[follow.broadcaster_id]) ?? null,
       isLive: Boolean(stream)
     }
   })
