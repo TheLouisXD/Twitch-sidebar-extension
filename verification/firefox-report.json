@@ -1,0 +1,146 @@
+{
+  "results": [
+    {
+      "name": "Production platform Promise adapter latency",
+      "result": 48
+    },
+    {
+      "name": "Production platform Promise adapter",
+      "result": true
+    },
+    {
+      "name": "Firefox Promise API and native sidebar latency",
+      "result": 2
+    },
+    {
+      "name": "Firefox Promise API and native sidebar",
+      "result": "moz-extension://48fbb232-a0a2-4ccd-9a55-3f6e78618f6e/index.html"
+    },
+    {
+      "name": "Background runtime OAuth redirect response latency",
+      "result": 2
+    },
+    {
+      "name": "Background runtime OAuth redirect response",
+      "result": {
+        "redirectUrl": "https://f0a2ceefdf3784484246ec275b3ad757515d8cca.extensions.allizom.org/"
+      }
+    },
+    {
+      "name": "Storage session write/read/remove latency",
+      "result": 8
+    },
+    {
+      "name": "Storage session write/read/remove",
+      "result": true
+    },
+    {
+      "name": "Storage local write/read/remove latency",
+      "result": 23
+    },
+    {
+      "name": "Storage local write/read/remove",
+      "result": true
+    },
+    {
+      "name": "Production background badge initialization and adapter latency",
+      "result": 8
+    },
+    {
+      "name": "Production background badge initialization and adapter",
+      "result": {
+        "text": "2",
+        "color": [
+          145,
+          71,
+          255,
+          255
+        ]
+      }
+    },
+    {
+      "name": "Production background empty session and poll messages latency",
+      "result": 15
+    },
+    {
+      "name": "Production background empty session and poll messages",
+      "result": {
+        "session": {
+          "access_token": null
+        },
+        "poll": {
+          "channels": null
+        }
+      }
+    },
+    {
+      "name": "Production notification preference serial mutation latency",
+      "result": 25
+    },
+    {
+      "name": "Production notification preference serial mutation",
+      "result": true
+    },
+    {
+      "name": "Production background recurring alarm latency",
+      "result": 1
+    },
+    {
+      "name": "Production background recurring alarm",
+      "result": 3
+    },
+    {
+      "name": "Bundled React login page render inside Firefox latency",
+      "result": 1
+    },
+    {
+      "name": "Bundled React login page render inside Firefox",
+      "result": {
+        "buttons": 1,
+        "text": "Twitch Sidebar\n\nConnect your account to see the channels you follow that are live.\n\nSigning in sends your account ID to Twitch and OAuth credentials to the extension's authentication service to maintain your session.\n\nSign in\n\nOnly read access to your follows is requested."
+      }
+    },
+    {
+      "name": "Login layout at 320 by 500 pixels latency",
+      "result": 255
+    },
+    {
+      "name": "Login layout at 320 by 500 pixels",
+      "result": {
+        "width": 320,
+        "height": 500,
+        "scrollWidth": 320,
+        "scrollHeight": 568,
+        "buttonBottom": 434,
+        "selectorBottom": 544
+      }
+    },
+    {
+      "name": "React language selector and persisted preference latency",
+      "result": 5
+    },
+    {
+      "name": "React language selector and persisted preference",
+      "result": {
+        "spanishButton": "Iniciar sesión",
+        "persisted": true
+      }
+    },
+    {
+      "name": "Native OAuth cancellation through React login button latency",
+      "result": 772
+    },
+    {
+      "name": "Native OAuth cancellation through React login button",
+      "result": {
+        "popupType": "popup",
+        "error": "⚠ Could not sign in.",
+        "buttonEnabled": true,
+        "noTokens": true
+      }
+    }
+  ],
+  "failures": [],
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:157.0) Gecko/20100101 Firefox/157.0",
+  "productionManifestVersion": "1.1"
+}

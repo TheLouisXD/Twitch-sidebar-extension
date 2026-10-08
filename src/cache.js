@@ -1,66 +1,50 @@
-// ── Cache utility (chrome.storage.local) ─────────────────────
-//
-// Two separate caches:
-//   • "twitch_channels"  → { live, offline } data  (5 min TTL)
-//   • "twitch_profiles"  → { [userId]: profileUrl } (24 h TTL)
+import { localGet, localSet, localRemove, sendMessage } from "./platform.js"
+import { POLL_INTERVAL_KEY, normalizePollInterval } from "./preferences.js"
 
-const CHANNELS_KEY  = "twitch_channels_cache"
-const PROFILES_KEY  = "twitch_profiles_cache"
+export const CHANNELS_KEY = "twitch_channels_cache"
+export const PROFILES_KEY = "twitch_profiles_cache"
+export const NOTIFICATIONS_KEY = "notification_streamers"
+export const PREV_LIVE_KEY = "previously_live"
+const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
 
-const FIVE_MINUTES  = 5 * 60 * 1000
-const TWENTY_FOUR_H = 24 * 60 * 60 * 1000
-
-// ── Generic helpers ──────────────────────────────────────────
-
-function storageGet(key) {
-  return new Promise((resolve) =>
-    chrome.storage.local.get(key, (result) => resolve(result[key] ?? null))
-  )
+function isFresh(timestamp, maxAge) {
+  const age = Date.now() - timestamp
+  return Number.isFinite(timestamp) && age >= 0 && age < maxAge
 }
-
-function storageSet(key, value) {
-  return new Promise((resolve) =>
-    chrome.storage.local.set({ [key]: value }, resolve)
-  )
-}
-
-function isFresh(timestamp, maxAgeMs) {
-  return timestamp && Date.now() - timestamp < maxAgeMs
-}
-
-// ── Channel cache (5 min) ────────────────────────────────────
 
 export async function getCachedChannels() {
-  const entry = await storageGet(CHANNELS_KEY)
-  if (!entry) return null
-  return {
-    data:    entry.data,          // { live: [...], offline: [...] }
-    fresh:   isFresh(entry.ts, FIVE_MINUTES),
-    ts:      entry.ts,
-  }
+  const { [CHANNELS_KEY]: entry, [POLL_INTERVAL_KEY]: interval } = await localGet([CHANNELS_KEY, POLL_INTERVAL_KEY])
+  if (!Array.isArray(entry?.data?.live) || !Array.isArray(entry?.data?.offline)) return null
+  return { data: entry.data, ts: entry.ts, fresh: isFresh(entry.ts, normalizePollInterval(interval) * 60 * 1000) }
 }
 
-export async function setCachedChannels(data) {
-  await storageSet(CHANNELS_KEY, { data, ts: Date.now() })
+export function setCachedChannels(data) {
+  return localSet({ [CHANNELS_KEY]: { data, ts: Date.now() } })
 }
-
-// ── Profile cache (24 h) ─────────────────────────────────────
 
 export async function getCachedProfiles() {
-  const entry = await storageGet(PROFILES_KEY)
-  if (!entry) return { map: {}, fresh: false }
-  return {
-    map:   entry.map,             // { [userId]: profileImageUrl }
-    fresh: isFresh(entry.ts, TWENTY_FOUR_H),
-  }
+  const { [PROFILES_KEY]: entry } = await localGet(PROFILES_KEY)
+  return { map: entry?.map ?? {}, fresh: isFresh(entry?.ts, TWENTY_FOUR_HOURS) }
 }
 
-export async function setCachedProfiles(map) {
-  await storageSet(PROFILES_KEY, { map, ts: Date.now() })
+export function setCachedProfiles(map) {
+  return localSet({ [PROFILES_KEY]: { map, ts: Date.now() } })
 }
 
 export function clearAllCache() {
-  return new Promise((resolve) =>
-    chrome.storage.local.remove([CHANNELS_KEY, PROFILES_KEY], resolve)
-  )
+  return localRemove([CHANNELS_KEY, PROFILES_KEY, NOTIFICATIONS_KEY, PREV_LIVE_KEY])
+}
+
+export async function getNotificationStreamers() {
+  const { [NOTIFICATIONS_KEY]: ids } = await localGet(NOTIFICATIONS_KEY)
+  return new Set(Array.isArray(ids) ? ids : [])
+}
+
+// All read/modify/write operations run in the background, shared by all sidebars.
+export async function toggleNotificationStreamer(broadcasterId) {
+  return (await sendMessage({ type: "TOGGLE_NOTIFICATION", broadcasterId })).active
+}
+
+export function removeNotificationStreamer(broadcasterId) {
+  return sendMessage({ type: "REMOVE_NOTIFICATION", broadcasterId })
 }

@@ -2,166 +2,86 @@ import { useEffect, useState } from "react"
 import LoginPage from "./pages/LoginPage"
 import MainPage from "./pages/MainPage"
 import SettingsPage from "./pages/SettingsPage"
-import { refreshAccessToken } from "./auth"
-import { clearAllCache } from "./cache"
+import NotificationsPage from "./pages/NotificationsPage"
+import { extension, localGet, sendMessage } from "./platform.js"
+import { useI18n } from "./i18n-context.js"
 
 export default function App() {
-  const [token, setToken]               = useState(undefined) // undefined = still loading
-  const [refreshToken, setRefreshToken] = useState(null)
-  const [page, setPage]                 = useState("main")     // "main" | "settings"
-  const [showOffline, setShowOffline]   = useState(false)       // show offline channels
+  const { t } = useI18n()
+  const [token, setToken] = useState(undefined)
+  const [page, setPage] = useState("main")
+  const [showOffline, setShowOffline] = useState(false)
+  const [error, setError] = useState(null)
 
-  /** Validate a token with Twitch's OAuth endpoint (lightweight, no API quota) */
-  async function validateToken(accessToken) {
-    try {
-      const res = await fetch("https://id.twitch.tv/oauth2/validate", {
-        headers: { Authorization: `OAuth ${accessToken}` },
-      })
-      return res.ok
-    } catch {
-      return false
-    }
-  }
-
-  /** Try to refresh tokens silently; on failure, clear everything and show login */
-  async function silentRefresh(storedRefreshToken) {
-    try {
-      const result = await refreshAccessToken(storedRefreshToken)
-      chrome.storage.session.set({ twitch_access_token: result.access_token })
-      chrome.storage.local.set({ twitch_refresh_token: result.refresh_token })
-      setToken(result.access_token)
-      setRefreshToken(result.refresh_token)
-    } catch (e) {
-      console.error("Silent refresh failed:", e)
-      chrome.storage.local.remove("twitch_refresh_token")
-      chrome.storage.session.remove("twitch_access_token")
-      setToken(null)
-    }
-  }
-
-  // On mount: restore saved tokens
-  // - access_token  → chrome.storage.session (cleared when browser closes)
-  // - refresh_token → chrome.storage.local   (persists for silent re-auth)
   useEffect(() => {
-    // Load showOffline preference
-    chrome.storage.local.get("showOffline", (res) => {
-      // Default to true if not set
-      setShowOffline(res.showOffline !== undefined ? res.showOffline : false)
-    })
-
-    Promise.all([
-      new Promise((r) => chrome.storage.session.get("twitch_access_token",  (res) => r(res.twitch_access_token  ?? null))),
-      new Promise((r) => chrome.storage.local.get("twitch_refresh_token",   (res) => r(res.twitch_refresh_token ?? null))),
-    ]).then(async ([accessToken, storedRefreshToken]) => {
-      if (accessToken) {
-        // Validate the session token with Twitch before using it
-        const valid = await validateToken(accessToken)
-        if (valid) {
-          setToken(accessToken)
-          setRefreshToken(storedRefreshToken)
-        } else if (storedRefreshToken) {
-          await silentRefresh(storedRefreshToken)
-        } else {
-          chrome.storage.session.remove("twitch_access_token")
-          setToken(null)
-        }
-      } else if (storedRefreshToken) {
-        await silentRefresh(storedRefreshToken)
-      } else {
+    let active = true
+    const onStorageChanged = (changes, area) => {
+      if (area === "session" && changes.twitch_access_token) {
+        setToken(changes.twitch_access_token.newValue ?? null)
+      }
+      if (area === "local" && changes.showOffline) setShowOffline(Boolean(changes.showOffline.newValue))
+    }
+    extension.storage.onChanged.addListener(onStorageChanged)
+    localGet("showOffline").then((result) => {
+      if (active) setShowOffline(Boolean(result.showOffline))
+    }).catch(console.error)
+    sendMessage({ type: "SESSION_RESTORE" }).then((result) => {
+      if (active) setToken(result.access_token)
+    }).catch((failure) => {
+      if (active) {
+        setError(failure.message)
         setToken(null)
       }
     })
+    return () => {
+      active = false
+      extension.storage.onChanged.removeListener(onStorageChanged)
+    }
   }, [])
 
-  function handleLogin(accessToken, newRefreshToken) {
-    // Save access_token in session storage (cleared on browser close)
-    chrome.storage.session.set({ twitch_access_token: accessToken })
-    // Save refresh_token in local storage (persists for silent re-auth)
-    chrome.storage.local.set({ twitch_refresh_token: newRefreshToken })
-    setToken(accessToken)
-    setRefreshToken(newRefreshToken)
-  }
-
-  function handleLogout() {
-    // Clear all tokens
-    chrome.storage.session.remove("twitch_access_token")
-    chrome.storage.local.remove("twitch_refresh_token")
-    // Clear cached channel/profile data (security: no user data lingers)
-    clearAllCache()
-    // Clear badge
-    chrome.runtime.sendMessage({ type: "SET_BADGE", count: 0 })
-    setToken(null)
-    setRefreshToken(null)
+  function handleLogin(accessToken) {
+    setError(null)
     setPage("main")
+    setToken(accessToken)
   }
 
-  // Handle token refresh from MainPage (when API returns 401)
-  async function handleTokenRefresh() {
-    if (!refreshToken) {
-      handleLogout()
-      return null
-    }
+  async function handleLogout() {
     try {
-      const result = await refreshAccessToken(refreshToken)
-      chrome.storage.session.set({ twitch_access_token: result.access_token })
-      chrome.storage.local.set({ twitch_refresh_token: result.refresh_token })
-      setToken(result.access_token)
-      setRefreshToken(result.refresh_token)
-      return result.access_token
-    } catch (e) {
-      console.error("Token refresh failed:", e)
-      handleLogout()
-      return null
+      await sendMessage({ type: "SESSION_LOGOUT" })
+      setToken(null)
+      setPage("main")
+      setError(null)
+    } catch (failure) {
+      setError(failure.message)
     }
   }
 
-  // Still restoring session
   if (token === undefined) {
-    return (
-      <div style={loadingStyle}>
-        <div style={spinnerStyle} />
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      </div>
-    )
+    return <div style={loadingStyle}><div style={spinnerStyle} /></div>
   }
+  if (!token) return <LoginPage onLogin={handleLogin} initialError={error} />
 
-  if (!token) {
-    return <LoginPage onLogin={handleLogin} />
-  }
-
-  return page === "settings" ? (
-    <SettingsPage
-      token={token}
-      onLogout={handleLogout}
-      onBack={() => setPage("main")}
-      showOffline={showOffline}
-      onShowOfflineChange={setShowOffline}
-    />
-  ) : (
-    <MainPage
-      token={token}
-      onLogout={handleLogout}
-      onTokenRefresh={handleTokenRefresh}
-      onSettings={() => setPage("settings")}
-      showOffline={showOffline}
-    />
+  return (
+    <>
+      {error && <div className="main-error-banner" role="alert">{t("session.error")}</div>}
+      {page === "notifications" ? (
+        <NotificationsPage onBack={() => setPage("settings")} />
+      ) : page === "settings" ? (
+        <SettingsPage onLogout={handleLogout} onBack={() => setPage("main")}
+          showOffline={showOffline} onShowOfflineChange={setShowOffline}
+          onNotifications={() => setPage("notifications")} />
+      ) : (
+        <MainPage onSettings={() => setPage("settings")} showOffline={showOffline} />
+      )}
+    </>
   )
 }
 
 const loadingStyle = {
-  width: "100%",
-  height: "100vh",
-  background: "#0e0e10",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
+  width: "100%", height: "100vh", background: "#0e0e10", display: "flex",
+  alignItems: "center", justifyContent: "center",
 }
-
 const spinnerStyle = {
-  width: 32,
-  height: 32,
-  borderRadius: "50%",
-  border: "3px solid #1f1f23",
-  borderTop: "3px solid #9147ff",
-  animation: "spin 0.8s linear infinite",
+  width: 32, height: 32, borderRadius: "50%", border: "3px solid #1f1f23",
+  borderTop: "3px solid #9147ff", animation: "spin 0.8s linear infinite",
 }

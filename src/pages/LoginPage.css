@@ -7,21 +7,21 @@
 .login-root {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(0deg, #6030a8 0%, #9147ff 50%, #6030a8 100%);
+  background: linear-gradient(0deg, var(--tw-accent-dark) 0%, var(--tw-accent) 50%, var(--tw-accent-dark) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   position: relative;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--tw-font-family);
 }
 
 .login-box {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   width: 100%;
-  padding: 10px 40px;
+  padding: 24px clamp(16px, 6vw, 40px);
 
 }
 
@@ -35,9 +35,9 @@
 /* ── Text ── */
 .login-title {
   margin: 0;
-  font-size: 40px;
+  font-size: clamp(26px, 8vw, 40px);
   font-weight: 800;
-  color: #efeff1;
+  color: var(--tw-text-primary);
   text-align: center;
   letter-spacing: -0.3px;
 }
@@ -45,7 +45,7 @@
 .login-subtitle {
   margin: 0;
   font-size: 15px;
-  color: #efeff1;
+  color: var(--tw-text-primary);
   text-align: center;
   line-height: 1.6;
 }
@@ -83,7 +83,7 @@
 .login-debug-text {
   margin: 0 0 6px;
   font-size: 11px;
-  color: #adadb8;
+  color: var(--tw-text-secondary);
   line-height: 1.5;
 }
 
@@ -92,7 +92,7 @@
 }
 
 .login-url-box {
-  background: #0e0e10;
+  background: var(--tw-bg);
   border: 1px solid #3a3a3d;
   border-radius: 6px;
   padding: 6px 10px;
@@ -105,13 +105,13 @@
 }
 
 .login-url-box:hover {
-  border-color: #9147ff;
+  border-color: var(--tw-accent);
 }
 
 .login-url-text {
   flex: 1;
   font-size: 10px;
-  color: #a970ff;
+  color: var(--tw-accent-light);
   word-break: break-all;
   font-family: monospace;
 }
@@ -122,7 +122,7 @@
 }
 
 .login-link {
-  color: #a970ff;
+  color: var(--tw-accent-light);
   text-decoration: underline;
   cursor: pointer;
 }
@@ -130,8 +130,8 @@
 /* ── Login button ── */
 .login-btn {
   width: 100%;
-  background: #efeff1;
-  color: #0e0e10;
+  background: var(--tw-text-primary);
+  color: var(--tw-bg);
   border: none;
   border-radius: 10px;
   padding: 11px 20px;
@@ -174,6 +174,6 @@
 .login-privacy-note {
   margin: 0;
   font-size: 10.5px;
-  color: #57575e;
+  color: var(--tw-text-muted);
   text-align: center;
 }

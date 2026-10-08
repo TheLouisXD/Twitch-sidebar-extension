@@ -1,0 +1,51 @@
+{
+    "manifest_version": 3,
+    "name": "Twitch Live Sidebar",
+    "version": "1.1",
+    "description": "Check what of your followed channels are live right from your sidebar, just like opera GX >⩊<",
+    "permissions": ["storage", "identity", "alarms", "notifications"],
+    "host_permissions": [
+        "https://api.twitch.tv/*",
+        "https://id.twitch.tv/*",
+        "https://static-cdn.jtvnw.net/*",
+        "https://twitch-auth-worker.thelouisxd.workers.dev/*"
+    ],
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'none'; connect-src https://api.twitch.tv https://id.twitch.tv https://twitch-auth-worker.thelouisxd.workers.dev; img-src 'self' https://static-cdn.jtvnw.net"
+    },
+    "icons": {
+        "16": "icons/icon16.png",
+        "32": "icons/icon32.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    },
+    "sidebar_action": {
+        "default_panel": "index.html",
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "32": "icons/icon32.png",
+            "48": "icons/icon48.png"
+        },
+        "default_title": "Twitch Live Sidebar"
+    },
+    "background": {
+        "scripts": ["background.js"]
+    },
+    "action": {
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "32": "icons/icon32.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
+        }
+    },
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "twitch-live-sidebar@thelouisxd.com",
+            "strict_min_version": "115.0",
+            "data_collection_permissions": {
+                "required": ["authenticationInfo", "personallyIdentifyingInfo"]
+            }
+        }
+    }
+}

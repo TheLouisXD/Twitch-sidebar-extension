@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react"
-import { CLIENT_ID } from "../auth"
-import { useI18n } from "../i18n"
+import { extension, localSet, sendMessage } from "../platform.js"
+import { getPreferences, DEFAULT_POLL_INTERVAL, POLL_INTERVAL_KEY, FAVORITES_FIRST_KEY,
+  POLL_INTERVAL_OPTIONS, normalizePollInterval } from "../preferences.js"
+import { useI18n } from "../i18n-context.js"
 import "./SettingsPage.css"
-
-const API = "https://api.twitch.tv/helix"
 
 /**
  * Extract the dominant color from an image URL using a small canvas.
@@ -44,50 +44,46 @@ function extractDominantColor(imageUrl) {
   })
 }
 
-export default function SettingsPage({ token, onLogout, onBack, showOffline, onShowOfflineChange }) {
+export default function SettingsPage({ onLogout, onBack, showOffline, onShowOfflineChange, onNotifications }) {
   const { t, lang, changeLang } = useI18n()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [bgGradient, setBgGradient] = useState(null)
+  const [error, setError] = useState(null)
+  const [pollInterval, setPollInterval] = useState(DEFAULT_POLL_INTERVAL)
+  const [favoritesFirst, setFavoritesFirst] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
+    let active = true
+    let intervalChanged = false
+    let favoritesChanged = false
+    const onStorageChanged = (changes, area) => {
+      if (area !== "local") return
+      if (changes[POLL_INTERVAL_KEY]) {
+        intervalChanged = true
+        setPollInterval(normalizePollInterval(changes[POLL_INTERVAL_KEY].newValue))
+      }
+      if (changes[FAVORITES_FIRST_KEY]) {
+        favoritesChanged = true
+        setFavoritesFirst(changes[FAVORITES_FIRST_KEY].newValue === true)
+      }
+    }
+    extension.storage.onChanged.addListener(onStorageChanged)
+    getPreferences().then((preferences) => {
+      if (!active) return
+      if (!intervalChanged) setPollInterval(preferences.pollIntervalMinutes)
+      if (!favoritesChanged) setFavoritesFirst(preferences.favoritesFirst)
+    }).catch(() => { if (active) setError("settings.saveError") })
     async function fetchUserProfile() {
       try {
-        const res = await fetch(`${API}/users`, {
-          headers: {
-            "Client-ID": CLIENT_ID,
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        if (!res.ok) throw new Error("Failed to fetch user")
-        const data = await res.json()
-        if (data.data?.[0]) {
-          const profile = data.data[0]
+        const { profile } = await sendMessage({ type: "GET_PROFILE" })
+        if (active && profile) {
           setUser(profile)
-
-          // Fetch follower count
-          try {
-            const followersRes = await fetch(
-              `${API}/channels/followers?broadcaster_id=${profile.id}&first=1`,
-              {
-                headers: {
-                  "Client-ID": CLIENT_ID,
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            )
-            if (followersRes.ok) {
-              const followersData = await followersRes.json()
-              setUser((prev) => ({ ...prev, followers: followersData.total ?? 0 }))
-            }
-          } catch (_) {
-            // Non-critical — just leave followers as undefined
-          }
-
           // Extract dominant color for the background gradient
           if (profile.profile_image_url) {
             const color = await extractDominantColor(profile.profile_image_url)
-            if (color) {
+            if (active && color) {
               const [r, g, b] = color
               // Top: the dominant color at ~40% opacity, Bottom: much darker
               const top = `rgba(${r}, ${g}, ${b}, 0.45)`
@@ -98,13 +94,18 @@ export default function SettingsPage({ token, onLogout, onBack, showOffline, onS
         }
       } catch (e) {
         console.error("Failed to fetch user profile:", e)
+        if (active) setError("settings.error")
       } finally {
-        setLoading(false)
+        if (active) setLoading(false)
       }
     }
 
     fetchUserProfile()
-  }, [token])
+    return () => {
+      active = false
+      extension.storage.onChanged.removeListener(onStorageChanged)
+    }
+  }, [])
 
   // Format account creation date
   function formatDate(isoDate) {
@@ -116,10 +117,41 @@ export default function SettingsPage({ token, onLogout, onBack, showOffline, onS
     })
   }
 
-  function handleToggleOffline() {
+  async function handleToggleOffline() {
     const newValue = !showOffline
-    chrome.storage.local.set({ showOffline: newValue })
-    onShowOfflineChange(newValue)
+    try {
+      await localSet({ showOffline: newValue })
+      onShowOfflineChange(newValue)
+    } catch {
+      setError("settings.saveError")
+    }
+  }
+
+  async function handleIntervalChange(event) {
+    const minutes = Number(event.target.value)
+    setSaving(true)
+    try {
+      const preferences = await sendMessage({ type: "SET_POLL_INTERVAL", minutes })
+      setPollInterval(preferences.pollIntervalMinutes)
+      setError(null)
+    } catch {
+      setError("settings.saveError")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleToggleFavoritesFirst() {
+    setSaving(true)
+    try {
+      const preferences = await sendMessage({ type: "SET_FAVORITES_FIRST", enabled: !favoritesFirst })
+      setFavoritesFirst(preferences.favoritesFirst)
+      setError(null)
+    } catch {
+      setError("settings.saveError")
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -130,7 +162,7 @@ export default function SettingsPage({ token, onLogout, onBack, showOffline, onS
           id="settings-back-btn"
           className="settings-back-btn"
           onClick={onBack}
-          aria-label="Volver"
+          aria-label={t("settings.back")}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
@@ -138,6 +170,8 @@ export default function SettingsPage({ token, onLogout, onBack, showOffline, onS
         </button>
         <span className="settings-header-title">{t("settings.title")}</span>
       </header>
+
+      {error && <div className="main-error-banner" role="alert">{t(error)}</div>}
 
       {loading ? (
         <div className="settings-loading">
@@ -195,6 +229,7 @@ export default function SettingsPage({ token, onLogout, onBack, showOffline, onS
                 <span className="settings-info-label">{t("settings.language")}</span>
                 <select
                   className="settings-lang-select"
+                  aria-label={t("settings.language")}
                   value={lang}
                   onChange={(e) => changeLang(e.target.value)}
                 >
@@ -218,8 +253,57 @@ export default function SettingsPage({ token, onLogout, onBack, showOffline, onS
                   <span className="settings-toggle-knob" />
                 </button>
               </div>
+
+              <div className="settings-info-item settings-info-item--preference">
+                <label className="settings-preference-copy" htmlFor="settings-poll-interval">
+                  <span className="settings-info-label">{t("settings.refreshInterval")}</span>
+                  <span className="settings-preference-hint">{t("settings.refreshIntervalHint")}</span>
+                </label>
+                <select id="settings-poll-interval" className="settings-lang-select"
+                  value={pollInterval} onChange={handleIntervalChange} disabled={saving}>
+                  {POLL_INTERVAL_OPTIONS.map((minutes) => (
+                    <option key={minutes} value={minutes}>{t("settings.minutes", minutes)}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="settings-info-item settings-info-item--preference">
+                <div className="settings-preference-copy">
+                  <span className="settings-info-label">{t("settings.favoritesFirst")}</span>
+                  <span className="settings-preference-hint">{t("settings.favoritesFirstHint")}</span>
+                </div>
+                <button id="settings-favorites-first-toggle"
+                  className={`settings-toggle ${favoritesFirst ? "settings-toggle--on" : ""}`}
+                  onClick={handleToggleFavoritesFirst} disabled={saving}
+                  role="switch" aria-checked={favoritesFirst} aria-label={t("settings.favoritesFirst")}>
+                  <span className="settings-toggle-knob" />
+                </button>
+              </div>
+
+              {/* Live Notifications nav item */}
+              <div
+                className="settings-info-item settings-info-item--clickable"
+                onClick={onNotifications}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === "Enter" && onNotifications()}
+                id="settings-notifications-btn"
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                    stroke="#adadb8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                  </svg>
+                  <span className="settings-info-label">{t("settings.notifications")}</span>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                  style={{ color: "#adadb8", flexShrink: 0 }}>
+                  <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
+                </svg>
+              </div>
             </div>
           </div>
+
 
           {/* Logout */}
           <div className="settings-logout-section">

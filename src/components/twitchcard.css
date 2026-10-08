@@ -5,8 +5,8 @@
   flex-direction: column;
   border-radius: 10px;
   overflow: hidden;
-  background: #18181b;
-  border: 1px solid #2a2a2e;
+  background: var(--tw-surface);
+  border: 1px solid var(--tw-surface-hover-light);
   cursor: pointer;
   text-align: center;
   transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
@@ -15,7 +15,7 @@
 /* ── Live card hover ── */
 .tc-card:not(.tc-card--offline):hover {
   transform: translateY(-2px);
-  border-color: #9147ff;
+  border-color: var(--tw-accent);
   box-shadow: 0 4px 14px rgba(145, 71, 255, 0.25);
 }
 
@@ -53,7 +53,7 @@
 .tc-avatar-fallback {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #9147ff, #6441a5);
+  background: linear-gradient(135deg, var(--tw-accent), #6441a5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -68,26 +68,91 @@
 
 /* ── Info (debajo de la foto) ── */
 .tc-info {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 2px;
   padding: 6px 6px 7px;
-  border-top: 2px solid transparent; /* Reserve space to prevent layout shifts */
-  transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+/* Mask the container so flipping its image keeps the fade direction intact. */
+.tc-ambient {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 100%);
+}
+
+.tc-ambient-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  transform: scaleY(-1);
+  filter: blur(6px);
+}
+
+.tc-info--ambient > :not(.tc-ambient) {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+/* Name + bell row */
+.tc-name-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
 }
 
 .tc-name {
+  flex: 1;
+  min-width: 0;
   font-size: 11px;
   font-weight: 700;
-  color: #efeff1;
+  color: var(--tw-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* Bell button — hidden until card hovered or bell is active */
+.tc-bell-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 4px;
+  opacity: 0.5;
+  transition: opacity 0.15s, transform 0.15s, background 0.15s;
+  line-height: 0;
+}
+
+.tc-card:hover .tc-bell-btn,
+.tc-bell-btn--active {
+  opacity: 1;
+}
+
+.tc-bell-btn:hover {
+  transform: scale(1.25);
+  background: rgba(221, 221, 221, 0.07);
+}
+
+.tc-bell-btn--active {
+  opacity: 1;
+}
+
 .tc-game {
   font-size: 9.5px;
-  color: #adadb8;
+  color: var(--tw-text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -95,10 +160,10 @@
 
 .tc-viewers {
   font-size: 9.5px;
-  color: #adadb8;
+  color: var(--tw-text-secondary);
 }
 
 .tc-offline-label {
   font-size: 9.5px;
-  color: #57575e;
+  color: var(--tw-text-muted);
 }

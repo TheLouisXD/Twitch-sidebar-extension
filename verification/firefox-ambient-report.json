@@ -1,0 +1,47 @@
+{
+  "results": [
+    {
+      "name": "Production cards rendered with local fixture",
+      "result": {
+        "cards": 5,
+        "live": 3,
+        "offline": 2
+      }
+    },
+    {
+      "name": "Firefox mask, vertical flip, square crop, blur and stacking",
+      "result": {
+        "sameImageURL": true,
+        "maskImage": "linear-gradient(rgb(0, 0, 0) 0%, rgba(0, 0, 0, 0) 100%)",
+        "transform": "matrix(1, 0, 0, -1, 0, 0)",
+        "filter": "blur(6px)",
+        "imageWidth": 99.33332824707031,
+        "imageHeight": 99.33334350585938,
+        "objectFit": "cover",
+        "pointerEvents": "none",
+        "zIndex": "-1",
+        "isolation": "isolate"
+      }
+    },
+    {
+      "name": "Actual bell click toggles preference without opening channel",
+      "result": {
+        "active": true,
+        "noChannelOpened": true
+      }
+    },
+    {
+      "name": "Ambient leaves readable foreground text",
+      "result": {
+        "textShadow": "rgba(0, 0, 0, 0.9) 0px 1px 3px",
+        "nameColor": "rgb(239, 239, 241)"
+      }
+    }
+  ],
+  "failures": [],
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:157.0) Gecko/20100101 Firefox/157.0",
+  "viewport": {
+    "width": 981,
+    "height": 683
+  }
+}

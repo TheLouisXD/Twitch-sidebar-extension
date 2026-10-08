@@ -1,0 +1,21 @@
+{
+  "firefoxVersion": "157.0.1",
+  "headless": true,
+  "temporaryProfile": true,
+  "passedChecks": 13,
+  "failedChecks": 0,
+  "backgroundSha256": "1377C82B04CE2B951267EBF64DCB57D8A0B74465FA3B960094EC2F5EEB2A98C9",
+  "panelAssets": ["index-BLR-d_h7.js", "index-B9B6JI3C.css"],
+  "webExtLint": {
+    "errors": 0,
+    "warnings": 4,
+    "warningCategories": ["React runtime innerHTML (2)", "Data consent manifest minimum-version notices (2)"]
+  },
+  "limitations": [
+    "Successful OAuth login with a Twitch account was not tested",
+    "Native operating system notification delivery was not tested",
+    "A physical toolbar icon click was not tested",
+    "Firefox 115 itself was not executed",
+    "Legacy data consent for AMO distribution requires additional work"
+  ]
+}

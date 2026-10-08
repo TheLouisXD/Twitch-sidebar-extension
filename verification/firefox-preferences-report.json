@@ -1,0 +1,148 @@
+{
+  "results": [
+    {
+      "name": "Initial list viewer order and synchronized total",
+      "result": {
+        "order": [
+          "Alpha",
+          "Beta",
+          "Gamma",
+          "Delta"
+        ],
+        "liveTotal": "4",
+        "badge": "4"
+      }
+    },
+    {
+      "name": "All allowed refresh periods persist and reprogram native Firefox alarm",
+      "result": {
+        "verified": [
+          1,
+          2,
+          3,
+          5,
+          10,
+          15,
+          30,
+          60
+        ],
+        "uiSelected": "10",
+        "persisted": 10
+      }
+    },
+    {
+      "name": "Live favorites use bells and preserve viewer order in each group",
+      "result": {
+        "first": [
+          "Beta",
+          "Gamma",
+          "Alpha",
+          "Delta"
+        ],
+        "afterRemovingBeta": [
+          "Gamma",
+          "Alpha",
+          "Beta",
+          "Delta"
+        ],
+        "afterAddingDelta": [
+          "Gamma",
+          "Delta",
+          "Alpha",
+          "Beta"
+        ],
+        "offlineFavoriteRemainsOffline": true
+      }
+    },
+    {
+      "name": "Preference off restores viewer order while bells stay active",
+      "result": {
+        "restored": [
+          "Alpha",
+          "Beta",
+          "Gamma",
+          "Delta"
+        ],
+        "bellsPreserved": true,
+        "final": [
+          "Beta",
+          "Delta",
+          "Alpha",
+          "Gamma"
+        ]
+      }
+    },
+    {
+      "name": "Search with one and zero matches keeps global live total",
+      "result": {
+        "oneMatchTotal": 4,
+        "zeroMatchesTotal": 4
+      }
+    },
+    {
+      "name": "Preferences survive reopening the actual extension UI",
+      "result": {
+        "minutes": 10,
+        "favoritesFirst": true
+      }
+    },
+    {
+      "name": "Background native alarm updates cache and badge with both app sidebars closed",
+      "result": {
+        "liveTotal": 5,
+        "badge": "5",
+        "newLive": [
+          "Epsilon",
+          "Zeta"
+        ],
+        "offline": [
+          "Gamma",
+          "Offline"
+        ],
+        "recurringPeriod": 10
+      }
+    },
+    {
+      "name": "An open searched sidebar responds to background transition to zero live",
+      "result": {
+        "emptyLiveTotal": 0,
+        "emptyBadge": "",
+        "restoredTotal": 5
+      }
+    },
+    {
+      "name": "Invalid preference messages cannot change saved interval or sorting",
+      "result": {
+        "invalidRejected": true,
+        "saved": {
+          "pollIntervalMinutes": 10,
+          "favoritesFirst": true
+        }
+      }
+    },
+    {
+      "name": "Main and preference controls fit 320px without horizontal overflow",
+      "result": [
+        {
+          "panel": "main",
+          "width": 320,
+          "scrollWidth": 320,
+          "scrollHeight": 700
+        },
+        {
+          "panel": "settings",
+          "width": 320,
+          "scrollWidth": 320,
+          "scrollHeight": 939
+        }
+      ]
+    }
+  ],
+  "failures": [],
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:157.0) Gecko/20100101 Firefox/157.0",
+  "viewport": {
+    "width": 981,
+    "height": 683
+  },
+  "mockedTwitch": true
+}

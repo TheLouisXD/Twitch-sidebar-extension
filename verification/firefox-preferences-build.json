@@ -1,0 +1,24 @@
+{
+  "firefoxVersion": "157.0.1",
+  "headless": true,
+  "temporaryProfile": true,
+  "mockedTwitch": true,
+  "passedChecks": 10,
+  "failedChecks": 0,
+  "automatedTests": 47,
+  "eslint": "passed",
+  "browserBuilds": ["firefox", "chrome"],
+  "backgroundSha256": "7AEDFFF3F7657E257B6DF3CAFAA8953E12116ACFD404C10C95C4CB8E1461BBD2",
+  "panelAssets": ["index-Bi_Ssbpg.js", "index-C1VYZ0-B.css"],
+  "webExtLint": {
+    "errors": 0,
+    "warnings": 4,
+    "warningCategories": ["React runtime innerHTML (2)", "Data consent manifest minimum-version notices (2)"]
+  },
+  "limitations": [
+    "Twitch API responses were simulated in a temporary fixture extension",
+    "Successful OAuth login with a Twitch account was not tested",
+    "Firefox 115 itself was not executed",
+    "Live Chrome behavior is covered by simulated APIs and the Chrome build"
+  ]
+}

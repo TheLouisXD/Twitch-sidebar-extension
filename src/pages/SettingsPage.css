@@ -3,8 +3,8 @@
 .settings-root {
   width: 100%;
   min-height: 100vh;
-  background: #0e0e10;
-  color: #efeff1;
+  background: var(--tw-bg);
+  color: var(--tw-text-primary);
   font-family: 'Inter', sans-serif;
   display: flex;
   flex-direction: column;
@@ -16,15 +16,15 @@
   align-items: center;
   gap: 10px;
   padding: 12px 14px;
-  border-bottom: 1px solid #1f1f23;
-  background: #18181b;
+  border-bottom: 1px solid var(--tw-surface-light);
+  background: var(--tw-surface);
   flex-shrink: 0;
 }
 
 .settings-back-btn {
   background: none;
   border: none;
-  color: #adadb8;
+  color: var(--tw-text-secondary);
   cursor: pointer;
   padding: 4px;
   display: flex;
@@ -35,14 +35,14 @@
 }
 
 .settings-back-btn:hover {
-  color: #efeff1;
-  background: #26262c;
+  color: var(--tw-text-primary);
+  background: var(--tw-surface-hover);
 }
 
 .settings-header-title {
   font-weight: 700;
   font-size: 14px;
-  color: #efeff1;
+  color: var(--tw-text-primary);
 }
 
 /* ── Profile card ── */
@@ -50,30 +50,30 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 32px 20px 24px;
+  padding: 20px 20px 24px;
   gap: 14px;
 }
 
 .settings-avatar-wrap {
   position: relative;
-  width: 70%;
-  height: 70%;
-  border-radius: 6px;
+  width: 200px;
+  height: 200px;
+  border-radius: 5%;
   overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .settings-avatar {
-  width: 70%;
-  height: 70%;
-  border-radius: 6px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
 .settings-avatar-placeholder {
-  width: 70%;
-  height: 70%;
-  background: #26262c;
-  border-radius: 6px;
+  width: 100%;
+  height: 100%;
+  background: var(--tw-surface-hover);
+  border-radius: 50%;
   border: 3px solid #3a3a3d;
   animation: pulse 1.5s ease-in-out infinite;
 }
@@ -86,12 +86,12 @@
 .settings-username {
   font-size: 18px;
   font-weight: 700;
-  color: #efeff1;
+  color: var(--tw-text-primary);
 }
 
 .settings-login {
   font-size: 13px;
-  color: #adadb8;
+  color: var(--tw-text-secondary);
   margin-top: -8px;
 }
 
@@ -106,15 +106,15 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #adadb8;
+  color: var(--tw-text-secondary);
   padding: 0 0 8px;
 }
 
 .settings-info-list {
-  background: #18181b;
+  background: var(--tw-surface);
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid #1f1f23;
+  border: 1px solid var(--tw-surface-light);
 }
 
 .settings-info-item {
@@ -126,23 +126,61 @@
 }
 
 .settings-info-item + .settings-info-item {
-  border-top: 1px solid #1f1f23;
+  border-top: 1px solid var(--tw-surface-light);
+}
+
+/* Clickable nav items (e.g. Live Notifications) */
+.settings-info-item--clickable {
+  cursor: pointer;
+  transition: background 0.15s;
+  user-select: none;
+}
+
+.settings-info-item--clickable:hover {
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .settings-info-label {
-  color: #adadb8;
+  color: var(--tw-text-secondary);
   text-align: start;
 }
 
+.settings-info-item--preference {
+  gap: 12px;
+}
+
+.settings-preference-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.settings-preference-hint {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--tw-text-secondary);
+}
+
+.settings-info-item--preference select {
+  flex-shrink: 0;
+}
+
+.settings-toggle:disabled,
+.settings-lang-select:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 .settings-info-value {
-  color: #efeff1;
+  color: var(--tw-text-primary);
   font-weight: 500;
 }
 
 /* ── Language selector ── */
 .settings-lang-select {
-  background: #26262c;
-  color: #efeff1;
+  background: var(--tw-surface-hover);
+  color: var(--tw-text-primary);
   border: 1px solid #3a3a3d;
   border-radius: 6px;
   padding: 6px 10px;
@@ -155,7 +193,7 @@
 
 .settings-lang-select:hover,
 .settings-lang-select:focus {
-  border-color: #9147ff;
+  border-color: var(--tw-accent);
 }
 
 /* ── Toggle switch ── */
@@ -173,7 +211,7 @@
 }
 
 .settings-toggle--on {
-  background: #9147ff;
+  background: var(--tw-accent);
 }
 
 .settings-toggle-knob {
@@ -182,7 +220,7 @@
   left: 3px;
   width: 18px;
   height: 18px;
-  background: #efeff1;
+  background: var(--tw-text-primary);
   border-radius: 50%;
   transition: transform 0.2s ease;
   pointer-events: none;
@@ -229,8 +267,8 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 3px solid #1f1f23;
-  border-top-color: #9147ff;
+  border: 3px solid var(--tw-surface-light);
+  border-top-color: var(--tw-accent);
   animation: spin 0.8s linear infinite;
 }
 
