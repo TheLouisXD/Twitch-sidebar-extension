@@ -76,7 +76,8 @@ export async function fetchAllFollowed(token) {
   const profileMap = fresh ? { ...cachedProfiles } : {}
   const missing = ids.filter((id) => !Object.hasOwn(profileMap, id))
   const profiles = await fetchBatch(token, "users", "id", missing)
-  for (const profile of profiles) profileMap[profile.id] = formatAvatarUrl(profile.profile_image_url)
+  for (const profile of profiles)
+    profileMap[profile.id] = formatAvatarUrl(profile.profile_image_url)
   const streams = await fetchBatch(token, "streams", "user_id", ids)
   const liveMap = new Map(streams.map((stream) => [stream.user_id, stream]))
   const channels = follows.map((follow) => {

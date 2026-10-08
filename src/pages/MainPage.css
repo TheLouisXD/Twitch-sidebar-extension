@@ -169,7 +169,7 @@
   align-content: start;
 }
 
-@media (min-width: 400px) {
+@media (min-width: 480px) {
   .main-grid {
     grid-template-columns: repeat(4, 1fr);
   }

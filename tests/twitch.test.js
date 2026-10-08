@@ -106,9 +106,7 @@ test("follow pagination is complete and an expired profile cache is refreshed", 
 
 test("formatAvatarUrl optimizes 300x300 URLs and preserves other sources", () => {
   assert.equal(
-    formatAvatarUrl(
-      "https://static-cdn.jtvnw.net/jtv_user_pictures/abc-profile_image-300x300.png"
-    ),
+    formatAvatarUrl("https://static-cdn.jtvnw.net/jtv_user_pictures/abc-profile_image-300x300.png"),
     "https://static-cdn.jtvnw.net/jtv_user_pictures/abc-profile_image-150x150.png"
   )
   assert.equal(
