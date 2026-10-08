@@ -91,6 +91,7 @@ const {
   App,
   SettingsPage,
   NotificationsPage,
+  ThemesPage,
   TwitchCard,
   I18nProvider,
   useStoredValue,
@@ -292,7 +293,7 @@ test("preferences and language react to changes from another panel", async () =>
   mount(SettingsPage, { showOffline: false })
   const interval = await screen.findByRole("combobox", { name: /Refresh every/ })
   await waitFor(() => assert.equal(interval.disabled, false))
-  const themeSelect = screen.getByRole("combobox", { name: /Theme/ })
+  assert.ok(screen.getByText("Default"))
   await act(async () => {
     changeStorage({
       pollIntervalMinutes: 15,
@@ -302,7 +303,7 @@ test("preferences and language react to changes from another panel", async () =>
     })
   })
   assert.equal(interval.value, "15")
-  assert.equal(themeSelect.value, "gx")
+  assert.ok(screen.getByText("GX"))
   assert.equal(
     screen.getByRole("switch", { name: "Live favorites first" }).getAttribute("aria-checked"),
     "true"
@@ -319,9 +320,8 @@ test("preferences and language react to changes from another panel", async () =>
 })
 
 test("changing theme updates storage", async () => {
-  mount(SettingsPage, { showOffline: false })
-  const themeSelect = await screen.findByRole("combobox", { name: /Theme/ })
-  await waitFor(() => assert.equal(themeSelect.disabled, false))
-  await userEvent.selectOptions(themeSelect, "gx")
+  mount(ThemesPage)
+  const gxCard = await screen.findByRole("radio", { name: /GX/i })
+  await userEvent.click(gxCard)
   assert.equal(local.theme, "gx")
 })

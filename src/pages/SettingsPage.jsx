@@ -1,13 +1,13 @@
 import { useState } from "react"
 import { localSet, sendMessage } from "../platform.js"
-import { POLL_INTERVAL_OPTIONS, THEME_KEY } from "../preferences.js"
+import { POLL_INTERVAL_OPTIONS } from "../preferences.js"
 import { usePreferences } from "../hooks/usePreferences.js"
 import { useProfile } from "../hooks/useProfile.js"
 import AccountProfile from "../components/AccountProfile.jsx"
 import { useI18n } from "../i18n-context.js"
 import "./SettingsPage.css"
 
-export default function SettingsPage({ onLogout, onBack, showOffline, onNotifications }) {
+export default function SettingsPage({ onLogout, onBack, showOffline, onNotifications, onThemes }) {
   const { t, lang, changeLang } = useI18n()
   const profile = useProfile()
   const {
@@ -28,19 +28,6 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
       setError(null)
     } catch {
       setError("settings.saveError")
-    }
-  }
-
-  async function handleThemeChange(event) {
-    const newTheme = event.target.value
-    setSaving(true)
-    try {
-      await localSet({ [THEME_KEY]: newTheme })
-      setError(null)
-    } catch {
-      setError("settings.saveError")
-    } finally {
-      setSaving(false)
     }
   }
 
@@ -119,20 +106,42 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
               <option value="en">English</option>
             </select>
           </div>
-          <div className="settings-info-item">
-            <span className="settings-info-label">{t("settings.theme")}</span>
-            <select
-              id="settings-theme-select"
-              className="settings-lang-select"
-              aria-label={t("settings.theme")}
-              value={theme}
-              onChange={handleThemeChange}
-              disabled={saving || preferencesLoading}
-            >
-              <option value="default">{t("settings.themeDefault")}</option>
-              <option value="gx">{t("settings.themeGx")}</option>
-            </select>
-          </div>
+          <button
+            className="settings-info-item settings-info-item--clickable"
+            onClick={onThemes}
+            id="settings-themes-btn"
+          >
+            <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--tw-text-secondary)"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 2a10 10 0 0 1 0 20v-20z" fill="var(--tw-text-secondary)" />
+              </svg>
+              <span className="settings-info-label">{t("settings.theme")}</span>
+            </span>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <span className="settings-preference-hint">
+                {theme === "gx" ? t("settings.themeGx") : t("settings.themeDefault")}
+              </span>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                style={{ color: "var(--tw-text-secondary)", flexShrink: 0 }}
+              >
+                <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
+              </svg>
+            </div>
+          </button>
           <div className="settings-info-item">
             <div style={{ display: "flex", flexDirection: "column" }}>
               <span className="settings-info-label">{t("settings.showOffline")}</span>

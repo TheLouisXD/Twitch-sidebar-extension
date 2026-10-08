@@ -9,6 +9,19 @@ export const DEFAULT_THEME = "default"
 export const POLL_INTERVAL_OPTIONS = [1, 2, 3, 5, 10, 15, 30, 60]
 export const THEME_OPTIONS = ["default", "gx"]
 
+export const THEMES = [
+  {
+    id: "default",
+    nameKey: "settings.themeDefault",
+    previewUrl: "" // Espacio para la foto del tema
+  },
+  {
+    id: "gx",
+    nameKey: "settings.themeGx",
+    previewUrl: "" // Espacio para la foto del tema
+  }
+]
+
 export function normalizePollInterval(value) {
   return POLL_INTERVAL_OPTIONS.includes(value) ? value : DEFAULT_POLL_INTERVAL
 }

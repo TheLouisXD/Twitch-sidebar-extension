@@ -3,6 +3,7 @@ import LoginPage from "./pages/LoginPage.jsx"
 import MainPage from "./pages/MainPage.jsx"
 import SettingsPage from "./pages/SettingsPage.jsx"
 import NotificationsPage from "./pages/NotificationsPage.jsx"
+import ThemesPage from "./pages/ThemesPage.jsx"
 import { extension, sendMessage } from "./platform.js"
 import { useI18n } from "./i18n-context.js"
 import SessionStatus from "./components/SessionStatus.jsx"
@@ -91,12 +92,15 @@ export default function App() {
       )}
       {page === "notifications" ? (
         <NotificationsPage onBack={() => setPage("settings")} />
+      ) : page === "themes" ? (
+        <ThemesPage onBack={() => setPage("settings")} />
       ) : page === "settings" ? (
         <SettingsPage
           onLogout={handleLogout}
           onBack={() => setPage("main")}
           showOffline={showOffline}
           onNotifications={() => setPage("notifications")}
+          onThemes={() => setPage("themes")}
         />
       ) : (
         <MainPage onSettings={() => setPage("settings")} showOffline={showOffline} />

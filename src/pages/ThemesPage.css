@@ -1,0 +1,228 @@
+/* ── ThemesPage.css ──────────────────────────────────── */
+
+.themes-root {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--tw-bg);
+  color: var(--tw-text-primary);
+  font-family: var(--tw-font-family);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ── */
+.themes-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--tw-surface-light);
+  background: var(--tw-surface);
+  flex-shrink: 0;
+}
+
+.themes-back-btn {
+  background: none;
+  border: none;
+  color: var(--tw-text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition:
+    color 0.15s,
+    background 0.15s;
+  flex-shrink: 0;
+}
+
+.themes-back-btn:hover {
+  color: var(--tw-text-primary);
+  background: var(--tw-surface-hover);
+}
+
+.themes-back-btn:focus-visible {
+  outline: 2px solid var(--tw-accent-light);
+  outline-offset: -1px;
+}
+
+.themes-header-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--tw-text-primary);
+  flex: 1;
+}
+
+.themes-header-icon {
+  flex-shrink: 0;
+  color: var(--tw-accent);
+  opacity: 0.85;
+}
+
+/* ── Grid igual al de canales ── */
+.themes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 10px 10px 16px;
+  align-content: start;
+}
+
+@media (min-width: 480px) {
+  .themes-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ── Card estilo TwitchCard ── */
+.theme-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--tw-surface);
+  border: 1px solid var(--tw-surface-hover-light);
+  cursor: pointer;
+  text-align: center;
+  padding: 0;
+  font-family: inherit;
+  color: inherit;
+  transition:
+    transform 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.theme-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--tw-surface-light);
+  box-shadow: 0 4px 12px var(--tw-shadow);
+}
+
+.theme-card:focus-visible {
+  outline: 2px solid var(--tw-accent-light);
+  outline-offset: 1px;
+}
+
+.theme-card--active {
+  border-color: var(--tw-accent);
+  box-shadow:
+    0 0 0 1px var(--tw-accent),
+    0 4px 14px var(--tw-accent-glow);
+}
+
+.theme-card--active:hover {
+  border-color: var(--tw-accent);
+  box-shadow:
+    0 0 0 1px var(--tw-accent),
+    0 6px 18px var(--tw-accent-glow);
+}
+
+/* ── Preview wrap (aspect ratio 1 / 1 igual que avatar) ── */
+.theme-card-preview-wrap {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  overflow: hidden;
+  background: var(--tw-surface-light);
+}
+
+.theme-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Placeholder cuando aún no se ha provisto imagen */
+.theme-card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: opacity 0.2s;
+}
+
+.theme-card-placeholder--default {
+  background: radial-gradient(circle at 50% 40%, #2f194d 0%, #18181b 75%);
+  color: #a970ff;
+}
+
+.theme-card-placeholder--gx {
+  background: radial-gradient(circle at 50% 40%, #3d0713 0%, #121212 75%);
+  color: #fa1e4e;
+}
+
+.theme-card-placeholder-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+}
+
+/* Badge de tema activo */
+.theme-card-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--tw-accent);
+  color: var(--tw-on-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Info del tema debajo del preview */
+.theme-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 6px 8px;
+}
+
+.theme-card-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--tw-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.theme-card-status {
+  font-size: 10.5px;
+  color: var(--tw-text-secondary);
+}
+
+.theme-card--active .theme-card-status {
+  color: var(--tw-accent);
+  font-weight: 600;
+}
+
+/* ── GX Theme TwitchCard aesthetics ── */
+[data-theme="gx"] .theme-card {
+  border-radius: 2px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(#1d1d1d, #1d1d1d) padding-box,
+    linear-gradient(#a01231, #1f060b) border-box;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+}
+
+[data-theme="gx"] .theme-card:hover,
+[data-theme="gx"] .theme-card--active {
+  background:
+    linear-gradient(#1d1d1d, #1d1d1d) padding-box,
+    linear-gradient(#fa1e4e, #a01231) border-box;
+  box-shadow: 0 4px 14px rgba(250, 30, 78, 0.4);
+}

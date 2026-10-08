@@ -68,7 +68,12 @@ export const translations = {
     "notifications.removeLabel": (name) => `Desactivar notificaciones de ${name}`,
     "notifications.unknownChannel": (id) => `Canal ${id}`,
     "notifications.bell.activate": "Activar notificación",
-    "notifications.bell.deactivate": "Desactivar notificación"
+    "notifications.bell.deactivate": "Desactivar notificación",
+
+    // Themes page
+    "themes.title": "Temas",
+    "themes.active": "Activo",
+    "themes.select": "Seleccionar"
   },
 
   en: {
@@ -139,6 +144,11 @@ export const translations = {
     "notifications.removeLabel": (name) => `Disable notifications for ${name}`,
     "notifications.unknownChannel": (id) => `Channel ${id}`,
     "notifications.bell.activate": "Enable notification",
-    "notifications.bell.deactivate": "Disable notification"
+    "notifications.bell.deactivate": "Disable notification",
+
+    // Themes page
+    "themes.title": "Themes",
+    "themes.active": "Active",
+    "themes.select": "Select"
   }
 }
