@@ -271,6 +271,31 @@ test("keyboard users can open a channel and toggle its bell independently", asyn
   assert.deepEqual(opened, ["channel1"])
 })
 
+test("clicking the channel card link opens the channel while clicking the bell only toggles notifications", async () => {
+  const opened = [],
+    toggled = []
+  mount(TwitchCard, {
+    channel,
+    isLive: true,
+    onClick(login) {
+      opened.push(login)
+    },
+    onToggleNotify(id) {
+      toggled.push(id)
+    }
+  })
+  const channelLink = screen.getByRole("link", { name: "Open Channel One's channel" })
+  const bellButton = screen.getByRole("button", { name: "Enable notification: Channel One" })
+
+  await userEvent.click(channelLink)
+  assert.deepEqual(opened, ["channel1"])
+  assert.deepEqual(toggled, [])
+
+  await userEvent.click(bellButton)
+  assert.deepEqual(toggled, ["1"])
+  assert.deepEqual(opened, ["channel1"])
+})
+
 test("late initial preference reads cannot overwrite a newer storage change", async () => {
   const pending = deferred()
   readOverride = (key) => (key === "showOffline" ? pending.promise : { [key]: local[key] })
