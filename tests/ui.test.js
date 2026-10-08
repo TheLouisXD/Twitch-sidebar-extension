@@ -291,10 +291,17 @@ test("preferences and language react to changes from another panel", async () =>
   mount(SettingsPage, { showOffline: false })
   const interval = await screen.findByRole("combobox", { name: /Refresh every/ })
   await waitFor(() => assert.equal(interval.disabled, false))
+  const themeSelect = screen.getByRole("combobox", { name: /Theme/ })
   await act(async () => {
-    changeStorage({ pollIntervalMinutes: 15, favoritesFirst: true, rememberSession: false })
+    changeStorage({
+      pollIntervalMinutes: 15,
+      favoritesFirst: true,
+      rememberSession: false,
+      theme: "gx"
+    })
   })
   assert.equal(interval.value, "15")
+  assert.equal(themeSelect.value, "gx")
   assert.equal(
     screen.getByRole("switch", { name: "Live favorites first" }).getAttribute("aria-checked"),
     "true"
@@ -308,4 +315,11 @@ test("preferences and language react to changes from another panel", async () =>
   })
   assert.ok(screen.getByRole("switch", { name: "Recordar sesión" }))
   assert.equal(dom.window.document.documentElement.lang, "es")
+})
+
+test("changing theme updates storage", async () => {
+  mount(SettingsPage, { showOffline: false })
+  const themeSelect = await screen.findByRole("combobox", { name: /Theme/ })
+  await userEvent.selectOptions(themeSelect, "gx")
+  assert.equal(local.theme, "gx")
 })

@@ -42,3 +42,33 @@
 .main-search-clear:hover {
   color: var(--tw-text-primary);
 }
+
+/* ── GX Theme Search Bar ── */
+[data-theme="gx"] .search-bar-input {
+  border-radius: 3px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(#1d1d1d, #1d1d1d) padding-box,
+    linear-gradient(to right, #a01231, #1f060b) border-box;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+  color: #ffffff;
+}
+
+[data-theme="gx"] .search-bar-input:focus {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(#1d1d1d, #1d1d1d) padding-box,
+    linear-gradient(to right, #fa1e4e, #a01231) border-box;
+}
+
+[data-theme="gx"] .search-bar-input::placeholder {
+  color: #7b8196;
+}
+
+[data-theme="gx"] .search-bar-clear {
+  color: #7b8196;
+}
+
+[data-theme="gx"] .search-bar-clear:hover {
+  color: #fa1e4e;
+}

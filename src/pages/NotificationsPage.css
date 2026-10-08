@@ -232,3 +232,26 @@
 .notif-remove-btn svg {
   flex-shrink: 0;
 }
+
+/* ── GX Theme Notifications ── */
+[data-theme="gx"] .notif-header {
+  border-bottom: 2px solid transparent;
+  background:
+    linear-gradient(to right, #fa1e4e, #1f060b) bottom / 100% 2px no-repeat,
+    var(--tw-surface);
+}
+
+[data-theme="gx"] .notif-back-btn {
+  color: #fa1e4e;
+}
+
+[data-theme="gx"] .notif-back-btn:hover {
+  color: #ffffff;
+  background: rgba(250, 30, 78, 0.2);
+}
+
+[data-theme="gx"] .notif-item {
+  border-radius: 3px;
+  border: 1px solid rgba(160, 18, 49, 0.4);
+  background: #10121a;
+}

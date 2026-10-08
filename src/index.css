@@ -1,3 +1,28 @@
+@font-face {
+  font-family: "Zen Dots";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    url("./fonts/ZenDots-Regular-Ext.woff2") format("woff2"),
+    url("./fonts/ZenDots-Regular.woff2") format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Zen Dots";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/ZenDots-Regular.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
   /* ── Background Colors ── */
   --tw-bg: #0e0e10;
@@ -49,6 +74,57 @@
   --tw-font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
+[data-theme="gx"] {
+  /* ── Background Colors (Almost Black / Opera GX) ── */
+  --tw-bg: #06070d;
+  --tw-surface: #10121a;
+  --tw-surface-light: #181b26;
+  --tw-surface-hover: #1f2230;
+  --tw-surface-hover-light: #282c3f;
+
+  /* ── Text Colors ── */
+  --tw-text-primary: #ffffff;
+  --tw-text-secondary: #9da3b4;
+  --tw-text-muted: #626779;
+  --tw-text-inverse: #000000;
+
+  /* ── Accents (Opera GX Neon Red) ── */
+  --tw-accent: #fa1e4e;
+  --tw-accent-hover: #ff3b68;
+  --tw-accent-light: #fa1e4e;
+  --tw-accent-dark: #a01231;
+  --tw-accent-gradient: linear-gradient(135deg, #fa1e4e, #a01231);
+  --tw-accent-glow: rgba(250, 30, 78, 0.35);
+  --tw-accent-glow-strong: rgba(250, 30, 78, 0.6);
+  --tw-on-accent: #ffffff;
+  --tw-border: #a01231;
+  --tw-shadow: rgba(0, 0, 0, 0.7);
+  --tw-overlay-subtle: rgba(250, 30, 78, 0.05);
+  --tw-overlay-hover: rgba(250, 30, 78, 0.12);
+  --tw-spinner-border: rgba(250, 30, 78, 0.25);
+  --tw-ambient-text-shadow: rgba(0, 0, 0, 0.95);
+
+  /* ── Status Colors ── */
+  --tw-live: #fa1e4e;
+  --tw-danger: #fa1e4e;
+  --tw-danger-hover: #ff3b68;
+  --tw-error-text: #ff6b6b;
+  --tw-error-bg: rgba(250, 30, 78, 0.15);
+  --tw-error-border: rgba(250, 30, 78, 0.4);
+  --tw-warning: #ffb800;
+  --tw-warning-bg: rgba(255, 184, 0, 0.1);
+  --tw-warning-border: rgba(255, 184, 0, 0.3);
+  --tw-warning-hover-bg: rgba(255, 184, 0, 0.2);
+  --tw-warning-hover-border: rgba(255, 184, 0, 0.5);
+
+  --tw-offline: #444754;
+  --tw-offline-dark: #22242c;
+  --tw-offline-gradient: linear-gradient(135deg, #444754, #22242c);
+
+  /* ── Typography (Zen Dots Google Font) ── */
+  --tw-font-family: "Zen Dots", sans-serif;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -56,6 +132,27 @@ body {
   background-color: var(--tw-bg);
   color: var(--tw-text-primary);
   color-scheme: dark;
+}
+
+/* Opera GX Top Accent Line */
+[data-theme="gx"] body::before {
+  content: "";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to right, #fa1e4e, #1f060b);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+input,
+button,
+select,
+textarea {
+  font-family: inherit;
 }
 
 * {
@@ -85,6 +182,19 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--tw-text-muted);
+}
+
+[data-theme="gx"] html,
+html[data-theme="gx"] {
+  scrollbar-color: #a01231 var(--tw-bg);
+}
+
+[data-theme="gx"] ::-webkit-scrollbar-thumb {
+  background: #a01231;
+}
+
+[data-theme="gx"] ::-webkit-scrollbar-thumb:hover {
+  background: #fa1e4e;
 }
 @keyframes spin {
   to {

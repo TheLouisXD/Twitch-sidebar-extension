@@ -1,6 +1,6 @@
 import test from "node:test"
 import assert from "node:assert/strict"
-import { normalizePollInterval, orderLiveChannels } from "../src/preferences.js"
+import { normalizePollInterval, normalizeTheme, orderLiveChannels } from "../src/preferences.js"
 import { search } from "../src/search.js"
 
 const channels = [
@@ -51,4 +51,11 @@ test("stored intervals use supported choices with a three-minute default", () =>
     assert.equal(normalizePollInterval(value), value)
   for (const value of [undefined, null, 0, -1, 4, "5", NaN])
     assert.equal(normalizePollInterval(value), 3)
+})
+
+test("stored themes use supported choices with a default fallback", () => {
+  assert.equal(normalizeTheme("default"), "default")
+  assert.equal(normalizeTheme("gx"), "gx")
+  for (const value of [undefined, null, "", "dark", "light", 123])
+    assert.equal(normalizeTheme(value), "default")
 })

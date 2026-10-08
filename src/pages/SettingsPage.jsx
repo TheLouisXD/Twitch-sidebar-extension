@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { localSet, sendMessage } from "../platform.js"
-import { POLL_INTERVAL_OPTIONS } from "../preferences.js"
+import { POLL_INTERVAL_OPTIONS, THEME_KEY } from "../preferences.js"
 import { usePreferences } from "../hooks/usePreferences.js"
 import { useProfile } from "../hooks/useProfile.js"
 import AccountProfile from "../components/AccountProfile.jsx"
@@ -14,6 +14,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
     pollInterval,
     favoritesFirst,
     rememberSession,
+    theme,
     loading: preferencesLoading,
     error: preferencesError
   } = usePreferences()
@@ -27,6 +28,19 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
       setError(null)
     } catch {
       setError("settings.saveError")
+    }
+  }
+
+  async function handleThemeChange(event) {
+    const newTheme = event.target.value
+    setSaving(true)
+    try {
+      await localSet({ [THEME_KEY]: newTheme })
+      setError(null)
+    } catch {
+      setError("settings.saveError")
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -103,6 +117,20 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
             >
               <option value="es">Español</option>
               <option value="en">English</option>
+            </select>
+          </div>
+          <div className="settings-info-item">
+            <span className="settings-info-label">{t("settings.theme")}</span>
+            <select
+              id="settings-theme-select"
+              className="settings-lang-select"
+              aria-label={t("settings.theme")}
+              value={theme}
+              onChange={handleThemeChange}
+              disabled={saving || preferencesLoading}
+            >
+              <option value="default">{t("settings.themeDefault")}</option>
+              <option value="gx">{t("settings.themeGx")}</option>
             </select>
           </div>
           <div className="settings-info-item">

@@ -18,6 +18,7 @@
  * @property {number} pollIntervalMinutes
  * @property {boolean} favoritesFirst
  * @property {boolean} rememberSession
+ * @property {"default"|"gx"} theme
  *
  * @typedef {object} TwitchCardProps
  * @property {Channel} channel

@@ -7,14 +7,20 @@ import { extension, sendMessage } from "./platform.js"
 import { useI18n } from "./i18n-context.js"
 import SessionStatus from "./components/SessionStatus.jsx"
 import { useStoredValue, asBoolean } from "./hooks/useStoredValue.js"
+import { THEME_KEY, DEFAULT_THEME, normalizeTheme } from "./preferences.js"
 
 export default function App() {
   const { t } = useI18n()
   const [authenticated, setAuthenticated] = useState(undefined)
   const [page, setPage] = useState("main")
   const { value: showOffline } = useStoredValue("showOffline", false, asBoolean)
+  const { value: theme } = useStoredValue(THEME_KEY, DEFAULT_THEME, normalizeTheme)
   const [error, setError] = useState(null)
   const [restoreAttempt, setRestoreAttempt] = useState(0)
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme)
+  }, [theme])
 
   useEffect(() => {
     let active = true
