@@ -146,6 +146,12 @@ beforeEach(() => {
         notification_streamers: local.notification_streamers.filter((id) => id !== broadcasterId)
       })
       return { active: false }
+    },
+    REMOVE_FAVORITE: async ({ broadcasterId }) => {
+      changeStorage({
+        notification_streamers: local.notification_streamers.filter((id) => id !== broadcasterId)
+      })
+      return { active: false }
     }
   }
 })
@@ -207,7 +213,7 @@ test("a profile image that never loads does not block account information or pre
   assert.equal(screen.queryByText("Could not load the profile."), null)
 })
 
-test("notification rows reflect cache and bell changes from another panel", async () => {
+test("favorite rows reflect cache and star changes from another panel", async () => {
   mount(NotificationsPage)
   assert.ok(await screen.findByText("Test Game"))
   await act(async () => {
@@ -222,25 +228,23 @@ test("notification rows reflect cache and bell changes from another panel", asyn
   await act(async () => {
     changeStorage({ notification_streamers: [] })
   })
-  assert.ok(screen.getByText("You don't have any streamers with notifications enabled."))
+  assert.ok(screen.getByText("You don't have any favorite channels saved."))
   await act(async () => {
     changeStorage({ notification_streamers: ["1"] })
   })
-  assert.ok(screen.getByRole("button", { name: "Disable notifications for Channel One" }))
+  assert.ok(screen.getByRole("button", { name: "Remove Channel One from favorites" }))
 })
 
 test("an unfollowed channel preference remains visible and removable", async () => {
   local.notification_streamers = ["999"]
   mount(NotificationsPage)
   assert.ok(await screen.findByText("Channel 999"))
-  await userEvent.click(
-    screen.getByRole("button", { name: "Disable notifications for Channel 999" })
-  )
-  assert.ok(await screen.findByText("You don't have any streamers with notifications enabled."))
+  await userEvent.click(screen.getByRole("button", { name: "Remove Channel 999 from favorites" }))
+  assert.ok(await screen.findByText("You don't have any favorite channels saved."))
   assert.deepEqual(local.notification_streamers, [])
 })
 
-test("keyboard users can open a channel and toggle its bell independently", async () => {
+test("keyboard users can open a channel and toggle its star independently", async () => {
   const opened = [],
     toggled = []
   mount(TwitchCard, {
@@ -249,7 +253,7 @@ test("keyboard users can open a channel and toggle its bell independently", asyn
     onClick(login) {
       opened.push(login)
     },
-    onToggleNotify(id) {
+    onToggleFavorite(id) {
       toggled.push(id)
     }
   })
@@ -264,14 +268,14 @@ test("keyboard users can open a channel and toggle its bell independently", asyn
   await user.tab()
   assert.equal(
     dom.window.document.activeElement,
-    screen.getByRole("button", { name: "Enable notification: Channel One" })
+    screen.getByRole("button", { name: "Add to favorites: Channel One" })
   )
   await user.keyboard(" ")
   assert.deepEqual(toggled, ["1"])
   assert.deepEqual(opened, ["channel1"])
 })
 
-test("clicking the channel card link opens the channel while clicking the bell only toggles notifications", async () => {
+test("clicking the channel card link opens the channel while clicking the star only toggles favorites", async () => {
   const opened = [],
     toggled = []
   mount(TwitchCard, {
@@ -280,18 +284,18 @@ test("clicking the channel card link opens the channel while clicking the bell o
     onClick(login) {
       opened.push(login)
     },
-    onToggleNotify(id) {
+    onToggleFavorite(id) {
       toggled.push(id)
     }
   })
   const channelLink = screen.getByRole("link", { name: "Open Channel One's channel" })
-  const bellButton = screen.getByRole("button", { name: "Enable notification: Channel One" })
+  const starButton = screen.getByRole("button", { name: "Add to favorites: Channel One" })
 
   await userEvent.click(channelLink)
   assert.deepEqual(opened, ["channel1"])
   assert.deepEqual(toggled, [])
 
-  await userEvent.click(bellButton)
+  await userEvent.click(starButton)
   assert.deepEqual(toggled, ["1"])
   assert.deepEqual(opened, ["channel1"])
 })

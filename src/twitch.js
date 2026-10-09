@@ -22,8 +22,11 @@ export async function fetchTwitch(token, path, params = new URLSearchParams()) {
  * @returns {string|null}
  */
 export function formatAvatarUrl(url, size = "150x150") {
-  if (!url || typeof url !== "string") return url ?? null
-  return url.replace("300x300", size)
+  if (!url || typeof url !== "string") return null
+  if (url.startsWith("https://")) {
+    return url.replace("300x300", size)
+  }
+  return url
 }
 
 export async function fetchUser(token) {

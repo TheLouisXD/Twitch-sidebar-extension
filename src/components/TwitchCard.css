@@ -124,7 +124,7 @@
   text-shadow: 0 1px 3px var(--tw-ambient-text-shadow);
 }
 
-/* Name + bell row */
+/* Name + star row */
 .tc-name-row {
   display: flex;
   align-items: center;
@@ -143,7 +143,8 @@
   text-overflow: ellipsis;
 }
 
-/* The bell stays clickable above the full-card channel link. */
+/* The star button stays clickable above the full-card channel link. */
+.tc-star-btn,
 .tc-bell-btn {
   pointer-events: auto;
   position: relative;
@@ -165,22 +166,28 @@
   line-height: 0;
 }
 
+.tc-card:hover .tc-star-btn,
 .tc-card:hover .tc-bell-btn,
+.tc-star-btn:focus-visible,
 .tc-bell-btn:focus-visible,
+.tc-star-btn--active,
 .tc-bell-btn--active {
   opacity: 1;
 }
 
+.tc-star-btn:hover,
 .tc-bell-btn:hover {
   transform: scale(1.25);
   background: var(--tw-overlay-hover);
 }
 
+.tc-star-btn:focus-visible,
 .tc-bell-btn:focus-visible {
   outline: 2px solid var(--tw-accent-light);
   outline-offset: -1px;
 }
 
+.tc-star-btn--active,
 .tc-bell-btn--active {
   opacity: 1;
 }

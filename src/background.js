@@ -1,13 +1,11 @@
 import { CLIENT_ID, SCOPES } from "./config.js"
 import { AuthError, requestTokens } from "./auth.js"
-import { extension, callExtension, isFirefox, localGet, localSet, openChannel } from "./platform.js"
+import { extension, callExtension, isFirefox, localGet, localSet } from "./platform.js"
 import {
   CHANNELS_KEY,
   NOTIFICATIONS_KEY,
-  PREV_LIVE_KEY,
   clearAllCache,
   getCachedChannels,
-  getNotificationStreamers,
   setCachedChannels,
   setCachedProfiles
 } from "./cache.js"
@@ -21,7 +19,8 @@ import {
   withSession,
   waitForSessionTasks,
   guardSession,
-  setRememberSession
+  setRememberSession,
+  revokeSessionTokens
 } from "./session.js"
 import { fetchAllFollowed, fetchUser, fetchTwitch } from "./twitch.js"
 import { randomState, parseAuthRedirect } from "./oauth.js"
@@ -76,21 +75,6 @@ function syncBadgeFromCache() {
   return task
 }
 
-export function notificationOptions(stream, language) {
-  const spanish = language === "es"
-  return {
-    type: "basic",
-    iconUrl: extension.runtime.getURL("icons/icon128.png"),
-    title: spanish ? `🔴 ¡${stream.user_name} está en vivo!` : `🔴 ${stream.user_name} is live!`,
-    message: stream.game_name
-      ? `${spanish ? "Jugando" : "Playing"}: ${stream.game_name}`
-      : spanish
-        ? "En vivo ahora"
-        : "Live now",
-    ...(isFirefox ? {} : { priority: 2, silent: true })
-  }
-}
-
 function pollStreams() {
   if (pollTask) return pollTask
   const expected = getSessionRevision()
@@ -105,26 +89,6 @@ function pollStreams() {
     await setCachedChannels(data)
     assertSession(expected)
     await syncBadgeFromCache()
-    const { [PREV_LIVE_KEY]: previous, language } = await localGet([PREV_LIVE_KEY, "language"])
-    const watched = await getNotificationStreamers()
-    assertSession(expected)
-    // First successful poll establishes a baseline. Keep it current even when
-    // no bells are enabled, so enabling one does not notify an existing stream.
-    if (Array.isArray(previous)) {
-      const previousIds = new Set(previous)
-      for (const stream of data.live) {
-        assertSession(expected)
-        if (watched.has(stream.user_id) && !previousIds.has(stream.user_id)) {
-          await callExtension(
-            "notifications.create",
-            `twitch-live-${stream.user_id}`,
-            notificationOptions(stream, language)
-          ).catch(report)
-        }
-      }
-    }
-    assertSession(expected)
-    await localSet({ [PREV_LIVE_KEY]: data.live.map((stream) => stream.user_id) })
     return data
   })().finally(() => {
     pollTask = null
@@ -138,6 +102,7 @@ function signOut() {
   logoutTask = (async () => {
     // Invalidate immediately, then finish pending writes before clearing data.
     await Promise.allSettled([pollTask, notificationQueue, waitForSessionTasks()].filter(Boolean))
+    await revokeSessionTokens().catch(() => {})
     await clearTokens()
     await clearAllCache()
     await syncBadgeFromCache()
@@ -261,8 +226,10 @@ async function route(message) {
         throw new Error("Invalid session persistence preference")
       return setRememberSession(message.enabled)
     }
+    case "TOGGLE_FAVORITE":
     case "TOGGLE_NOTIFICATION":
       return changeStreamerPreference(NOTIFICATIONS_KEY, message.broadcasterId)
+    case "REMOVE_FAVORITE":
     case "REMOVE_NOTIFICATION":
       return changeStreamerPreference(NOTIFICATIONS_KEY, message.broadcasterId, true)
     default:
@@ -318,21 +285,6 @@ extension.runtime.onStartup.addListener(() => {
 })
 extension.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === ALARM_NAME) return runPoll()
-})
-extension.notifications.onClicked.addListener((id) => {
-  if (!id.startsWith("twitch-live-")) return
-  localGet(CHANNELS_KEY)
-    .then(async (result) => {
-      const data = result[CHANNELS_KEY]?.data
-      const channel = [...(data?.live ?? []), ...(data?.offline ?? [])].find(
-        (item) => item.user_id === id.slice("twitch-live-".length)
-      )
-      if (channel) await openChannel(channel.user_login)
-    })
-    .catch(report)
-    .finally(() => {
-      callExtension("notifications.clear", id).catch(report)
-    })
 })
 
 callExtension("action.setBadgeBackgroundColor", { color: "#9147ff" }).catch(report)

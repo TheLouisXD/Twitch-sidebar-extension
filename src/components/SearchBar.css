@@ -27,22 +27,6 @@
   border-color: var(--tw-accent);
 }
 
-.search-bar-clear {
-  background: transparent;
-  border: none;
-  color: var(--tw-text-muted);
-  cursor: pointer;
-  font-size: 13px;
-  padding: 2px 4px;
-  border-radius: 4px;
-  flex-shrink: 0;
-  transition: color 0.1s;
-}
-
-.main-search-clear:hover {
-  color: var(--tw-text-primary);
-}
-
 /* ── GX Theme Search Bar ── */
 [data-theme="gx"] .search-bar-input {
   border-radius: 3px;
@@ -63,12 +47,4 @@
 
 [data-theme="gx"] .search-bar-input::placeholder {
   color: #7b8196;
-}
-
-[data-theme="gx"] .search-bar-clear {
-  color: #7b8196;
-}
-
-[data-theme="gx"] .search-bar-clear:hover {
-  color: #fa1e4e;
 }

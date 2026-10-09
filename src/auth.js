@@ -31,3 +31,17 @@ export async function requestTokens(endpoint, body) {
   }
   return data
 }
+
+export async function revokeToken(token) {
+  if (!token) return
+  try {
+    await fetch(`${WORKER_URL}/revoke`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+      signal: AbortSignal.timeout(10000)
+    })
+  } catch (error) {
+    console.error("Token revocation failed:", error)
+  }
+}

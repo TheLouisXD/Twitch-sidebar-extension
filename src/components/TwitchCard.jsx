@@ -9,11 +9,15 @@ const TwitchCard = React.memo(function TwitchCard({
   isLive,
   onClick,
   isNotified = false,
-  onToggleNotify
+  isFavorite,
+  onToggleNotify,
+  onToggleFavorite
 }) {
   const { t } = useI18n()
   const { user_name, user_login, game_name, profile_image_url, viewer_count, user_id } = channel
   const avatarUrl = formatAvatarUrl(profile_image_url)
+  const favorite = isFavorite !== undefined ? isFavorite : isNotified
+  const toggleFavorite = onToggleFavorite || onToggleNotify
 
   function formatViewers(n) {
     if (!Number.isFinite(n)) return "0"
@@ -22,14 +26,15 @@ const TwitchCard = React.memo(function TwitchCard({
     return n.toString()
   }
 
-  function handleBellClick(e) {
+  function handleStarClick(e) {
     e.stopPropagation()
-    if (onToggleNotify) onToggleNotify(user_id)
+    if (toggleFavorite) toggleFavorite(user_id)
   }
 
-  const bellLabel = isNotified
-    ? t("notifications.bell.deactivate")
-    : t("notifications.bell.activate")
+  const isValidLogin = typeof user_login === "string" && /^[a-zA-Z0-9_]+$/.test(user_login)
+  const channelHref = isValidLogin ? `https://www.twitch.tv/${user_login}` : "#"
+
+  const favLabel = favorite ? t("notifications.bell.deactivate") : t("notifications.bell.activate")
 
   return (
     <div
@@ -38,7 +43,7 @@ const TwitchCard = React.memo(function TwitchCard({
     >
       <a
         className="tc-channel-link"
-        href={`https://www.twitch.tv/${user_login}`}
+        href={channelHref}
         target="_blank"
         rel="noopener noreferrer"
         aria-label={t("card.openChannel", user_name)}
@@ -71,24 +76,23 @@ const TwitchCard = React.memo(function TwitchCard({
         <div className="tc-name-row">
           <span className="tc-name">{user_name}</span>
           <button
-            className={`tc-bell-btn${isNotified ? " tc-bell-btn--active" : ""}`}
-            onClick={handleBellClick}
-            aria-label={`${bellLabel}: ${user_name}`}
-            aria-pressed={isNotified}
-            title={bellLabel}
+            className={`tc-star-btn tc-bell-btn${favorite ? " tc-star-btn--active tc-bell-btn--active" : ""}`}
+            onClick={handleStarClick}
+            aria-label={`${favLabel}: ${user_name}`}
+            aria-pressed={favorite}
+            title={favLabel}
           >
             <svg
               width="14"
               height="14"
               viewBox="0 0 24 24"
-              fill={isNotified ? "var(--tw-warning)" : "none"}
-              stroke={isNotified ? "var(--tw-warning)" : "var(--tw-text-secondary)"}
-              strokeWidth="2.5"
+              fill={favorite ? "#f5c518" : "none"}
+              stroke={favorite ? "#f5c518" : "var(--tw-text-secondary)"}
+              strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
             </svg>
           </button>
         </div>

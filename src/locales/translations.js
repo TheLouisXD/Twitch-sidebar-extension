@@ -6,7 +6,7 @@ export const translations = {
     "session.recovery": "No se pudo comprobar tu sesión. Revisa la conexión e inténtalo de nuevo.",
     "settings.error": "No se pudo cargar el perfil.",
     "settings.saveError": "No se pudieron cargar o guardar las preferencias. Inténtalo de nuevo.",
-    "notifications.error": "No se pudieron actualizar las notificaciones.",
+    "notifications.error": "No se pudieron actualizar los favoritos.",
     // Login
     "login.subtitle": "Conecta tu cuenta para ver los canales que sigues en vivo.",
     "login.button": "Iniciar sesión",
@@ -53,22 +53,22 @@ export const translations = {
     "settings.minutes": (minutes) => `${minutes} min`,
     "settings.favoritesFirst": "Favoritos en vivo primero",
     "settings.favoritesFirstHint":
-      "Los canales con la campana activada aparecen arriba cuando están en vivo.",
+      "Los canales marcados como favoritos aparecen arriba cuando están en vivo.",
     "settings.rememberSession": "Recordar sesión",
     "settings.rememberSessionHint": "Mantiene la conexión al cerrar y volver a abrir el navegador.",
     "settings.showOffline": "Mostrar canales offline",
     "settings.showOfflineTooltip": "Muestra los canales que no están emitiendo.",
-    "settings.notifications": "Notificaciones de directos",
+    "settings.notifications": "Canales favoritos",
 
-    // Notifications page
-    "notifications.title": "Notificaciones de directos",
-    "notifications.empty": "No tienes streamers con notificaciones activadas.",
-    "notifications.emptyHint": "Activa la 🔔 en cualquier card de streamer.",
+    // Notifications page -> Favorites
+    "notifications.title": "Canales favoritos",
+    "notifications.empty": "No tienes canales favoritos guardados.",
+    "notifications.emptyHint": "Marca la ⭐ en cualquier canal para agregarlo a favoritos.",
     "notifications.remove": "Quitar",
-    "notifications.removeLabel": (name) => `Desactivar notificaciones de ${name}`,
+    "notifications.removeLabel": (name) => `Quitar a ${name} de favoritos`,
     "notifications.unknownChannel": (id) => `Canal ${id}`,
-    "notifications.bell.activate": "Activar notificación",
-    "notifications.bell.deactivate": "Desactivar notificación",
+    "notifications.bell.activate": "Marcar como favorito",
+    "notifications.bell.deactivate": "Quitar de favoritos",
 
     // Themes page
     "themes.title": "Temas",
@@ -83,7 +83,7 @@ export const translations = {
     "session.recovery": "Could not check your session. Check your connection and try again.",
     "settings.error": "Could not load the profile.",
     "settings.saveError": "Could not load or save preferences. Please try again.",
-    "notifications.error": "Could not update notifications.",
+    "notifications.error": "Could not update favorites.",
     // Login
     "login.subtitle": "Connect your account to see the channels you follow that are live.",
     "login.button": "Sign in",
@@ -129,22 +129,22 @@ export const translations = {
     "settings.refreshIntervalHint": "Updates the list and live count in the background.",
     "settings.minutes": (minutes) => `${minutes} min`,
     "settings.favoritesFirst": "Live favorites first",
-    "settings.favoritesFirstHint": "Channels with notifications enabled appear first while live.",
+    "settings.favoritesFirstHint": "Channels marked as favorites appear first while live.",
     "settings.rememberSession": "Remember session",
     "settings.rememberSessionHint": "Keeps you signed in after closing and reopening the browser.",
     "settings.showOffline": "Show offline channels",
     "settings.showOfflineTooltip": "Shows channels that are not streaming.",
-    "settings.notifications": "Live notifications",
+    "settings.notifications": "Favorite channels",
 
-    // Notifications page
-    "notifications.title": "Live notifications",
-    "notifications.empty": "You don't have any streamers with notifications enabled.",
-    "notifications.emptyHint": "Enable the 🔔 on any streamer card.",
+    // Notifications page -> Favorites
+    "notifications.title": "Favorite channels",
+    "notifications.empty": "You don't have any favorite channels saved.",
+    "notifications.emptyHint": "Mark the ⭐ on any streamer card to add to favorites.",
     "notifications.remove": "Remove",
-    "notifications.removeLabel": (name) => `Disable notifications for ${name}`,
+    "notifications.removeLabel": (name) => `Remove ${name} from favorites`,
     "notifications.unknownChannel": (id) => `Channel ${id}`,
-    "notifications.bell.activate": "Enable notification",
-    "notifications.bell.deactivate": "Disable notification",
+    "notifications.bell.activate": "Add to favorites",
+    "notifications.bell.deactivate": "Remove from favorites",
 
     // Themes page
     "themes.title": "Themes",

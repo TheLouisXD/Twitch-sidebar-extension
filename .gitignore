@@ -23,3 +23,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Build and report artifacts
+*.zip
+eslint-report.json
+audit_report.html
+file_stats.json

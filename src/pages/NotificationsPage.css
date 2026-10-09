@@ -1,10 +1,4 @@
-/* ── NotificationsPage.css ─────────────────────────────────── */
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
+/* ── NotificationsPage.css ────────────────────────────────────────── */
 
 .notif-root {
   width: 100%;
@@ -55,9 +49,10 @@
   flex: 1;
 }
 
+.notif-header-star,
 .notif-header-bell {
   flex-shrink: 0;
-  opacity: 0.7;
+  opacity: 0.9;
 }
 
 /* ── Loading ── */

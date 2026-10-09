@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "Twitch Live Sidebar",
   "version": "1.1",
-  "description": "Check what of your followed channels are live right from your sidebar, just like opera GX >⩊<",
-  "permissions": ["storage", "identity", "alarms", "notifications"],
+  "description": "Check what of your followed channels are live right from your sidebar, just like opera GX >⪤<",
+  "permissions": ["storage", "identity", "alarms"],
   "host_permissions": [
     "https://api.twitch.tv/*",
     "https://id.twitch.tv/*",

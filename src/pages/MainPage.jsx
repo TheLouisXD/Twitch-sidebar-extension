@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { useI18n } from "../i18n-context.js"
 import Header from "../components/Header.jsx"
 import StreamerList from "../components/StreamerList.jsx"
@@ -96,8 +96,14 @@ export default function MainPage({ onSettings, showOffline }) {
   const handleCardClick = useCallback((login) => {
     openChannel(login).catch((failure) => setError(failure.message))
   }, [])
-  const orderedLive = orderLiveChannels(channels.live, notifiedIds, favoritesFirst)
-  const { filteredLive, filteredOffline } = search(orderedLive, channels.offline, query)
+  const orderedLive = useMemo(
+    () => orderLiveChannels(channels.live, notifiedIds, favoritesFirst),
+    [channels.live, notifiedIds, favoritesFirst]
+  )
+  const { filteredLive, filteredOffline } = useMemo(
+    () => search(orderedLive, channels.offline, query),
+    [orderedLive, channels.offline, query]
+  )
 
   return (
     <div className="main-root">

@@ -6,7 +6,7 @@ import {
   EMPTY_NOTIFICATION_IDS,
   decodeChannelCache,
   decodeNotificationIds,
-  removeNotificationStreamer
+  removeFavoriteStreamer
 } from "../cache.js"
 import { useStoredValue } from "../hooks/useStoredValue.js"
 import { formatAvatarUrl } from "../twitch.js"
@@ -34,7 +34,7 @@ export default function NotificationsPage({ onBack }) {
 
   async function handleRemove(broadcasterId) {
     try {
-      await removeNotificationStreamer(broadcasterId)
+      await removeFavoriteStreamer(broadcasterId)
       setError(null)
     } catch (failure) {
       setError(failure.message)
@@ -56,18 +56,17 @@ export default function NotificationsPage({ onBack }) {
         </button>
         <span className="notif-header-title">{t("notifications.title")}</span>
         <svg
-          className="notif-header-bell"
+          className="notif-header-star notif-header-bell"
           width="18"
           height="18"
           viewBox="0 0 24 24"
-          fill="none"
-          stroke="var(--tw-accent)"
-          strokeWidth="2"
+          fill="#f5c518"
+          stroke="#f5c518"
+          strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         >
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
         </svg>
       </header>
 
@@ -83,7 +82,7 @@ export default function NotificationsPage({ onBack }) {
         </div>
       ) : streamers.length === 0 ? (
         <EmptyState
-          icon="🔔"
+          icon="⭐"
           message={t("notifications.empty")}
           hint={t("notifications.emptyHint")}
         />
@@ -124,18 +123,13 @@ export default function NotificationsPage({ onBack }) {
                   width="13"
                   height="13"
                   viewBox="0 0 24 24"
-                  fill="currentColor"
-                  stroke="var(--tw-warning)"
-                  strokeWidth="0"
+                  fill="#f5c518"
+                  stroke="#f5c518"
+                  strokeWidth="1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" fill="var(--tw-warning)" />
-                  <path
-                    d="M13.73 21a2 2 0 0 1-3.46 0"
-                    fill="none"
-                    stroke="var(--tw-warning)"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                 </svg>
                 <span>{t("notifications.remove")}</span>
               </button>

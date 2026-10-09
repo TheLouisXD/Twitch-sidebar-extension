@@ -140,14 +140,6 @@ function createHarness(mode, saved = {}, savedSession = {}) {
         return `https://test.extensions.allizom.org/?code=code&state=${oauthState}`
       })
     },
-    notifications: {
-      create: method(async (id, options) => {
-        notifications.push({ id, options })
-        return id
-      }),
-      clear: method(async () => true),
-      onClicked: event("notification")
-    },
     tabs: { create: method(async () => {}) }
   }
   if (mode === "firefox")
@@ -216,6 +208,10 @@ function createHarness(mode, saved = {}, savedSession = {}) {
         })),
         pagination: {}
       })
+    }
+    if (path.endsWith("/revoke")) {
+      state.revocations = (state.revocations ?? 0) + 1
+      return response({ revoked: true })
     }
     throw new Error(`Unexpected request: ${url}`)
   }
@@ -344,30 +340,28 @@ for (const browser of ["firefox", "chrome"]) {
     assert.equal(harness.local.twitch_channels_cache, undefined)
   })
 
-  test(`${browser}: live transition notifications and zero-channel badge update`, async () => {
+  test(`${browser}: live transition and zero-channel badge update with favorites`, async () => {
     const harness = createHarness(browser)
     harness.signedIn()
     harness.local.notification_streamers = ["1"]
     await harness.message({ type: "POLL_NOW" })
-    assert.equal(harness.notifications.length, 0)
+    assert.equal(harness.state.badge, "1")
     harness.state.live = []
     await harness.message({ type: "POLL_NOW" })
     assert.equal(harness.state.badge, "")
     harness.state.live = ["1"]
     await harness.message({ type: "POLL_NOW" })
-    assert.equal(harness.notifications.length, 1)
-    assert.equal("silent" in harness.notifications[0].options, browser === "chrome")
-    assert.equal("priority" in harness.notifications[0].options, browser === "chrome")
+    assert.equal(harness.state.badge, "1")
   })
 
-  test(`${browser}: concurrent notification writes and repeated removal are safe`, async () => {
+  test(`${browser}: concurrent favorite writes and repeated removal are safe`, async () => {
     const harness = createHarness(browser)
     await Promise.all(
-      ["1", "2"].map((id) => harness.message({ type: "TOGGLE_NOTIFICATION", broadcasterId: id }))
+      ["1", "2"].map((id) => harness.message({ type: "TOGGLE_FAVORITE", broadcasterId: id }))
     )
     assert.equal(harness.local.notification_streamers.length, 2)
     await Promise.all(
-      [1, 2].map(() => harness.message({ type: "REMOVE_NOTIFICATION", broadcasterId: "1" }))
+      [1, 2].map(() => harness.message({ type: "REMOVE_FAVORITE", broadcasterId: "1" }))
     )
     assert.equal(harness.local.notification_streamers.length, 1)
     assert.equal(harness.local.notification_streamers[0], "2")
@@ -389,6 +383,7 @@ for (const browser of ["firefox", "chrome"]) {
     const logout = harness.message({ type: "SESSION_LOGOUT" })
     release()
     await Promise.all([poll, logout])
+    assert.ok((harness.state.revocations ?? 0) >= 1)
     assert.equal(harness.session.twitch_access_token, undefined)
     assert.equal(harness.local.twitch_refresh_token, undefined)
     assert.equal(harness.local.twitch_channels_cache, undefined)
@@ -575,6 +570,7 @@ for (const browser of ["firefox", "chrome"]) {
     assert.equal(harness.local.twitch_refresh_token, undefined)
     assert.equal(harness.session.twitch_refresh_token, "rotated")
     await harness.message({ type: "SESSION_LOGOUT" })
+    assert.ok((harness.state.revocations ?? 0) >= 1)
     assert.equal(harness.session.twitch_access_token, undefined)
     assert.equal(harness.session.twitch_refresh_token, undefined)
     assert.equal(harness.local.twitch_refresh_token, undefined)

@@ -1,5 +1,5 @@
 import { CLIENT_ID, SCOPES } from "./config.js"
-import { AuthError, requestTokens } from "./auth.js"
+import { AuthError, requestTokens, revokeToken } from "./auth.js"
 import {
   localGet,
   localSet,
@@ -112,6 +112,24 @@ function getRefreshToken(expected) {
         : await sessionGet("twitch_refresh_token")
     return stored.twitch_refresh_token
   })
+}
+
+export async function revokeSessionTokens() {
+  try {
+    const [sessionCreds, localCreds] = await Promise.all([
+      sessionGet(["twitch_access_token", "twitch_refresh_token"]),
+      localGet("twitch_refresh_token")
+    ])
+    const token =
+      sessionCreds.twitch_access_token ||
+      sessionCreds.twitch_refresh_token ||
+      localCreds.twitch_refresh_token
+    if (token) {
+      await revokeToken(token)
+    }
+  } catch (error) {
+    console.error("Token revocation failed:", error)
+  }
 }
 
 export async function clearTokens() {
