@@ -1,6 +1,6 @@
 /** Average mid-tone pixels; this is a decorative approximation, not a dominant-color histogram. */
 export function sampleAverageColor(imageUrl, { signal, timeoutMs = 3000 } = {}) {
-  if (signal?.aborted) return Promise.resolve(null)
+  if (signal?.aborted || !imageUrl || typeof imageUrl !== "string") return Promise.resolve(null)
   return new Promise((resolve) => {
     const img = new Image()
     let timer
@@ -18,7 +18,9 @@ export function sampleAverageColor(imageUrl, { signal, timeoutMs = 3000 } = {}) 
     const onAbort = () => finish(null)
     signal?.addEventListener("abort", onAbort, { once: true })
     timer = setTimeout(onAbort, timeoutMs)
-    img.crossOrigin = "anonymous"
+    if (!imageUrl.startsWith("data:")) {
+      img.crossOrigin = "anonymous"
+    }
     img.onload = () => {
       try {
         const canvas = document.createElement("canvas")

@@ -25,7 +25,13 @@ export function useProfile() {
     let active = true
     const controller = new AbortController()
 
-    function applyColors(imageUrl) {
+    function applyColors(targetProfile) {
+      if (!targetProfile) return
+      if (targetProfile.colors) {
+        setColors(targetProfile.colors)
+        return
+      }
+      const imageUrl = targetProfile.avatar_data || targetProfile.profile_image_url
       if (!imageUrl) return
       // Decorative image work must never delay preferences or sign-out.
       sampleAverageColor(imageUrl, { signal: controller.signal }).then((color) => {
@@ -45,7 +51,7 @@ export function useProfile() {
       if (!active || !updated) return
       setUser((current) => (profilesEqual(current, updated) ? current : updated))
       setLoading(false)
-      applyColors(updated.profile_image_url)
+      applyColors(updated)
     }
     if (extension?.storage?.onChanged?.addListener) {
       extension.storage.onChanged.addListener(onChanged)
@@ -57,7 +63,7 @@ export function useProfile() {
         if (!active || !cached?.profile) return
         setUser((current) => (profilesEqual(current, cached.profile) ? current : cached.profile))
         setLoading(false)
-        applyColors(cached.profile.profile_image_url)
+        applyColors(cached.profile)
       })
       .catch(() => {})
 
@@ -67,7 +73,7 @@ export function useProfile() {
         if (!active || !profile) return
         setUser((current) => (profilesEqual(current, profile) ? current : profile))
         setLoading(false)
-        applyColors(profile.profile_image_url)
+        applyColors(profile)
       })
       .catch((failure) => {
         setUser((current) => {

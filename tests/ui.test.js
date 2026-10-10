@@ -494,3 +494,27 @@ test("settings profile updates seamlessly in background when cache changes witho
   assert.ok(screen.getByText("5000"))
   assert.equal(screen.queryByRole("status"), null)
 })
+
+test("settings root applies profile dynamic tint and dark colors from profile", async () => {
+  const pending = deferred()
+  handlers.GET_PROFILE = () => pending.promise
+  local.twitch_user_profile_cache = {
+    profile: {
+      id: "99",
+      display_name: "ColorUser",
+      login: "coloruser",
+      colors: {
+        "--profile-tint": "rgba(224, 128, 48, 0.45)",
+        "--profile-dark": "rgb(34, 19, 7)"
+      },
+      followers: 10
+    },
+    ts: Date.now()
+  }
+  mount(SettingsPage, { showOffline: false })
+  assert.ok(await screen.findByText("ColorUser"))
+  const root = dom.window.document.querySelector(".settings-root")
+  assert.ok(root)
+  assert.equal(root.style.getPropertyValue("--profile-tint"), "rgba(224, 128, 48, 0.45)")
+  assert.equal(root.style.getPropertyValue("--profile-dark"), "rgb(34, 19, 7)")
+})

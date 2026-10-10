@@ -1,9 +1,14 @@
-/* ── SettingsPage.css ────────────────────────────────── */
+/* ── SettingsPage.css ─────────────────────────────────── */
 
 .settings-root {
   width: 100%;
   min-height: 100vh;
-  background: var(--tw-bg);
+  background: linear-gradient(
+    to bottom,
+    var(--profile-tint, var(--tw-bg)) 0%,
+    var(--profile-dark, var(--tw-bg)) 50%,
+    var(--tw-bg) 100%
+  );
   color: var(--tw-text-primary);
   font-family: var(--tw-font-family);
   display: flex;
