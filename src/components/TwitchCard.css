@@ -1,147 +1,117 @@
+/* ── TwitchCard.css ───────────────────────────────── */
+
 .tc-card {
   position: relative;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
+  flex-direction: column;
+  border-radius: 10px;
+  overflow: hidden;
   background: var(--tw-surface);
-  border-radius: 6px;
+  border: 1px solid var(--tw-surface-hover-light);
   cursor: pointer;
-  border-left: 3px solid var(--tw-live);
-  text-decoration: none;
-  color: inherit;
+  text-align: center;
   transition:
-    background 0.15s ease,
-    transform 0.1s ease;
+    transform 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
 }
 
-.tc-card:hover {
-  background: var(--tw-surface-hover);
+.tc-channel-link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+}
+.tc-channel-link:focus-visible {
+  outline: 2px solid var(--tw-accent-light);
+  outline-offset: -3px;
 }
 
+/* ── Live card hover ── */
+.tc-card:not(.tc-card--offline):hover {
+  transform: translateY(-2px);
+  border-color: var(--tw-accent);
+  box-shadow: 0 4px 14px var(--tw-accent-glow);
+}
+
+/* ── Offline card ── */
 .tc-card--offline {
-  border-left-color: var(--tw-offline);
-  opacity: 0.65;
+  opacity: 0.75;
 }
 
 .tc-card--offline:hover {
   opacity: 1;
-  background: var(--tw-surface-hover);
+  transform: translateY(-1px);
 }
 
-/* Avatar container with live ring */
+/* ── Foto de perfil (arriba de la card) ── */
 .tc-avatar-wrap {
-  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.tc-avatar-wrap::before {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: 50%;
-  border: 2px solid var(--tw-live);
-  opacity: 0.85;
-}
-
-.tc-card--offline .tc-avatar-wrap::before {
-  border-color: var(--tw-offline);
-  opacity: 0.4;
+  z-index: 1;
+  position: relative;
+  pointer-events: none;
 }
 
 .tc-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   display: block;
+  transition: filter 0.2s;
 }
 
+/* Grayscale para canales offline */
+.tc-avatar--offline {
+  filter: grayscale(100%);
+}
+
+/* Fallback cuando no hay foto */
 .tc-avatar-fallback {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--tw-surface-light);
-  color: var(--tw-text-muted);
-  font-size: 14px;
-  font-weight: 700;
+  width: 100%;
+  height: 100%;
+  background: var(--tw-accent-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
-  text-transform: uppercase;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--tw-on-accent);
 }
 
-/* Dot indicator on avatar */
-.tc-dot {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--tw-live);
-  border: 1.5px solid var(--tw-surface);
+.tc-avatar-fallback--offline {
+  background: var(--tw-offline-gradient);
 }
 
-.tc-card--offline .tc-dot {
-  display: none;
-}
-
-/* Info column */
+/* ── Info (debajo de la foto) ── */
 .tc-info {
-  flex: 1;
-  min-width: 0;
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+  isolation: isolate;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 2px;
+  padding: 6px 6px 7px;
 }
 
-/* Ambient glow container */
-.tc-info--ambient {
-  position: relative;
-}
-
+/* Mask the container so flipping its image keeps the fade direction intact. */
 .tc-ambient {
   position: absolute;
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
-  width: 130px;
-  height: 60px;
-  border-radius: 6px;
-  overflow: hidden;
+  inset: 0;
+  z-index: -1;
   pointer-events: none;
-  z-index: 0;
-  opacity: 0.75;
-  transition: opacity 0.2s ease;
-  mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    rgba(0, 0, 0, 0.4) 30%,
-    rgba(0, 0, 0, 0.95) 75%,
-    black 100%
-  );
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    rgba(0, 0, 0, 0.4) 30%,
-    rgba(0, 0, 0, 0.95) 75%,
-    black 100%
-  );
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 100%);
 }
 
-.tc-card:hover .tc-ambient {
-  opacity: 0.95;
-}
-
-.tc-ambient-img {
-  width: 100%;
+.tc-ambient-image {
+  position: absolute;
+  inset: -20%;
+  width: 140%;
   height: 140%;
   object-fit: cover;
   object-position: center bottom;
@@ -232,84 +202,41 @@
   text-overflow: ellipsis;
 }
 
-.tc-title {
-  font-size: 10px;
-  color: var(--tw-text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Viewers count badge */
 .tc-viewers {
-  flex-shrink: 0;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--tw-text-primary);
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  background: var(--tw-surface-light);
-  padding: 2px 6px;
-  border-radius: 4px;
+  font-size: 10.5px;
+  color: var(--tw-text-secondary);
 }
 
-.tc-viewers-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--tw-live);
-}
-
-/* Offline badge */
-.tc-offline-badge {
-  flex-shrink: 0;
-  font-size: 10px;
-  font-weight: 500;
+.tc-offline-label {
+  font-size: 10.5px;
   color: var(--tw-text-muted);
-  background: var(--tw-surface-light);
-  padding: 2px 5px;
-  border-radius: 4px;
 }
 
-/* GX Theme Overrides */
+/* ── GX Theme TwitchCard ── */
 [data-theme="gx"] .tc-card {
-  border-radius: 0;
-  border-left-width: 2px;
-  border-left-color: var(--tw-accent);
-  background: var(--tw-surface);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  border-radius: 2px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(#1d1d1d, #1d1d1d) padding-box,
+    linear-gradient(#a01231, #1f060b) border-box;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
 }
 
 [data-theme="gx"] .tc-card:not(.tc-card--offline):hover {
-  background: var(--tw-surface-hover);
-  border-left-color: var(--tw-accent-hover);
-  box-shadow:
-    inset 0 0 15px var(--tw-accent-glow),
-    0 0 10px rgba(0, 0, 0, 0.8);
-  transform: translateX(2px);
+  background:
+    linear-gradient(#1d1d1d, #1d1d1d) padding-box,
+    linear-gradient(#fa1e4e, #a01231) border-box;
+  box-shadow: 0 4px 14px rgba(250, 30, 78, 0.4);
 }
 
 [data-theme="gx"] .tc-name {
-  letter-spacing: 0.5px;
+  font-size: 11.5px;
 }
 
 [data-theme="gx"] .tc-game {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 10px;
 }
 
 [data-theme="gx"] .tc-viewers {
-  border-radius: 0;
-  background: #141724;
-  border: 1px solid rgba(250, 30, 78, 0.3);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
-
-[data-theme="gx"] .tc-viewers-dot {
-  box-shadow: 0 0 5px var(--tw-accent);
-}
-
-[data-theme="gx"] .tc-star-btn--active svg,
-[data-theme="gx"] .tc-bell-btn--active svg {
-  filter: drop-shadow(0 0 4px var(--tw-warning));
+  font-size: 10px;
 }
