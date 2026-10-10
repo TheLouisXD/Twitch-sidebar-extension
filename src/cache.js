@@ -3,6 +3,7 @@ import { POLL_INTERVAL_KEY, normalizePollInterval } from "./preferences.js"
 
 export const CHANNELS_KEY = "twitch_channels_cache"
 export const PROFILES_KEY = "twitch_profiles_cache"
+export const USER_PROFILE_KEY = "twitch_user_profile_cache"
 export const NOTIFICATIONS_KEY = "notification_streamers"
 export const FAVORITES_KEY = NOTIFICATIONS_KEY
 export const PREV_LIVE_KEY = "previously_live"
@@ -48,8 +49,24 @@ export function setCachedProfiles(map) {
   return localSet({ [PROFILES_KEY]: { map, ts: Date.now() } })
 }
 
+export async function getCachedUserProfile() {
+  const { [USER_PROFILE_KEY]: entry } = await localGet(USER_PROFILE_KEY)
+  if (!entry?.profile) return null
+  return { profile: entry.profile, fresh: isFresh(entry.ts, TWENTY_FOUR_HOURS) }
+}
+
+export function setCachedUserProfile(profile) {
+  return localSet({ [USER_PROFILE_KEY]: { profile, ts: Date.now() } })
+}
+
 export function clearAllCache() {
-  return localRemove([CHANNELS_KEY, PROFILES_KEY, NOTIFICATIONS_KEY, PREV_LIVE_KEY])
+  return localRemove([
+    CHANNELS_KEY,
+    PROFILES_KEY,
+    USER_PROFILE_KEY,
+    NOTIFICATIONS_KEY,
+    PREV_LIVE_KEY
+  ])
 }
 
 export async function getNotificationStreamers() {

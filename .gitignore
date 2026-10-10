@@ -26,6 +26,7 @@ dist-ssr
 
 # Build and report artifacts
 *.zip
+release/
 eslint-report.json
 audit_report.html
 file_stats.json

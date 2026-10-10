@@ -7,7 +7,9 @@ import {
   clearAllCache,
   getCachedChannels,
   setCachedChannels,
-  setCachedProfiles
+  setCachedProfiles,
+  getCachedUserProfile,
+  setCachedUserProfile
 } from "./cache.js"
 import {
   getSessionRevision,
@@ -170,20 +172,33 @@ function changeStreamerPreference(key, id, remove = false) {
 }
 
 async function getProfile() {
+  const cached = await getCachedUserProfile()
+  if (cached?.fresh) {
+    return { profile: cached.profile }
+  }
+
   return withSession(async (token) => {
-    const profile = await fetchUser(token)
     try {
-      const result = await fetchTwitch(
-        token,
-        "channels/followers",
-        new URLSearchParams({ broadcaster_id: profile.id, first: "1" })
-      )
-      profile.followers = result.total
+      const profile = await fetchUser(token)
+      try {
+        const result = await fetchTwitch(
+          token,
+          "channels/followers",
+          new URLSearchParams({ broadcaster_id: profile.id, first: "1" })
+        )
+        profile.followers = result.total
+      } catch (error) {
+        // Follower count is optional; do not request moderator access for it.
+        if (error instanceof AuthError) throw error
+      }
+      await setCachedUserProfile(profile)
+      return { profile }
     } catch (error) {
-      // Follower count is optional; do not request moderator access for it.
-      if (error instanceof AuthError) throw error
+      if (cached?.profile && !(error instanceof AuthError)) {
+        return { profile: cached.profile }
+      }
+      throw error
     }
-    return { profile }
   })
 }
 

@@ -9,9 +9,10 @@
     "build:chrome": "cross-env BROWSER_TARGET=chrome vite build",
     "build:firefox": "cross-env BROWSER_TARGET=firefox vite build",
     "build:all": "npm run build:chrome && npm run build:firefox",
+    "pack": "node scripts/pack.js",
     "lint": "eslint .",
-    "format": "prettier --write src tests manifests *.config.js *.json *.md .prettierrc.json index.html",
-    "format:check": "prettier --check src tests manifests *.config.js *.json *.md .prettierrc.json index.html",
+    "format": "prettier --write src tests manifests scripts *.config.js *.json *.md .prettierrc.json index.html",
+    "format:check": "prettier --check src tests manifests scripts *.config.js *.json *.md .prettierrc.json index.html",
     "test": "node --test tests/*.test.js",
     "preview": "vite preview"
   },

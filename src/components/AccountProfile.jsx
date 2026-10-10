@@ -2,15 +2,7 @@ import { useI18n } from "../i18n-context.js"
 import { formatAvatarUrl } from "../twitch.js"
 
 export default function AccountProfile({ user, loading, error }) {
-  const { t, lang } = useI18n()
-  function formatDate(isoDate) {
-    if (!isoDate) return "—"
-    return new Date(isoDate).toLocaleDateString(lang === "en" ? "en-US" : "es-ES", {
-      year: "numeric",
-      month: "long",
-      day: "numeric"
-    })
-  }
+  const { t } = useI18n()
 
   if (loading)
     return (
@@ -48,20 +40,6 @@ export default function AccountProfile({ user, loading, error }) {
           <div className="settings-info-item">
             <span className="settings-info-label">{t("settings.followers")}</span>
             <span className="settings-info-value">{user?.followers ?? "—"}</span>
-          </div>
-          <div className="settings-info-item">
-            <span className="settings-info-label">{t("settings.type")}</span>
-            <span className="settings-info-value">
-              {user?.broadcaster_type === "partner"
-                ? t("settings.partner")
-                : user?.broadcaster_type === "affiliate"
-                  ? t("settings.affiliate")
-                  : t("settings.standard")}
-            </span>
-          </div>
-          <div className="settings-info-item">
-            <span className="settings-info-label">{t("settings.created")}</span>
-            <span className="settings-info-value">{formatDate(user?.created_at)}</span>
           </div>
         </div>
       </div>
