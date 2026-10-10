@@ -104,6 +104,7 @@ export async function fetchAllFollowed(token) {
       offline: channels.filter((channel) => !channel.isLive)
     },
     profileMap,
-    profilesChanged: !fresh || missing.length > 0
+    profilesChanged: !fresh || missing.length > 0,
+    user
   }
 }

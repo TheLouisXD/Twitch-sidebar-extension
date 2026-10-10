@@ -449,3 +449,48 @@ test("login page renders requested tagline, button text and link to ThelouisXD T
   assert.equal(link.getAttribute("target"), "_blank")
   assert.ok(link.parentElement.textContent.includes("hecho con ❤︎ por ThelouisXD"))
 })
+
+test("settings profile updates seamlessly in background when cache changes without showing a spinner", async () => {
+  local.twitch_user_profile_cache = {
+    profile: {
+      id: "99",
+      display_name: "CachedUser",
+      login: "cacheduser",
+      profile_image_url: "https://static-cdn.jtvnw.net/cached.png",
+      avatar_data: "data:image/png;base64,AAA",
+      followers: 100
+    },
+    ts: Date.now()
+  }
+  const pending = deferred()
+  handlers.GET_PROFILE = () => pending.promise
+
+  mount(SettingsPage, { showOffline: false })
+  assert.ok(await screen.findByText("CachedUser"))
+  const img = screen.getByAltText("CachedUser")
+  assert.equal(img.src, "data:image/png;base64,AAA")
+  assert.ok(screen.getByText("100"))
+  assert.equal(screen.queryByRole("status"), null)
+
+  await act(async () => {
+    changeStorage({
+      twitch_user_profile_cache: {
+        profile: {
+          id: "99",
+          display_name: "UpdatedUser",
+          login: "updateduser",
+          profile_image_url: "https://static-cdn.jtvnw.net/updated.png",
+          avatar_data: "data:image/png;base64,BBB",
+          followers: 5000
+        },
+        ts: Date.now()
+      }
+    })
+  })
+
+  assert.ok(screen.getByText("UpdatedUser"))
+  const updatedImg = screen.getByAltText("UpdatedUser")
+  assert.equal(updatedImg.src, "data:image/png;base64,BBB")
+  assert.ok(screen.getByText("5000"))
+  assert.equal(screen.queryByRole("status"), null)
+})

@@ -4,13 +4,13 @@ import { formatAvatarUrl } from "../twitch.js"
 export default function AccountProfile({ user, loading, error }) {
   const { t } = useI18n()
 
-  if (loading)
+  if (loading && !user)
     return (
       <div className="settings-loading">
         <div className="settings-spinner" role="status" aria-label={t("main.loading")} />
       </div>
     )
-  if (error)
+  if (error && !user)
     return (
       <div className="main-error-banner" role="alert">
         {t("settings.error")}
@@ -20,11 +20,11 @@ export default function AccountProfile({ user, loading, error }) {
     <>
       <div className="settings-profile">
         <div className="settings-avatar-wrap">
-          {user?.profile_image_url ? (
+          {user?.avatar_data || user?.profile_image_url ? (
             <img
               className="settings-avatar"
-              src={formatAvatarUrl(user.profile_image_url)}
-              alt={user.display_name}
+              src={user?.avatar_data || formatAvatarUrl(user?.profile_image_url)}
+              alt={user?.display_name ?? ""}
               decoding="async"
             />
           ) : (

@@ -15,6 +15,24 @@ function isFresh(timestamp, maxAge) {
   return Number.isFinite(timestamp) && age >= 0 && age < maxAge
 }
 
+export async function fetchImageAsDataUrl(url) {
+  if (!url || typeof url !== "string") return null
+  try {
+    const res = await fetch(url)
+    if (!res.ok) return null
+    const buffer = await res.arrayBuffer()
+    const bytes = new Uint8Array(buffer)
+    let binary = ""
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i])
+    }
+    const mime = res.headers.get("content-type") || "image/png"
+    return `data:${mime};base64,${btoa(binary)}`
+  } catch {
+    return null
+  }
+}
+
 export async function getCachedChannels() {
   const { [CHANNELS_KEY]: entry, [POLL_INTERVAL_KEY]: interval } = await localGet([
     CHANNELS_KEY,
@@ -52,10 +70,14 @@ export function setCachedProfiles(map) {
 export async function getCachedUserProfile() {
   const { [USER_PROFILE_KEY]: entry } = await localGet(USER_PROFILE_KEY)
   if (!entry?.profile) return null
-  return { profile: entry.profile, fresh: isFresh(entry.ts, TWENTY_FOUR_HOURS) }
+  return { profile: entry.profile, ts: entry.ts, fresh: isFresh(entry.ts, TWENTY_FOUR_HOURS) }
 }
 
-export function setCachedUserProfile(profile) {
+export async function setCachedUserProfile(profile) {
+  if (!profile) return
+  if (!profile.avatar_data && profile.profile_image_url && typeof fetch === "function") {
+    profile.avatar_data = await fetchImageAsDataUrl(profile.profile_image_url).catch(() => null)
+  }
   return localSet({ [USER_PROFILE_KEY]: { profile, ts: Date.now() } })
 }
 

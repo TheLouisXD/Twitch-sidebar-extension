@@ -84,11 +84,29 @@ function pollStreams() {
     const token = await restoreSession()
     assertSession(expected)
     if (!token) return null
-    const { data, profileMap, profilesChanged } = await withSession(fetchAllFollowed)
+    const { data, profileMap, profilesChanged, user } = await withSession(fetchAllFollowed)
     assertSession(expected)
     if (profilesChanged) await setCachedProfiles(profileMap)
     assertSession(expected)
     await setCachedChannels(data)
+    assertSession(expected)
+    if (user) {
+      const cached = await getCachedUserProfile()
+      const prev = cached?.profile
+      const changed =
+        !prev ||
+        prev.id !== user.id ||
+        prev.display_name !== user.display_name ||
+        prev.login !== user.login ||
+        prev.profile_image_url !== user.profile_image_url
+      if (changed || !prev?.avatar_data) {
+        await setCachedUserProfile({
+          ...prev,
+          ...user,
+          followers: prev?.followers ?? null
+        })
+      }
+    }
     assertSession(expected)
     await syncBadgeFromCache()
     return data
@@ -148,6 +166,7 @@ function authenticate() {
     assertSession(expected)
     await clearAllCache()
     await saveTokens(tokens, expected)
+    pollStreams().catch(report)
     return { authenticated: true }
   }).finally(() => {
     authTask = null
@@ -173,11 +192,8 @@ function changeStreamerPreference(key, id, remove = false) {
 
 async function getProfile() {
   const cached = await getCachedUserProfile()
-  if (cached?.fresh) {
-    return { profile: cached.profile }
-  }
 
-  return withSession(async (token) => {
+  const refreshTask = withSession(async (token) => {
     try {
       const profile = await fetchUser(token)
       try {
@@ -191,15 +207,39 @@ async function getProfile() {
         // Follower count is optional; do not request moderator access for it.
         if (error instanceof AuthError) throw error
       }
-      await setCachedUserProfile(profile)
-      return { profile }
+
+      const prev = cached?.profile
+      const changed =
+        !prev ||
+        prev.id !== profile.id ||
+        prev.display_name !== profile.display_name ||
+        prev.login !== profile.login ||
+        prev.profile_image_url !== profile.profile_image_url ||
+        prev.followers !== profile.followers
+
+      if (changed || !prev?.avatar_data) {
+        await setCachedUserProfile(profile)
+      } else {
+        profile.avatar_data = prev.avatar_data
+      }
+
+      return { profile, changed }
     } catch (error) {
       if (cached?.profile && !(error instanceof AuthError)) {
-        return { profile: cached.profile }
+        return { profile: cached.profile, changed: false }
       }
       throw error
     }
   })
+
+  // Stale-while-revalidate: return cached profile instantly if available,
+  // while refreshTask runs in the background to update cache if there are changes.
+  if (cached?.profile) {
+    refreshTask.catch(() => {})
+    return { profile: cached.profile, fromCache: true }
+  }
+
+  return refreshTask
 }
 
 /** @param {import("./types.js").ExtensionMessage} message */

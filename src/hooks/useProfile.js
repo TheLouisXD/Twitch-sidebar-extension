@@ -1,7 +1,19 @@
 import { useEffect, useState } from "react"
-import { sendMessage } from "../platform.js"
+import { extension, sendMessage } from "../platform.js"
 import { sampleAverageColor } from "../image-color.js"
-import { getCachedUserProfile } from "../cache.js"
+import { USER_PROFILE_KEY, getCachedUserProfile } from "../cache.js"
+
+function profilesEqual(a, b) {
+  if (!a || !b) return a === b
+  return (
+    a.id === b.id &&
+    a.display_name === b.display_name &&
+    a.login === b.login &&
+    a.profile_image_url === b.profile_image_url &&
+    a.avatar_data === b.avatar_data &&
+    a.followers === b.followers
+  )
+}
 
 export function useProfile() {
   const [user, setUser] = useState(null)
@@ -26,25 +38,42 @@ export function useProfile() {
       })
     }
 
+    // Listen to background cache updates from storage
+    const onChanged = (changes, area) => {
+      if (area !== "local" || !changes[USER_PROFILE_KEY]) return
+      const updated = changes[USER_PROFILE_KEY].newValue?.profile
+      if (!active || !updated) return
+      setUser((current) => (profilesEqual(current, updated) ? current : updated))
+      setLoading(false)
+      applyColors(updated.profile_image_url)
+    }
+    if (extension?.storage?.onChanged?.addListener) {
+      extension.storage.onChanged.addListener(onChanged)
+    }
+
     // 1. Immediately display cached profile if available to eliminate loading delay
     getCachedUserProfile()
       .then((cached) => {
         if (!active || !cached?.profile) return
-        setUser(cached.profile)
+        setUser((current) => (profilesEqual(current, cached.profile) ? current : cached.profile))
         setLoading(false)
         applyColors(cached.profile.profile_image_url)
       })
       .catch(() => {})
 
-    // 2. Fetch fresh profile in background
+    // 2. Fetch fresh profile in background and update if changed
     sendMessage({ type: "GET_PROFILE" })
       .then(({ profile }) => {
         if (!active || !profile) return
-        setUser(profile)
+        setUser((current) => (profilesEqual(current, profile) ? current : profile))
+        setLoading(false)
         applyColors(profile.profile_image_url)
       })
       .catch((failure) => {
-        if (active) setError(failure)
+        setUser((current) => {
+          if (!current && active) setError(failure)
+          return current
+        })
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -53,6 +82,9 @@ export function useProfile() {
     return () => {
       active = false
       controller.abort()
+      if (extension?.storage?.onChanged?.removeListener) {
+        extension.storage.onChanged.removeListener(onChanged)
+      }
     }
   }, [])
 
