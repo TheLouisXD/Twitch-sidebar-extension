@@ -50,13 +50,15 @@
   border-color: var(--tw-border);
 }
 
-/* ── Avatar / Preview ── */
+/* ── Avatar (cuadrado 1:1 para evitar que la foto de perfil se corte) ── */
 .tc-avatar-wrap {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 1 / 1;
   background: var(--tw-surface-light);
   overflow: hidden;
   position: relative;
+  flex-shrink: 0;
+  pointer-events: none;
 }
 
 .tc-avatar {

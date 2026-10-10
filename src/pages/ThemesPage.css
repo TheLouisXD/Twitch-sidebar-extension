@@ -105,10 +105,10 @@
   box-shadow: 0 0 12px var(--tw-accent-glow);
 }
 
-/* Preview / Portada igual al aspect ratio de video 16:9 */
+/* Preview wrap (aspect ratio 1 / 1 igual que avatar) */
 .theme-card-preview-wrap {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 1 / 1;
   background: var(--tw-surface-light);
   overflow: hidden;
   position: relative;
