@@ -24,6 +24,8 @@
 }
 
 :root {
+  color-scheme: dark;
+
   /* ── Background Colors ── */
   --tw-bg: #0e0e10;
   --tw-surface: #18181b;
@@ -147,8 +149,14 @@ textarea {
 
 /* Firefox uses the standard scrollbar properties. */
 html {
+  color-scheme: dark;
   scrollbar-width: thin;
   scrollbar-color: var(--tw-surface-light) var(--tw-bg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--tw-accent);
+  outline-offset: 2px;
 }
 
 /* Custom Scrollbar to match Twitch */
@@ -182,6 +190,7 @@ html[data-theme="gx"] {
 [data-theme="gx"] ::-webkit-scrollbar-thumb:hover {
   background: #fa1e4e;
 }
+
 @keyframes spin {
   to {
     transform: rotate(360deg);

@@ -276,6 +276,9 @@ extension.storage.onChanged.addListener((changes, area) => {
 })
 
 extension.runtime.onInstalled.addListener(() => {
+  if (!isFirefox && extension.sidePanel?.setPanelBehavior) {
+    callExtension("sidePanel.setPanelBehavior", { openPanelOnActionClick: true }).catch(report)
+  }
   ensureAlarm().catch(report)
   runPoll()
 })
@@ -287,6 +290,9 @@ extension.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === ALARM_NAME) return runPoll()
 })
 
+if (!isFirefox && extension.sidePanel?.setPanelBehavior) {
+  callExtension("sidePanel.setPanelBehavior", { openPanelOnActionClick: true }).catch(report)
+}
 callExtension("action.setBadgeBackgroundColor", { color: "#9147ff" }).catch(report)
 ensureAlarm().catch(report)
 syncBadgeFromCache().catch(report)
