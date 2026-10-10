@@ -10,34 +10,45 @@ if (!existsSync(releaseDir)) {
   mkdirSync(releaseDir, { recursive: true })
 }
 
+const chromeManifest = JSON.parse(
+  readFileSync(join(root, "manifests", "manifest.chrome.json"), "utf8")
+)
+const version = chromeManifest.version || "1.0"
+
 function sha256(filePath) {
   const fileBuffer = readFileSync(filePath)
   return createHash("sha256").update(fileBuffer).digest("hex")
 }
 
-console.log("==> 1. Compilando extensiones para Chrome y Firefox...")
-execSync("npm run build:all", { cwd: root, stdio: "inherit" })
+const shouldBuild = !process.argv.includes("--no-build") && !process.env.SKIP_BUILD
 
-console.log("\n==> 2. Empaquetando para Chrome Web Store...")
+if (shouldBuild) {
+  console.log("==> 1. Compilando extensiones para Chrome y Firefox...")
+  execSync("npm run build:all", { cwd: root, stdio: "inherit" })
+} else {
+  console.log("==> 1. Omitiendo compilación (ya compilado con npm run build:all)...")
+}
+
+console.log(`\n==> 2. Empaquetando para Chrome Web Store (v${version})...`)
 const chromeDist = join(root, "dist-chrome")
-const chromeZipRelease = join(releaseDir, "twitch-live-sidebar-chrome-v1.1.zip")
-const chromeZipRoot = join(root, "twitch-live-sidebar-v1.1.zip")
+const chromeZipRelease = join(releaseDir, `twitch-live-sidebar-chrome-v${version}.zip`)
+const chromeZipRoot = join(root, `twitch-live-sidebar-v${version}.zip`)
 
 // Crear ZIP con los contenidos de dist-chrome en la raíz del archivo
 execSync(`tar -a -c -f "${chromeZipRelease}" *`, { cwd: chromeDist })
 execSync(`tar -a -c -f "${chromeZipRoot}" *`, { cwd: chromeDist })
 
-console.log("\n==> 3. Empaquetando para Firefox Add-ons (AMO)...")
+console.log(`\n==> 3. Empaquetando para Firefox Add-ons (AMO) (v${version})...`)
 const firefoxDist = join(root, "dist-firefox")
-const firefoxZipRelease = join(releaseDir, "twitch-live-sidebar-firefox-v1.1.zip")
-const firefoxZipRoot = join(root, "twitch-live-sidebar-firefox-v1.1.zip")
+const firefoxZipRelease = join(releaseDir, `twitch-live-sidebar-firefox-v${version}.zip`)
+const firefoxZipRoot = join(root, `twitch-live-sidebar-firefox-v${version}.zip`)
 
 execSync(`tar -a -c -f "${firefoxZipRelease}" *`, { cwd: firefoxDist })
 execSync(`tar -a -c -f "${firefoxZipRoot}" *`, { cwd: firefoxDist })
 
-console.log("\n==> 4. Empaquetando código fuente para Mozilla AMO...")
-const sourceZipRelease = join(releaseDir, "twitch-live-sidebar-firefox-v1.1-SOURCE.zip")
-const sourceZipRoot = join(root, "twitch-live-sidebar-firefox-v1.1-SOURCE.zip")
+console.log(`\n==> 4. Empaquetando código fuente para Mozilla AMO (v${version})...`)
+const sourceZipRelease = join(releaseDir, `twitch-live-sidebar-firefox-v${version}-SOURCE.zip`)
+const sourceZipRoot = join(root, `twitch-live-sidebar-firefox-v${version}-SOURCE.zip`)
 
 // Incluir archivos fuente para que revisores de Mozilla puedan reproducir el build
 const sourceFiles = [
@@ -52,6 +63,7 @@ const sourceFiles = [
   "package-lock.json",
   "BUILD.md",
   "README.md",
+  "LICENSE",
   ".prettierrc.json"
 ]
 execSync(`tar -a -c -f "${sourceZipRelease}" ${sourceFiles.join(" ")}`, { cwd: root })
@@ -59,9 +71,9 @@ execSync(`tar -a -c -f "${sourceZipRoot}" ${sourceFiles.join(" ")}`, { cwd: root
 
 console.log("\n==> 5. Verificando paquetes creados:")
 const packages = [
-  { name: "Chrome Web Store ZIP", path: chromeZipRelease },
-  { name: "Firefox AMO ZIP", path: firefoxZipRelease },
-  { name: "Firefox Source ZIP", path: sourceZipRelease }
+  { name: `Chrome Web Store ZIP (v${version})`, path: chromeZipRelease },
+  { name: `Firefox AMO ZIP (v${version})`, path: firefoxZipRelease },
+  { name: `Firefox Source ZIP (v${version})`, path: sourceZipRelease }
 ]
 
 for (const pkg of packages) {

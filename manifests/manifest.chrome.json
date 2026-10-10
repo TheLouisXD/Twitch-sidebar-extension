@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "minimum_chrome_version": "116",
   "name": "Twitch Live Sidebar",
-  "version": "1.1",
+  "version": "1.2",
   "description": "Check which of your followed Twitch channels are live directly from your sidebar.",
   "permissions": ["storage", "identity", "sidePanel", "alarms"],
   "host_permissions": [

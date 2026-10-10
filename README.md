@@ -76,3 +76,7 @@ npx wrangler deploy --dry-run
 El Worker limita cuerpos, campos y solicitudes mediante el binding de Cloudflare, compartido entre `/exchange` y `/refresh`. Los cambios se han validado localmente; requieren un despliegue independiente para entrar en producción. Ver su `README.md` para configuración y límites. El override de `miniflare > sharp` fija 0.35.5 para evitar la versión vulnerable 0.35.4 incluida por Wrangler; retirarlo cuando Miniflare integre la corrección.
 
 Ver [BUILD.md](BUILD.md) para reproducción y límites de la comprobación de Firefox.
+
+## Licencia
+
+Este proyecto se distribuye bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
