@@ -1,7 +1,7 @@
 @font-face {
   font-family: "Roboto";
   font-style: normal;
-  font-weight: 100 900;
+  weight: 100 900;
   font-display: swap;
   src:
     url("./fonts/Roboto-Regular-Ext.woff2") format("woff2"),
@@ -99,8 +99,8 @@
 
   /* ── Typography (Roboto) ── */
   --tw-font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --tw-font-size-base: 20px;
-  --tw-font-size-title: 24px;
+  --tw-font-size-base: 13px;
+  --tw-font-size-title: 14px;
 }
 
 [data-theme="gx"] {
@@ -150,27 +150,19 @@
   --tw-offline-dark: #22242c;
   --tw-offline-gradient: linear-gradient(135deg, #444754, #22242c);
 
-  /* ── Typography (Roboto) ── */
-  --tw-font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --tw-font-size-base: 20px;
-  --tw-font-size-title: 24px;
+  /* ── Typography (Zen Dots Google Font) ── */
+  --tw-font-family: "Zen Dots", sans-serif;
+  --tw-font-size-base: 13px;
+  --tw-font-size-title: 14px;
 }
 
 body {
   margin: 0;
   padding: 0;
   font-family: var(--tw-font-family);
-  font-size: var(--tw-font-size-base);
   background-color: var(--tw-bg);
   color: var(--tw-text-primary);
   color-scheme: dark;
-}
-
-h1,
-h2,
-h3 {
-  font-size: var(--tw-font-size-title);
-  margin: 0;
 }
 
 input,
@@ -178,7 +170,6 @@ button,
 select,
 textarea {
   font-family: inherit;
-  font-size: var(--tw-font-size-base);
 }
 
 * {

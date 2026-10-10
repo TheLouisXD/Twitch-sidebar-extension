@@ -51,7 +51,7 @@ export default function LoginPage({ onLogin, initialError }) {
           </a>
         </p>
         <select
-          className="settings-lang-select"
+          className="login-lang-select"
           value={lang}
           aria-label={t("settings.language")}
           onChange={(event) => changeLang(event.target.value)}

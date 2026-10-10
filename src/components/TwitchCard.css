@@ -2,56 +2,61 @@
 
 .tc-card {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: hidden;
   background: var(--tw-surface);
-  border: 1px solid var(--tw-surface-hover-light);
-  cursor: pointer;
-  text-align: center;
+  border: 1px solid var(--tw-surface-light);
   transition:
     transform 0.15s,
-    border-color 0.15s,
-    box-shadow 0.15s;
+    box-shadow 0.15s,
+    border-color 0.15s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
 }
 
+.tc-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px var(--tw-shadow);
+  border-color: var(--tw-surface-hover-light);
+}
+
+.tc-card:active {
+  transform: translateY(0);
+}
+
+/* Enlace a todo el card para navegación accesible y click primario. */
 .tc-channel-link {
   position: absolute;
   inset: 0;
   z-index: 1;
+  text-decoration: none;
+  cursor: pointer;
   border-radius: inherit;
 }
-.tc-channel-link:focus-visible {
-  outline: 2px solid var(--tw-accent-light);
-  outline-offset: -3px;
+
+.tc-card:focus-within {
+  outline: 2px solid var(--tw-accent);
+  outline-offset: 2px;
 }
 
-/* ── Live card hover ── */
-.tc-card:not(.tc-card--offline):hover {
-  transform: translateY(-2px);
-  border-color: var(--tw-accent);
-  box-shadow: 0 4px 14px var(--tw-accent-glow);
-}
-
-/* ── Offline card ── */
+/* Offline state */
 .tc-card--offline {
-  opacity: 0.75;
+  opacity: 0.65;
 }
 
 .tc-card--offline:hover {
-  opacity: 1;
-  transform: translateY(-1px);
+  opacity: 0.9;
+  border-color: var(--tw-border);
 }
 
-/* ── Foto de perfil (arriba de la card) ── */
+/* ── Avatar / Preview ── */
 .tc-avatar-wrap {
   width: 100%;
-  aspect-ratio: 1 / 1;
-  flex-shrink: 0;
-  z-index: 1;
+  aspect-ratio: 16 / 9;
+  background: var(--tw-surface-light);
+  overflow: hidden;
   position: relative;
-  pointer-events: none;
 }
 
 .tc-avatar {
@@ -75,7 +80,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--tw-font-size-title, 24px);
+  font-size: 20px;
   font-weight: 700;
   color: var(--tw-on-accent);
 }
@@ -135,7 +140,7 @@
 .tc-name {
   flex: 1;
   min-width: 0;
-  font-size: var(--tw-font-size-base, 20px);
+  font-size: 12px;
   font-weight: 700;
   color: var(--tw-text-primary);
   white-space: nowrap;
@@ -195,7 +200,7 @@
 }
 
 .tc-game {
-  font-size: var(--tw-font-size-base, 20px);
+  font-size: 10.5px;
   color: var(--tw-text-secondary);
   white-space: nowrap;
   overflow: hidden;
@@ -203,12 +208,12 @@
 }
 
 .tc-viewers {
-  font-size: var(--tw-font-size-base, 20px);
+  font-size: 10.5px;
   color: var(--tw-text-secondary);
 }
 
 .tc-offline-label {
-  font-size: var(--tw-font-size-base, 20px);
+  font-size: 10.5px;
   color: var(--tw-text-muted);
 }
 
@@ -227,4 +232,16 @@
     linear-gradient(#1d1d1d, #1d1d1d) padding-box,
     linear-gradient(#fa1e4e, #a01231) border-box;
   box-shadow: 0 4px 14px rgba(250, 30, 78, 0.4);
+}
+
+[data-theme="gx"] .tc-name {
+  font-size: 11.5px;
+}
+
+[data-theme="gx"] .tc-game {
+  font-size: 10px;
+}
+
+[data-theme="gx"] .tc-viewers {
+  font-size: 10px;
 }

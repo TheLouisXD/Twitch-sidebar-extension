@@ -35,7 +35,7 @@
 /* ── Text ── */
 .login-title {
   margin: 0;
-  font-size: var(--tw-font-size-title, 24px);
+  font-size: clamp(26px, 8vw, 36px);
   font-weight: 800;
   color: var(--tw-text-primary);
   text-align: center;
@@ -44,10 +44,10 @@
 
 .login-subtitle {
   margin: 0;
-  font-size: var(--tw-font-size-base, 20px);
+  font-size: 14px;
   color: var(--tw-text-primary);
   text-align: center;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 /* ── Error box ── */
@@ -58,7 +58,7 @@
   color: var(--tw-error-text);
   border-radius: 8px;
   padding: 8px 12px;
-  font-size: var(--tw-font-size-base, 20px);
+  font-size: 12px;
   text-align: center;
   box-sizing: border-box;
 }
@@ -71,7 +71,7 @@
   border: none;
   border-radius: 10px;
   padding: 11px 20px;
-  font-size: var(--tw-font-size-base, 20px);
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   transition:
@@ -100,7 +100,7 @@
 
 .login-privacy {
   margin: 0;
-  font-size: var(--tw-font-size-base, 20px);
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.75);
   text-align: center;
   line-height: 1.4;
@@ -123,6 +123,40 @@
 .login-author-link:active {
   color: inherit;
   text-decoration: none;
+}
+
+/* ── Language Selector ── */
+.login-lang-select {
+  background: transparent !important;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 12px;
+  font-family: inherit;
+  margin: 0 auto;
+  align-self: center;
+  text-align: center;
+  text-align-last: center;
+  width: fit-content;
+  max-width: max-content;
+  field-sizing: content;
+  cursor: pointer;
+  padding: 4px 6px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  transition: color 0.15s ease;
+}
+
+.login-lang-select:hover,
+.login-lang-select:focus {
+  color: #ffffff;
+}
+
+.login-lang-select option {
+  background: var(--tw-surface, #18181b);
+  color: var(--tw-text-primary, #ffffff);
 }
 
 .login-spinner {

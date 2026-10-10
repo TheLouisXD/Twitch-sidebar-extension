@@ -10,10 +10,10 @@
   flex: 1;
   background: var(--tw-surface);
   border: 1px solid var(--tw-surface-hover-light);
-  border-radius: 4px;
+  border-radius: 3px;
   color: var(--tw-text-primary);
-  font-size: var(--tw-font-size-base, 20px);
-  padding: 8px 12px;
+  font-size: 13px;
+  padding: 10px 10px;
   outline: none;
   font-family: inherit;
   transition: border-color 0.15s;
@@ -36,15 +36,4 @@
     linear-gradient(to right, #a01231, #1f060b) border-box;
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
   color: #ffffff;
-}
-
-[data-theme="gx"] .search-bar-input:focus {
-  border: 1px solid transparent;
-  background:
-    linear-gradient(#1d1d1d, #1d1d1d) padding-box,
-    linear-gradient(to right, #fa1e4e, #a01231) border-box;
-}
-
-[data-theme="gx"] .search-bar-input::placeholder {
-  color: #7b8196;
 }
