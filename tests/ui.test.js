@@ -354,3 +354,41 @@ test("changing theme updates storage", async () => {
   await userEvent.click(gxCard)
   assert.equal(local.theme, "gx")
 })
+
+test("settings profile renders cached avatar and followers, and does not render account type or creation date", async () => {
+  mount(SettingsPage, { showOffline: false })
+  assert.ok(await screen.findByText("Tester"))
+  const img = screen.getByAltText("Tester")
+  assert.ok(img)
+  assert.equal(img.src, "https://static-cdn.jtvnw.net/tester.png")
+  assert.ok(screen.getByText("Followers"))
+  assert.equal(screen.queryByText("Type"), null)
+  assert.equal(screen.queryByText("Tipo"), null)
+  assert.equal(screen.queryByText("Created"), null)
+  assert.equal(screen.queryByText("Creada"), null)
+  assert.equal(screen.queryByText("Partner"), null)
+  assert.equal(screen.queryByText("Affiliate"), null)
+  assert.equal(screen.queryByText("Standard"), null)
+})
+
+test("settings profile uses cached profile instantly without showing a loading spinner", async () => {
+  local.twitch_user_profile_cache = {
+    profile: {
+      id: "99",
+      display_name: "CachedUser",
+      login: "cacheduser",
+      profile_image_url: "https://static-cdn.jtvnw.net/cached.png",
+      followers: 1234
+    },
+    ts: Date.now()
+  }
+  const pending = deferred()
+  handlers.GET_PROFILE = () => pending.promise
+
+  mount(SettingsPage, { showOffline: false })
+  assert.ok(await screen.findByText("CachedUser"))
+  const img = screen.getByAltText("CachedUser")
+  assert.equal(img.src, "https://static-cdn.jtvnw.net/cached.png")
+  assert.ok(screen.getByText("1234"))
+  assert.equal(screen.queryByLabelText("Loading channels..."), null)
+})
