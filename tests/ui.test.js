@@ -392,3 +392,46 @@ test("settings profile uses cached profile instantly without showing a loading s
   assert.ok(screen.getByText("1234"))
   assert.equal(screen.queryByLabelText("Loading channels..."), null)
 })
+
+test("favorite live channels appear in a dedicated Favorites section and are excluded from regular live list", async () => {
+  const channel2 = {
+    user_id: "2",
+    user_login: "channel2",
+    user_name: "Channel Two",
+    isLive: true,
+    profile_image_url: "https://static-cdn.jtvnw.net/2.png",
+    game_name: "Game Two",
+    viewer_count: 50
+  }
+  local.twitch_channels_cache = {
+    data: { live: [channel, channel2], offline: [] },
+    ts: Date.now()
+  }
+  local.notification_streamers = ["1"]
+
+  mount(App)
+  assert.ok(await screen.findByText("Favorites"))
+  const favoritesSection = dom.window.document.querySelector(".main-favorites-section")
+  assert.ok(favoritesSection)
+  assert.ok(favoritesSection.textContent.includes("Channel One"))
+  assert.ok(!favoritesSection.textContent.includes("Channel Two"))
+
+  const liveSection = dom.window.document.querySelector(".main-live-section")
+  assert.ok(liveSection)
+  assert.ok(liveSection.textContent.includes("Channel Two"))
+  assert.ok(!liveSection.textContent.includes("Channel One"))
+
+  await act(async () => {
+    changeStorage({ notification_streamers: [] })
+  })
+  assert.equal(screen.queryByText("Favorites"), null)
+  const fullLiveSection = dom.window.document.querySelector(".main-live-section")
+  assert.ok(fullLiveSection.textContent.includes("Channel One"))
+  assert.ok(fullLiveSection.textContent.includes("Channel Two"))
+
+  await act(async () => {
+    changeStorage({ notification_streamers: ["1", "2"] })
+  })
+  assert.ok(screen.getByText("Favorites"))
+  assert.equal(screen.queryByText("Live"), null)
+})

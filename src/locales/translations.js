@@ -18,6 +18,8 @@ export const translations = {
 
     // Main
     "main.loading": "Cargando canales...",
+    "main.favorites": "Favoritos",
+    "main.favoritesCount": "Total de favoritos en vivo",
     "main.live": "En vivo",
     "main.liveCount": "Total de canales en vivo",
     "main.offline": "Offline",
@@ -95,6 +97,8 @@ export const translations = {
 
     // Main
     "main.loading": "Loading channels...",
+    "main.favorites": "Favorites",
+    "main.favoritesCount": "Total live favorites",
     "main.live": "Live",
     "main.liveCount": "Total live channels",
     "main.offline": "Offline",

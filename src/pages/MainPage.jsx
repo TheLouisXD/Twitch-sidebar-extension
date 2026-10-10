@@ -126,7 +126,6 @@ export default function MainPage({ onSettings, showOffline }) {
           query={query}
           filteredLive={filteredLive}
           filteredOffline={filteredOffline}
-          liveCount={channels.live.length}
           showOffline={showOffline}
           notifiedIds={notifiedIds}
           handleToggleNotify={handleToggleNotify}
