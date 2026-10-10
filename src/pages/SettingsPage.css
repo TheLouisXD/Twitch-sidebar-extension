@@ -1,4 +1,4 @@
-/* ── SettingsPage.css ─────────────────────────────────── */
+/* ── SettingsPage.css ────────────────────────────────── */
 
 .settings-root {
   width: 100%;
@@ -48,7 +48,7 @@
 
 .settings-header-title {
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--tw-font-size-title, 24px);
   color: var(--tw-text-primary);
 }
 
@@ -96,13 +96,13 @@
 }
 
 .settings-username {
-  font-size: 18px;
+  font-size: var(--tw-font-size-title, 24px);
   font-weight: 700;
   color: var(--tw-text-primary);
 }
 
 .settings-login {
-  font-size: 13px;
+  font-size: var(--tw-font-size-base, 20px);
   color: var(--tw-text-secondary);
   margin-top: -8px;
 }
@@ -114,9 +114,9 @@
 }
 
 .settings-section-title {
-  font-size: 10.5px;
+  font-size: var(--tw-font-size-title, 24px);
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--tw-text-secondary);
   padding: 0 0 8px;
@@ -134,7 +134,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 14px;
-  font-size: 13px;
+  font-size: var(--tw-font-size-base, 20px);
 }
 
 .settings-info-item + .settings-info-item {
@@ -174,7 +174,7 @@
 }
 
 .settings-preference-hint {
-  font-size: 11px;
+  font-size: var(--tw-font-size-base, 20px);
   line-height: 1.4;
   color: var(--tw-text-secondary);
 }
@@ -201,7 +201,7 @@
   border: 1px solid var(--tw-border);
   border-radius: 6px;
   padding: 6px 10px;
-  font-size: 13px;
+  font-size: var(--tw-font-size-base, 20px);
   font-family: var(--tw-font-family);
   cursor: pointer;
   outline: none;
@@ -258,7 +258,7 @@
   padding: 12px;
   background-color: var(--tw-danger);
   color: var(--tw-on-accent);
-  font-size: 14px;
+  font-size: var(--tw-font-size-base, 20px);
   font-weight: 600;
   border-radius: 6px;
   cursor: pointer;
@@ -289,65 +289,4 @@
   border: 3px solid var(--tw-surface-light);
   border-top-color: var(--tw-accent);
   animation: spin 0.8s linear infinite;
-}
-
-/* ── GX Theme Settings ── */
-[data-theme="gx"] .settings-header {
-  border-bottom: 2px solid transparent;
-  background:
-    linear-gradient(to right, #fa1e4e, #1f060b) bottom / 100% 2px no-repeat,
-    var(--tw-surface);
-}
-
-[data-theme="gx"] .settings-back-btn {
-  color: #fa1e4e;
-}
-
-[data-theme="gx"] .settings-back-btn:hover {
-  color: #ffffff;
-  background: rgba(250, 30, 78, 0.2);
-}
-
-[data-theme="gx"] .settings-section-title {
-  color: #fa1e4e;
-  font-size: 11.5px;
-  letter-spacing: 0.06em;
-}
-
-[data-theme="gx"] .settings-info-list {
-  background: #10121a;
-  border: 1px solid rgba(160, 18, 49, 0.5);
-  border-radius: 4px;
-}
-
-[data-theme="gx"] .settings-info-item + .settings-info-item {
-  border-top: 1px solid rgba(160, 18, 49, 0.25);
-}
-
-[data-theme="gx"] .settings-lang-select {
-  background: #1d1d1d;
-  border: 1px solid rgba(160, 18, 49, 0.6);
-  border-radius: 3px;
-  color: #ffffff;
-}
-
-[data-theme="gx"] .settings-lang-select:hover,
-[data-theme="gx"] .settings-lang-select:focus {
-  border-color: #fa1e4e;
-  box-shadow: 0 0 8px rgba(250, 30, 78, 0.3);
-}
-
-[data-theme="gx"] .settings-toggle--on {
-  background: #fa1e4e;
-}
-
-[data-theme="gx"] .settings-logout-btn {
-  background: linear-gradient(135deg, #fa1e4e, #a01231);
-  border-radius: 3px;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
-  box-shadow: 0 2px 10px rgba(250, 30, 78, 0.3);
-}
-
-[data-theme="gx"] .settings-logout-btn:hover {
-  background: linear-gradient(135deg, #ff3b68, #fa1e4e);
 }

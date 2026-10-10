@@ -16,7 +16,7 @@
 }
 
 .empty-state-text {
-  font-size: 13px;
+  font-size: var(--tw-font-size-base, 20px);
   color: var(--tw-text-primary);
   font-weight: 600;
   margin: 0;
@@ -24,7 +24,7 @@
 }
 
 .empty-state-hint {
-  font-size: 12px;
+  font-size: var(--tw-font-size-base, 20px);
   color: var(--tw-text-muted);
   margin: 0;
   line-height: 1.5;

@@ -1,4 +1,4 @@
-/* ── TwitchCard.css ───────────────────────────────── */
+/* ── TwitchCard.css ────────────────────────────────── */
 
 .tc-card {
   position: relative;
@@ -75,7 +75,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: var(--tw-font-size-title, 24px);
   font-weight: 700;
   color: var(--tw-on-accent);
 }
@@ -135,7 +135,7 @@
 .tc-name {
   flex: 1;
   min-width: 0;
-  font-size: 12px;
+  font-size: var(--tw-font-size-base, 20px);
   font-weight: 700;
   color: var(--tw-text-primary);
   white-space: nowrap;
@@ -195,7 +195,7 @@
 }
 
 .tc-game {
-  font-size: 10.5px;
+  font-size: var(--tw-font-size-base, 20px);
   color: var(--tw-text-secondary);
   white-space: nowrap;
   overflow: hidden;
@@ -203,12 +203,12 @@
 }
 
 .tc-viewers {
-  font-size: 10.5px;
+  font-size: var(--tw-font-size-base, 20px);
   color: var(--tw-text-secondary);
 }
 
 .tc-offline-label {
-  font-size: 10.5px;
+  font-size: var(--tw-font-size-base, 20px);
   color: var(--tw-text-muted);
 }
 
@@ -227,16 +227,4 @@
     linear-gradient(#1d1d1d, #1d1d1d) padding-box,
     linear-gradient(#fa1e4e, #a01231) border-box;
   box-shadow: 0 4px 14px rgba(250, 30, 78, 0.4);
-}
-
-[data-theme="gx"] .tc-name {
-  font-size: 11.5px;
-}
-
-[data-theme="gx"] .tc-game {
-  font-size: 10px;
-}
-
-[data-theme="gx"] .tc-viewers {
-  font-size: 10px;
 }

@@ -1,4 +1,4 @@
-/* ── ThemesPage.css ──────────────────────────────────── */
+/* ── ThemesPage.css ────────────────────────────────── */
 
 .themes-root {
   width: 100%;
@@ -49,7 +49,7 @@
 
 .themes-header-title {
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--tw-font-size-title, 24px);
   color: var(--tw-text-primary);
   flex: 1;
 }
@@ -159,7 +159,7 @@
 }
 
 .theme-card-placeholder-label {
-  font-size: 10px;
+  font-size: var(--tw-font-size-base, 20px);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -191,7 +191,7 @@
 }
 
 .theme-card-name {
-  font-size: 12px;
+  font-size: var(--tw-font-size-base, 20px);
   font-weight: 700;
   color: var(--tw-text-primary);
   white-space: nowrap;
@@ -200,7 +200,7 @@
 }
 
 .theme-card-status {
-  font-size: 10.5px;
+  font-size: var(--tw-font-size-base, 20px);
   color: var(--tw-text-secondary);
 }
 
