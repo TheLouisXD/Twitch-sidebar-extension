@@ -1,4 +1,5 @@
 export { default as App } from "../../src/App.jsx"
+export { default as LoginPage } from "../../src/pages/LoginPage.jsx"
 export { default as SettingsPage } from "../../src/pages/SettingsPage.jsx"
 export { default as NotificationsPage } from "../../src/pages/NotificationsPage.jsx"
 export { default as ThemesPage } from "../../src/pages/ThemesPage.jsx"

@@ -8,10 +8,11 @@ export const translations = {
     "settings.saveError": "No se pudieron cargar o guardar las preferencias. Inténtalo de nuevo.",
     "notifications.error": "No se pudieron actualizar los favoritos.",
     // Login
-    "login.subtitle": "Conecta tu cuenta para ver los canales que sigues en vivo.",
-    "login.button": "Iniciar sesión",
+    "login.subtitle": "Quieres ver quien esta en twitch sin usar twitch /ᐠ • ˕ •マ ?",
+    "login.button": "iniciar sesion en twitch",
     "login.connecting": "Conectando...",
     "login.error": "No se pudo iniciar sesión.",
+    "login.madeWith": "hecho con ❤︎ por",
     "login.privacy": "Solo se solicita acceso de lectura a tus follows.",
     "login.dataUse":
       "Al iniciar sesión, tu identificador de cuenta se envía a Twitch y las credenciales OAuth al servicio de autenticación de la extensión para mantener la sesión.",
@@ -87,10 +88,11 @@ export const translations = {
     "settings.saveError": "Could not load or save preferences. Please try again.",
     "notifications.error": "Could not update favorites.",
     // Login
-    "login.subtitle": "Connect your account to see the channels you follow that are live.",
-    "login.button": "Sign in",
+    "login.subtitle": "Quieres ver quien esta en twitch sin usar twitch /ᐠ • ˕ •マ ?",
+    "login.button": "iniciar sesion en twitch",
     "login.connecting": "Connecting...",
     "login.error": "Could not sign in.",
+    "login.madeWith": "hecho con ❤︎ por",
     "login.privacy": "Only read access to your follows is requested.",
     "login.dataUse":
       "Signing in sends your account ID to Twitch and OAuth credentials to the extension's authentication service to maintain your session.",

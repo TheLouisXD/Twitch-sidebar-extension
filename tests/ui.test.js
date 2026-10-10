@@ -89,6 +89,7 @@ const bundles = await build({
 const code = bundles[0].output.find((file) => file.type === "chunk").code
 const {
   App,
+  LoginPage,
   SettingsPage,
   NotificationsPage,
   ThemesPage,
@@ -434,4 +435,17 @@ test("favorite live channels appear in a dedicated Favorites section and are exc
   })
   assert.ok(screen.getByText("Favorites"))
   assert.equal(screen.queryByText("Live"), null)
+})
+
+test("login page renders requested tagline, button text and link to ThelouisXD Twitch channel", async () => {
+  mount(LoginPage, { onLogin: () => {} })
+  assert.ok(screen.getByText("Quieres ver quien esta en twitch sin usar twitch /ᐠ • ˕ •マ ?"))
+  const button = screen.getByRole("button", { name: "iniciar sesion en twitch" })
+  assert.ok(button)
+
+  const link = screen.getByRole("link", { name: "ThelouisXD" })
+  assert.ok(link)
+  assert.equal(link.getAttribute("href"), "https://www.twitch.tv/thelouisxd")
+  assert.equal(link.getAttribute("target"), "_blank")
+  assert.ok(link.parentElement.textContent.includes("hecho con ❤︎ por ThelouisXD"))
 })

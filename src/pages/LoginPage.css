@@ -106,6 +106,25 @@
   line-height: 1.4;
 }
 
+.login-privacy a,
+.login-author-link {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.login-privacy a:hover,
+.login-privacy a:focus,
+.login-privacy a:visited,
+.login-privacy a:active,
+.login-author-link:hover,
+.login-author-link:focus,
+.login-author-link:visited,
+.login-author-link:active {
+  color: inherit;
+  text-decoration: none;
+}
+
 .login-spinner {
   width: 16px;
   height: 16px;

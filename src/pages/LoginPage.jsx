@@ -33,14 +33,23 @@ export default function LoginPage({ onLogin, initialError }) {
             <span>⚠ {t("login.error")}</span>
           </div>
         )}
-        <p className="login-subtitle">{t("login.dataUse")}</p>
         <button id="login-btn" className="login-btn" onClick={handleLogin} disabled={loading}>
           <span className="login-btn-content">
             {loading && <span className="login-spinner" />}
             {t(loading ? "login.connecting" : "login.button")}
           </span>
         </button>
-        <p className="login-subtitle">{t("login.privacy")}</p>
+        <p className="login-privacy">
+          {t("login.madeWith")}{" "}
+          <a
+            href="https://www.twitch.tv/thelouisxd"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="login-author-link"
+          >
+            ThelouisXD
+          </a>
+        </p>
         <select
           className="settings-lang-select"
           value={lang}
