@@ -12,7 +12,6 @@ import {
   toggleNotificationStreamer
 } from "../cache.js"
 import { extension, sendMessage, openChannel } from "../platform.js"
-import { getPreferences, FAVORITES_FIRST_KEY, orderLiveChannels } from "../preferences.js"
 import "./MainPage.css"
 
 export default function MainPage({ onSettings, showOffline }) {
@@ -24,12 +23,10 @@ export default function MainPage({ onSettings, showOffline }) {
   const [query, setQuery] = useState("")
   const [notifiedIds, setNotifiedIds] = useState(new Set())
   const [attempt, setAttempt] = useState(0)
-  const [favoritesFirst, setFavoritesFirst] = useState(false)
   const updatedAtRef = useRef(0)
 
   useEffect(() => {
     let active = true
-    let preferencesChanged = false
     let notificationsChanged = false
     function applySnapshot(data, timestamp) {
       const updatedAt = Number.isFinite(timestamp) ? timestamp : 0
@@ -47,22 +44,13 @@ export default function MainPage({ onSettings, showOffline }) {
         notificationsChanged = true
         setNotifiedIds(new Set(changes[NOTIFICATIONS_KEY].newValue ?? []))
       }
-      if (changes[FAVORITES_FIRST_KEY]) {
-        preferencesChanged = true
-        setFavoritesFirst(changes[FAVORITES_FIRST_KEY].newValue === true)
-      }
     }
     extension.storage.onChanged.addListener(onStorageChanged)
     async function load() {
       try {
-        const [cached, ids, preferences] = await Promise.all([
-          getCachedChannels(),
-          getNotificationStreamers(),
-          getPreferences()
-        ])
+        const [cached, ids] = await Promise.all([getCachedChannels(), getNotificationStreamers()])
         if (!active) return
         if (!notificationsChanged) setNotifiedIds(ids)
-        if (!preferencesChanged) setFavoritesFirst(preferences.favoritesFirst)
         setError(null)
         if (cached) {
           applySnapshot(cached.data, cached.ts)
@@ -96,13 +84,9 @@ export default function MainPage({ onSettings, showOffline }) {
   const handleCardClick = useCallback((login) => {
     openChannel(login).catch((failure) => setError(failure.message))
   }, [])
-  const orderedLive = useMemo(
-    () => orderLiveChannels(channels.live, notifiedIds, favoritesFirst),
-    [channels.live, notifiedIds, favoritesFirst]
-  )
   const { filteredLive, filteredOffline } = useMemo(
-    () => search(orderedLive, channels.offline, query),
-    [orderedLive, channels.offline, query]
+    () => search(channels.live, channels.offline, query),
+    [channels.live, channels.offline, query]
   )
 
   return (

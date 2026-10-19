@@ -120,13 +120,16 @@ export async function revokeSessionTokens() {
       sessionGet(["twitch_access_token", "twitch_refresh_token"]),
       localGet("twitch_refresh_token")
     ])
-    const token =
-      sessionCreds.twitch_access_token ||
-      sessionCreds.twitch_refresh_token ||
-      localCreds.twitch_refresh_token
-    if (token) {
-      await revokeToken(token)
-    }
+    // Twitch only drops a refresh token when it is revoked, so every stored
+    // credential is sent; the same token held in both areas is sent once.
+    const tokens = new Set(
+      [
+        sessionCreds.twitch_access_token,
+        sessionCreds.twitch_refresh_token,
+        localCreds.twitch_refresh_token
+      ].filter((token) => typeof token === "string" && token)
+    )
+    await Promise.all([...tokens].map((token) => revokeToken(token)))
   } catch (error) {
     console.error("Token revocation failed:", error)
   }

@@ -8,11 +8,11 @@ export const translations = {
     "settings.saveError": "No se pudieron cargar o guardar las preferencias. Inténtalo de nuevo.",
     "notifications.error": "No se pudieron actualizar los favoritos.",
     // Login
-    "login.subtitle": "Quieres ver quien esta en twitch sin usar twitch /ᐠ • ˕ •マ ?",
-    "login.button": "iniciar sesion en twitch",
+    "login.subtitle": "¿Quieres ver quién está en Twitch sin usar Twitch /ᐠ • ˕ •マ ?",
+    "login.button": "Iniciar sesión en Twitch",
     "login.connecting": "Conectando...",
     "login.error": "No se pudo iniciar sesión.",
-    "login.madeWith": "hecho con ❤︎ por",
+    "login.madeWith": "Hecho con ❤︎ por",
     "login.privacy": "Solo se solicita acceso de lectura a tus follows.",
     "login.dataUse":
       "Al iniciar sesión, tu identificador de cuenta se envía a Twitch y las credenciales OAuth al servicio de autenticación de la extensión para mantener la sesión.",
@@ -40,12 +40,7 @@ export const translations = {
     "settings.back": "Volver",
     "settings.account": "Cuenta",
     "settings.followers": "Seguidores",
-    "settings.type": "Tipo",
-    "settings.created": "Creada",
     "settings.logout": "Cerrar sesión",
-    "settings.partner": "Partner",
-    "settings.affiliate": "Afiliado",
-    "settings.standard": "Estándar",
     "settings.language": "Idioma",
     "settings.theme": "Tema",
     "settings.themeDefault": "Por defecto",
@@ -54,9 +49,6 @@ export const translations = {
     "settings.refreshInterval": "Actualizar cada",
     "settings.refreshIntervalHint": "Actualiza la lista y el contador en segundo plano.",
     "settings.minutes": (minutes) => `${minutes} min`,
-    "settings.favoritesFirst": "Favoritos en vivo primero",
-    "settings.favoritesFirstHint":
-      "Los canales marcados como favoritos aparecen arriba cuando están en vivo.",
     "settings.rememberSession": "Recordar sesión",
     "settings.rememberSessionHint": "Mantiene la conexión al cerrar y volver a abrir el navegador.",
     "settings.showOffline": "Mostrar canales offline",
@@ -76,6 +68,7 @@ export const translations = {
     // Themes page
     "themes.title": "Temas",
     "themes.active": "Activo",
+    "themes.preview": "Vista previa",
     "themes.select": "Seleccionar"
   },
 
@@ -88,11 +81,11 @@ export const translations = {
     "settings.saveError": "Could not load or save preferences. Please try again.",
     "notifications.error": "Could not update favorites.",
     // Login
-    "login.subtitle": "Quieres ver quien esta en twitch sin usar twitch /ᐠ • ˕ •マ ?",
-    "login.button": "iniciar sesion en twitch",
+    "login.subtitle": "See who is live on Twitch without opening Twitch /ᐠ • ˕ •マ ?",
+    "login.button": "Sign in with Twitch",
     "login.connecting": "Connecting...",
     "login.error": "Could not sign in.",
-    "login.madeWith": "hecho con ❤︎ por",
+    "login.madeWith": "made with ❤︎ by",
     "login.privacy": "Only read access to your follows is requested.",
     "login.dataUse":
       "Signing in sends your account ID to Twitch and OAuth credentials to the extension's authentication service to maintain your session.",
@@ -120,12 +113,7 @@ export const translations = {
     "settings.back": "Back",
     "settings.account": "Account",
     "settings.followers": "Followers",
-    "settings.type": "Type",
-    "settings.created": "Created",
     "settings.logout": "Sign out",
-    "settings.partner": "Partner",
-    "settings.affiliate": "Affiliate",
-    "settings.standard": "Standard",
     "settings.language": "Language",
     "settings.theme": "Theme",
     "settings.themeDefault": "Default",
@@ -134,8 +122,6 @@ export const translations = {
     "settings.refreshInterval": "Refresh every",
     "settings.refreshIntervalHint": "Updates the list and live count in the background.",
     "settings.minutes": (minutes) => `${minutes} min`,
-    "settings.favoritesFirst": "Live favorites first",
-    "settings.favoritesFirstHint": "Channels marked as favorites appear first while live.",
     "settings.rememberSession": "Remember session",
     "settings.rememberSessionHint": "Keeps you signed in after closing and reopening the browser.",
     "settings.showOffline": "Show offline channels",
@@ -155,6 +141,7 @@ export const translations = {
     // Themes page
     "themes.title": "Themes",
     "themes.active": "Active",
+    "themes.preview": "Preview",
     "themes.select": "Select"
   }
 }

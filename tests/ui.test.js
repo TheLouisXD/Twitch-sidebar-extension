@@ -117,7 +117,6 @@ beforeEach(() => {
     theme: "default",
     rememberSession: true,
     pollIntervalMinutes: 3,
-    favoritesFirst: false,
     notification_streamers: ["1"],
     twitch_channels_cache: { data: { live: [channel], offline: [] }, ts: Date.now() }
   }
@@ -327,17 +326,12 @@ test("preferences and language react to changes from another panel", async () =>
   await act(async () => {
     changeStorage({
       pollIntervalMinutes: 15,
-      favoritesFirst: true,
       rememberSession: false,
       theme: "gx"
     })
   })
   assert.equal(interval.value, "15")
   assert.ok(screen.getByText("GX"))
-  assert.equal(
-    screen.getByRole("switch", { name: "Live favorites first" }).getAttribute("aria-checked"),
-    "true"
-  )
   assert.equal(
     screen.getByRole("switch", { name: "Remember session" }).getAttribute("aria-checked"),
     "false"
@@ -437,17 +431,48 @@ test("favorite live channels appear in a dedicated Favorites section and are exc
   assert.equal(screen.queryByText("Live"), null)
 })
 
-test("login page renders requested tagline, button text and link to ThelouisXD Twitch channel", async () => {
+test("login page renders English texts, the data notice and the author link", async () => {
   mount(LoginPage, { onLogin: () => {} })
-  assert.ok(screen.getByText("Quieres ver quien esta en twitch sin usar twitch /ᐠ • ˕ •マ ?"))
-  const button = screen.getByRole("button", { name: "iniciar sesion en twitch" })
+  assert.ok(screen.getByText("See who is live on Twitch without opening Twitch /ᐠ • ˕ •マ ?"))
+  const button = screen.getByRole("button", { name: "Sign in with Twitch" })
   assert.ok(button)
+
+  // Store disclosures promise a transmission notice before sign-in.
+  assert.ok(screen.getByText("Only read access to your follows is requested."))
+  assert.ok(
+    screen.getByText(
+      "Signing in sends your account ID to Twitch and OAuth credentials to the extension's authentication service to maintain your session."
+    )
+  )
 
   const link = screen.getByRole("link", { name: "ThelouisXD" })
   assert.ok(link)
   assert.equal(link.getAttribute("href"), "https://www.twitch.tv/thelouisxd")
   assert.equal(link.getAttribute("target"), "_blank")
-  assert.ok(link.parentElement.textContent.includes("hecho con ❤︎ por ThelouisXD"))
+  assert.ok(link.parentElement.textContent.includes("made with ❤︎ by ThelouisXD"))
+})
+
+test("the English login never falls back to Spanish copy", async () => {
+  mount(LoginPage, { onLogin: () => {} })
+  const rendered = dom.window.document.body.textContent
+  for (const spanish of ["Iniciar sesión", "Hecho con", "¿Quieres ver quién", "Solo se solicita"])
+    assert.equal(rendered.includes(spanish), false, `Unexpected Spanish text: ${spanish}`)
+})
+
+test("the login translates every text when the interface is in Spanish", async () => {
+  local.language = "es"
+  mount(LoginPage, { onLogin: () => {} })
+  assert.ok(
+    await screen.findByRole("button", { name: "Iniciar sesión en Twitch" }),
+    "Spanish login button"
+  )
+  assert.ok(
+    screen.getByText("¿Quieres ver quién está en Twitch sin usar Twitch /ᐠ • ˕ •マ ?"),
+    "Spanish tagline"
+  )
+  assert.ok(screen.getByText("Solo se solicita acceso de lectura a tus follows."))
+  const link = screen.getByRole("link", { name: "ThelouisXD" })
+  assert.ok(link.parentElement.textContent.includes("Hecho con ❤︎ por ThelouisXD"))
 })
 
 test("settings profile updates seamlessly in background when cache changes without showing a spinner", async () => {

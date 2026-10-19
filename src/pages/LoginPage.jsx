@@ -39,6 +39,10 @@ export default function LoginPage({ onLogin, initialError }) {
             {t(loading ? "login.connecting" : "login.button")}
           </span>
         </button>
+        <div className="login-data-notice">
+          <p className="login-privacy">{t("login.privacy")}</p>
+          <p className="login-privacy">{t("login.dataUse")}</p>
+        </div>
         <p className="login-privacy">
           {t("login.madeWith")}{" "}
           <a

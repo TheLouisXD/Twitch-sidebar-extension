@@ -12,7 +12,6 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
   const profile = useProfile()
   const {
     pollInterval,
-    favoritesFirst,
     rememberSession,
     theme,
     loading: preferencesLoading,
@@ -36,18 +35,6 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
     setSaving(true)
     try {
       await sendMessage({ type: "SET_POLL_INTERVAL", minutes })
-      setError(null)
-    } catch {
-      setError("settings.saveError")
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  async function handleToggleFavoritesFirst() {
-    setSaving(true)
-    try {
-      await sendMessage({ type: "SET_FAVORITES_FIRST", enabled: !favoritesFirst })
       setError(null)
     } catch {
       setError("settings.saveError")
@@ -178,24 +165,6 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
               ))}
             </select>
           </div>
-          <div className="settings-info-item settings-info-item--preference">
-            <div className="settings-preference-copy">
-              <span className="settings-info-label">{t("settings.favoritesFirst")}</span>
-              <span className="settings-preference-hint">{t("settings.favoritesFirstHint")}</span>
-            </div>
-            <button
-              id="settings-favorites-first-toggle"
-              className={`settings-toggle ${favoritesFirst ? "settings-toggle--on" : ""}`}
-              onClick={handleToggleFavoritesFirst}
-              disabled={saving || preferencesLoading}
-              role="switch"
-              aria-checked={favoritesFirst}
-              aria-label={t("settings.favoritesFirst")}
-            >
-              <span className="settings-toggle-knob" />
-            </button>
-          </div>
-
           <div className="settings-info-item settings-info-item--preference">
             <div className="settings-preference-copy">
               <span className="settings-info-label">{t("settings.rememberSession")}</span>
