@@ -1,6 +1,13 @@
 import test from "node:test"
 import assert from "node:assert/strict"
-import { normalizePollInterval, normalizeTheme } from "../src/preferences.js"
+import {
+  ACCENTS,
+  ACCENT_OPTIONS,
+  getEffectiveAccent,
+  normalizeAccent,
+  normalizePollInterval,
+  normalizeTheme
+} from "../src/preferences.js"
 import { search } from "../src/search.js"
 
 const channels = [
@@ -35,4 +42,38 @@ test("stored themes use supported choices with a default fallback", () => {
   assert.equal(normalizeTheme("gx"), "gx")
   for (const value of [undefined, null, "", "dark", "light", 123])
     assert.equal(normalizeTheme(value), "default")
+})
+
+test("stored accent colors use supported choices and keep the theme default otherwise", () => {
+  for (const value of ACCENT_OPTIONS) assert.equal(normalizeAccent(value), value)
+  for (const value of [undefined, null, "", "pink", "GREEN", 123])
+    assert.equal(normalizeAccent(value), null)
+})
+
+test("accent definitions cover every option with the full set of CSS variables", () => {
+  assert.deepEqual(
+    ACCENTS.map(({ id }) => id),
+    ACCENT_OPTIONS
+  )
+  const properties = [
+    "--tw-accent",
+    "--tw-accent-hover",
+    "--tw-accent-light",
+    "--tw-accent-dark",
+    "--tw-accent-gradient",
+    "--tw-accent-glow",
+    "--tw-accent-glow-strong",
+    "--tw-on-accent"
+  ]
+  for (const accent of ACCENTS) {
+    assert.equal(typeof accent.nameKey, "string")
+    for (const property of properties) assert.equal(typeof accent.vars[property], "string")
+  }
+})
+
+test("the effective accent falls back to each theme's current color", () => {
+  assert.equal(getEffectiveAccent(null, "default"), "purple")
+  assert.equal(getEffectiveAccent(undefined, "gx"), "red")
+  assert.equal(getEffectiveAccent("blue", "default"), "blue")
+  assert.equal(getEffectiveAccent("blue", "gx"), "blue")
 })

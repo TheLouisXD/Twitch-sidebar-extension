@@ -99,7 +99,8 @@ const {
   asBoolean
 } = await import(`data:text/javascript;base64,${Buffer.from(code).toString("base64")}`)
 const { createElement } = await import("react")
-const { render, screen, waitFor, act, cleanup } = await import("@testing-library/react")
+const { render, screen, waitFor, act, cleanup, fireEvent, within } =
+  await import("@testing-library/react")
 const { default: userEvent } = await import("@testing-library/user-event")
 const mount = (Component, props = {}) =>
   render(createElement(I18nProvider, null, createElement(Component, props)))
@@ -350,6 +351,97 @@ test("changing theme updates storage", async () => {
   assert.equal(local.theme, "gx")
 })
 
+test("themes page offers seven accent colors and shows the theme default", async () => {
+  mount(ThemesPage)
+  const panel = await screen.findByRole("region", { name: "Accent color" })
+  const options = within(panel).getAllByRole("radio")
+  assert.equal(options.length, 7)
+  assert.deepEqual(
+    options.map((option) => option.getAttribute("aria-label")),
+    ["Red", "Blue", "Purple", "Yellow", "Orange", "Green", "Sky blue"]
+  )
+  assert.equal(
+    within(panel).getByRole("radio", { name: "Purple" }).getAttribute("aria-checked"),
+    "true"
+  )
+})
+
+test("GX keeps red as its default accent until the user chooses a color", async () => {
+  local.theme = "gx"
+  mount(ThemesPage)
+  const panel = await screen.findByRole("region", { name: "Accent color" })
+  await waitFor(() =>
+    assert.equal(
+      within(panel).getByRole("radio", { name: "Red" }).getAttribute("aria-checked"),
+      "true"
+    )
+  )
+})
+
+test("accent panel title and color names are localized", async () => {
+  local.language = "es"
+  mount(ThemesPage)
+  const panel = await screen.findByRole("region", { name: "Color de la interfaz" })
+  assert.ok(within(panel).getByRole("radio", { name: "Celeste" }))
+  assert.equal(within(panel).getAllByRole("radio").length, 7)
+})
+
+test("choosing an accent color persists it and keeps it across themes", async () => {
+  mount(ThemesPage)
+  const panel = await screen.findByRole("region", { name: "Accent color" })
+  await userEvent.click(within(panel).getByRole("radio", { name: "Blue" }))
+  await waitFor(() => assert.equal(local.accentColor, "blue"))
+  assert.equal(
+    within(panel).getByRole("radio", { name: "Blue" }).getAttribute("aria-checked"),
+    "true"
+  )
+
+  await userEvent.click(screen.getByRole("radio", { name: /GX/i }))
+  await waitFor(() => assert.equal(local.theme, "gx"))
+  assert.equal(
+    within(panel).getByRole("radio", { name: "Blue" }).getAttribute("aria-checked"),
+    "true"
+  )
+})
+
+test("accent color applies to the interface and survives theme changes", async () => {
+  mount(App)
+  const rootElement = dom.window.document.documentElement
+  await waitFor(() => assert.equal(rootElement.style.getPropertyValue("--tw-accent"), "#9147ff"))
+
+  await act(async () => {
+    changeStorage({ theme: "gx" })
+  })
+  await waitFor(() => assert.equal(rootElement.style.getPropertyValue("--tw-accent"), "#fa1e4e"))
+
+  await act(async () => {
+    changeStorage({ accentColor: "green" })
+  })
+  await waitFor(() => assert.equal(rootElement.style.getPropertyValue("--tw-accent"), "#22c55e"))
+  assert.equal(rootElement.style.getPropertyValue("--tw-on-accent"), "#000000")
+
+  await act(async () => {
+    changeStorage({ theme: "default" })
+  })
+  await waitFor(() => assert.equal(rootElement.style.getPropertyValue("--tw-accent"), "#22c55e"))
+})
+
+test("accent save errors use the preferences error banner", async () => {
+  const originalSet = globalThis.browser.storage.local.set
+  globalThis.browser.storage.local.set = async () => {
+    throw new Error("denied")
+  }
+  try {
+    mount(ThemesPage)
+    const panel = await screen.findByRole("region", { name: "Accent color" })
+    await userEvent.click(within(panel).getByRole("radio", { name: "Green" }))
+    assert.ok(await screen.findByRole("alert"))
+    assert.ok(screen.getByText("Could not load or save preferences. Please try again."))
+  } finally {
+    globalThis.browser.storage.local.set = originalSet
+  }
+})
+
 test("settings profile renders cached avatar and followers, and does not render account type or creation date", async () => {
   mount(SettingsPage, { showOffline: false })
   assert.ok(await screen.findByText("Tester"))
@@ -520,6 +612,125 @@ test("settings profile updates seamlessly in background when cache changes witho
   assert.equal(screen.queryByRole("status"), null)
 })
 
+test("settings avatar falls back to the CDN URL when the cached data URL cannot load", async () => {
+  local.twitch_user_profile_cache = {
+    profile: {
+      id: "99",
+      display_name: "FallbackUser",
+      login: "fallbackuser",
+      profile_image_url: "https://static-cdn.jtvnw.net/fallback-300x300.png",
+      avatar_data: "data:image/png;base64,AAA",
+      followers: 10
+    },
+    ts: Date.now()
+  }
+  const pending = deferred()
+  handlers.GET_PROFILE = () => pending.promise
+
+  mount(SettingsPage, { showOffline: false })
+  assert.ok(await screen.findByText("FallbackUser"))
+  const img = screen.getByAltText("FallbackUser")
+  assert.equal(img.src, "data:image/png;base64,AAA")
+
+  // A runtime that blocks the data URL (CSP) must not leave an empty frame.
+  await act(async () => {
+    fireEvent.error(img)
+  })
+  assert.equal(img.src, "https://static-cdn.jtvnw.net/fallback-150x150.png")
+
+  await act(async () => {
+    fireEvent.error(img)
+  })
+  assert.equal(screen.queryByAltText("FallbackUser"), null)
+  assert.ok(dom.window.document.querySelector(".settings-avatar-placeholder"))
+})
+
+test("settings gradient falls back to the CDN avatar when the cached data URL cannot be sampled", async () => {
+  local.twitch_user_profile_cache = {
+    profile: {
+      id: "99",
+      display_name: "GradientUser",
+      login: "gradientuser",
+      profile_image_url: "https://static-cdn.jtvnw.net/gradient-300x300.png",
+      avatar_data: "data:image/png;base64,AAA",
+      followers: 10
+    },
+    ts: Date.now()
+  }
+  const pending = deferred()
+  handlers.GET_PROFILE = () => pending.promise
+
+  const attempts = []
+  const originalImage = globalThis.Image
+  const jsdomDocument = dom.window.document
+  const originalCreateElement = jsdomDocument.createElement.bind(jsdomDocument)
+  globalThis.Image = class {
+    set src(value) {
+      if (!value) return
+      attempts.push(value.startsWith("data:") ? "data-url" : value)
+      queueMicrotask(() => (value.startsWith("data:") ? this.onerror?.() : this.onload?.()))
+    }
+  }
+  jsdomDocument.createElement = (tag) => {
+    if (tag !== "canvas") return originalCreateElement(tag)
+    return {
+      getContext: () => ({
+        drawImage() {},
+        getImageData: () => ({ data: Uint8ClampedArray.from([240, 60, 40, 255, 240, 60, 40, 255]) })
+      })
+    }
+  }
+
+  try {
+    mount(SettingsPage, { showOffline: false })
+    assert.ok(await screen.findByText("GradientUser"))
+    const root = dom.window.document.querySelector(".settings-root")
+    await waitFor(() => {
+      assert.equal(root.style.getPropertyValue("--profile-tint"), "rgba(240, 60, 40, 0.45)")
+    })
+    assert.equal(root.style.getPropertyValue("--profile-dark"), "rgb(36, 9, 6)")
+    assert.deepEqual(attempts, ["data-url", "https://static-cdn.jtvnw.net/gradient-150x150.png"])
+  } finally {
+    globalThis.Image = originalImage
+    jsdomDocument.createElement = originalCreateElement
+  }
+})
+
+test("settings stays functional without a gradient when every avatar source fails", async () => {
+  local.twitch_user_profile_cache = {
+    profile: {
+      id: "99",
+      display_name: "NoColorUser",
+      login: "nocoloruser",
+      profile_image_url: "https://static-cdn.jtvnw.net/broken.png",
+      avatar_data: "data:image/png;base64,BBB",
+      followers: 3
+    },
+    ts: Date.now()
+  }
+  const pending = deferred()
+  handlers.GET_PROFILE = () => pending.promise
+
+  const originalImage = globalThis.Image
+  globalThis.Image = class {
+    set src(value) {
+      if (!value) return
+      queueMicrotask(() => this.onerror?.())
+    }
+  }
+
+  try {
+    mount(SettingsPage, { showOffline: false })
+    assert.ok(await screen.findByText("NoColorUser"))
+    const root = dom.window.document.querySelector(".settings-root")
+    assert.equal(root.style.getPropertyValue("--profile-tint"), "")
+    assert.equal(root.style.getPropertyValue("--profile-dark"), "")
+    assert.ok(screen.getByText("Followers"))
+  } finally {
+    globalThis.Image = originalImage
+  }
+})
+
 test("settings root applies profile dynamic tint and dark colors from profile", async () => {
   const pending = deferred()
   handlers.GET_PROFILE = () => pending.promise
@@ -542,4 +753,30 @@ test("settings root applies profile dynamic tint and dark colors from profile", 
   assert.ok(root)
   assert.equal(root.style.getPropertyValue("--profile-tint"), "rgba(224, 128, 48, 0.45)")
   assert.equal(root.style.getPropertyValue("--profile-dark"), "rgb(34, 19, 7)")
+})
+
+test("main page renders 12-blade iOS spinner with 'Recargando canales' and toggles sliding drawer", async () => {
+  local.language = "es"
+  const pending = deferred()
+  handlers.LOAD_CHANNELS = () => pending.promise
+
+  mount(App)
+  assert.ok(await screen.findByText("Channel One"))
+
+  const drawer = dom.window.document.querySelector(".main-reload-drawer")
+  assert.ok(drawer)
+  await waitFor(() => assert.equal(drawer.classList.contains("main-reload-drawer--open"), true))
+  assert.equal(drawer.getAttribute("aria-hidden"), "false")
+  assert.ok(drawer.textContent.includes("Recargando canales"))
+  assert.equal(drawer.querySelectorAll(".spinner .spinner-blade").length, 12)
+
+  await act(async () => {
+    pending.resolve({
+      channels: local.twitch_channels_cache.data,
+      updatedAt: Date.now()
+    })
+  })
+
+  await waitFor(() => assert.equal(drawer.classList.contains("main-reload-drawer--open"), false))
+  assert.equal(drawer.getAttribute("aria-hidden"), "true")
 })

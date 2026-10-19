@@ -69,6 +69,82 @@
   align-content: start;
 }
 
+/* ── Accent color selector ── */
+.accent-panel {
+  margin: 0 14px 14px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--tw-surface);
+  border: 1px solid var(--tw-surface-light);
+}
+
+.accent-panel-title {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--tw-text-primary);
+}
+
+.accent-options {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.accent-option {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  min-width: 0;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  background: var(--accent-swatch);
+  cursor: pointer;
+  transition:
+    transform 0.15s,
+    border-color 0.15s;
+}
+
+.accent-option:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.accent-option:focus-visible {
+  outline: 2px solid var(--tw-text-primary);
+  outline-offset: 2px;
+}
+
+.accent-option:disabled {
+  cursor: default;
+}
+
+.accent-option--active {
+  border-color: #22c55e;
+  outline: 2px solid rgba(34, 197, 94, 0.35);
+  outline-offset: 1px;
+}
+
+.accent-option-check {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: #22c55e;
+  color: #052e16;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+[data-theme="gx"] .accent-panel,
+[data-theme="gx"] .accent-option {
+  border-radius: 2px;
+}
+
 /* ── Theme Card con estética idéntica a TwitchCard ── */
 .theme-card {
   position: relative;
@@ -202,4 +278,12 @@
     linear-gradient(#1d1d1d, #1d1d1d) padding-box,
     linear-gradient(#a01231, #1f060b) border-box;
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+}
+
+[data-theme="gx"] .theme-card--active {
+  border-color: transparent;
+  background:
+    linear-gradient(#1d1d1d, #1d1d1d) padding-box,
+    linear-gradient(var(--tw-accent), var(--tw-accent-dark)) border-box;
+  box-shadow: 0 0 12px var(--tw-accent-glow);
 }

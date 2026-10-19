@@ -19,6 +19,7 @@ export const translations = {
 
     // Main
     "main.loading": "Cargando canales...",
+    "main.reloading": "Recargando canales",
     "main.favorites": "Favoritos",
     "main.favoritesCount": "Total de favoritos en vivo",
     "main.live": "En vivo",
@@ -69,7 +70,15 @@ export const translations = {
     "themes.title": "Temas",
     "themes.active": "Activo",
     "themes.preview": "Vista previa",
-    "themes.select": "Seleccionar"
+    "themes.select": "Seleccionar",
+    "themes.accentTitle": "Color de la interfaz",
+    "themes.accentRed": "Rojo",
+    "themes.accentBlue": "Azul",
+    "themes.accentPurple": "Morado",
+    "themes.accentYellow": "Amarillo",
+    "themes.accentOrange": "Naranja",
+    "themes.accentGreen": "Verde",
+    "themes.accentSky": "Celeste"
   },
 
   en: {
@@ -92,6 +101,7 @@ export const translations = {
 
     // Main
     "main.loading": "Loading channels...",
+    "main.reloading": "Reloading channels",
     "main.favorites": "Favorites",
     "main.favoritesCount": "Total live favorites",
     "main.live": "Live",
@@ -142,6 +152,14 @@ export const translations = {
     "themes.title": "Themes",
     "themes.active": "Active",
     "themes.preview": "Preview",
-    "themes.select": "Select"
+    "themes.select": "Select",
+    "themes.accentTitle": "Accent color",
+    "themes.accentRed": "Red",
+    "themes.accentBlue": "Blue",
+    "themes.accentPurple": "Purple",
+    "themes.accentYellow": "Yellow",
+    "themes.accentOrange": "Orange",
+    "themes.accentGreen": "Green",
+    "themes.accentSky": "Sky blue"
   }
 }

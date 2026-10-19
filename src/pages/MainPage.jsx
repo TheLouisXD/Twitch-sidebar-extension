@@ -14,6 +14,18 @@ import {
 import { extension, sendMessage, openChannel } from "../platform.js"
 import "./MainPage.css"
 
+const SPINNER_BLADES = Array.from({ length: 12 }, (_, index) => index)
+
+function IosSpinner() {
+  return (
+    <div className="spinner" aria-hidden="true">
+      {SPINNER_BLADES.map((blade) => (
+        <div key={blade} className="spinner-blade" />
+      ))}
+    </div>
+  )
+}
+
 export default function MainPage({ onSettings, showOffline }) {
   const { t } = useI18n()
   const [channels, setChannels] = useState({ live: [], offline: [] })
@@ -48,6 +60,8 @@ export default function MainPage({ onSettings, showOffline }) {
     extension.storage.onChanged.addListener(onStorageChanged)
     async function load() {
       try {
+        const pollPromise = sendMessage({ type: attempt ? "POLL_NOW" : "LOAD_CHANNELS" })
+        pollPromise.catch(() => {})
         const [cached, ids] = await Promise.all([getCachedChannels(), getNotificationStreamers()])
         if (!active) return
         if (!notificationsChanged) setNotifiedIds(ids)
@@ -56,7 +70,7 @@ export default function MainPage({ onSettings, showOffline }) {
           applySnapshot(cached.data, cached.ts)
         }
         setRefreshing(true)
-        const result = await sendMessage({ type: attempt ? "POLL_NOW" : "LOAD_CHANNELS" })
+        const result = await pollPromise
         applySnapshot(result.channels, result.updatedAt)
       } catch (failure) {
         if (active) setError(failure.message)
@@ -88,12 +102,25 @@ export default function MainPage({ onSettings, showOffline }) {
     () => search(channels.live, channels.offline, query),
     [channels.live, channels.offline, query]
   )
+  const showReloadDrawer = refreshing && !loading
 
   return (
     <div className="main-root">
       <Header onSettings={onSettings} />
       <SearchBar query={query} setQuery={setQuery} />
-      {refreshing && <div className="main-refresh-bar" />}
+      <div
+        className={`main-reload-drawer${showReloadDrawer ? " main-reload-drawer--open" : ""}`}
+        role="status"
+        aria-live="polite"
+        aria-hidden={!showReloadDrawer}
+      >
+        <div className="main-reload-inner">
+          <div className="main-reload-content">
+            <IosSpinner />
+            <span className="main-reload-text">{t("main.reloading")}</span>
+          </div>
+        </div>
+      </div>
       {error && (
         <div className="main-error-banner" role="alert">
           ⚠ {t("main.loadError")}{" "}
@@ -101,9 +128,9 @@ export default function MainPage({ onSettings, showOffline }) {
         </div>
       )}
       {loading ? (
-        <div className="main-center">
-          <div className="main-spinner" />
-          <span className="main-loading-text">{t("main.loading")}</span>
+        <div className="main-center" role="status" aria-live="polite">
+          <IosSpinner />
+          <span className="main-loading-text">{t("main.reloading")}</span>
         </div>
       ) : (
         <StreamerList

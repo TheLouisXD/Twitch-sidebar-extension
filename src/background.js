@@ -5,8 +5,10 @@ import {
   CHANNELS_KEY,
   NOTIFICATIONS_KEY,
   clearAllCache,
+  decodeChannelCache,
   getCachedChannels,
   setCachedChannels,
+  setCachedFollows,
   setCachedProfiles,
   getCachedUserProfile,
   setCachedUserProfile
@@ -63,6 +65,12 @@ function setBadge(count) {
   return callExtension("action.setBadgeText", { text: count > 0 ? String(count) : "" })
 }
 
+function syncBadge(count) {
+  const task = badgeQueue.then(() => setBadge(count))
+  badgeQueue = task.catch(() => {})
+  return task
+}
+
 function syncBadgeFromCache() {
   const task = badgeQueue.then(async () => {
     const cached = await getCachedChannels()
@@ -79,12 +87,39 @@ function pollStreams() {
     const token = await restoreSession()
     assertSession(expected)
     if (!token) return null
-    const { data, profileMap, profilesChanged, user } = await withSession(fetchAllFollowed)
+    let lastSnapshot = null
+    const {
+      data,
+      profileMap,
+      profilesChanged,
+      follows,
+      followsChanged,
+      followsListChanged,
+      user,
+      progressed
+    } = await withSession((sessionToken) =>
+      fetchAllFollowed(sessionToken, {
+        onProgress: async (partialData) => {
+          assertSession(expected)
+          lastSnapshot = await setCachedChannels(partialData)
+          assertSession(expected)
+          await syncBadge(partialData.live.length)
+        }
+      })
+    )
     assertSession(expected)
-    if (profilesChanged) await setCachedProfiles(profileMap)
-    assertSession(expected)
-    await setCachedChannels(data)
-    assertSession(expected)
+    if (followsChanged && follows) {
+      await setCachedFollows(follows, user?.id ?? null)
+      assertSession(expected)
+    }
+    if (profilesChanged) {
+      await setCachedProfiles(profileMap)
+      assertSession(expected)
+    }
+    if (!progressed || profilesChanged || followsListChanged || !lastSnapshot) {
+      lastSnapshot = await setCachedChannels(data)
+      assertSession(expected)
+    }
     if (user) {
       const cached = await getCachedUserProfile()
       const prev = cached?.profile
@@ -94,7 +129,7 @@ function pollStreams() {
         prev.display_name !== user.display_name ||
         prev.login !== user.login ||
         prev.profile_image_url !== user.profile_image_url
-      if (changed || !prev?.avatar_data) {
+      if (changed || (user.profile_image_url && !prev?.avatar_data)) {
         await setCachedUserProfile({
           ...prev,
           ...user,
@@ -103,8 +138,8 @@ function pollStreams() {
       }
     }
     assertSession(expected)
-    await syncBadgeFromCache()
-    return data
+    await syncBadge(data.live.length)
+    return lastSnapshot
   })().finally(() => {
     pollTask = null
   })
@@ -120,7 +155,7 @@ function signOut() {
     await revokeSessionTokens().catch(() => {})
     await clearTokens()
     await clearAllCache()
-    await syncBadgeFromCache()
+    await syncBadge(0)
     return { ok: true }
   })().finally(() => {
     logoutTask = null
@@ -250,11 +285,12 @@ async function route(message) {
       return getProfile()
     case "LOAD_CHANNELS":
     case "POLL_NOW": {
-      await ensureAlarm()
+      ensureAlarm().catch(report)
       // Cache is displayed instantly by the UI; always refresh on opening.
-      const channels = await pollStreams()
+      const snapshot = await pollStreams()
+      if (snapshot) return { channels: snapshot.data, updatedAt: snapshot.ts }
       const cached = await getCachedChannels()
-      return { channels: cached?.data ?? channels, updatedAt: cached?.ts ?? 0 }
+      return { channels: cached?.data ?? null, updatedAt: cached?.ts ?? 0 }
     }
     case "SET_POLL_INTERVAL": {
       if (!POLL_INTERVAL_OPTIONS.includes(message.minutes))
@@ -313,7 +349,10 @@ function runPoll() {
 extension.storage.onChanged.addListener((changes, area) => {
   if (area !== "local") return
   if (changes[POLL_INTERVAL_KEY]) ensureAlarm().catch(report)
-  if (changes[CHANNELS_KEY]) syncBadgeFromCache().catch(report)
+  if (changes[CHANNELS_KEY]) {
+    const next = decodeChannelCache(changes[CHANNELS_KEY].newValue)
+    syncBadge(next?.data.live.length ?? 0).catch(report)
+  }
 })
 
 extension.runtime.onInstalled.addListener(() => {
