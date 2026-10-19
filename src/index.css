@@ -69,6 +69,7 @@
   --tw-accent-hover: #a25ceb;
   --tw-accent-light: #a970ff;
   --tw-accent-dark: #6030a8;
+  --tw-accent-deep: #1b0b33;
   --tw-accent-gradient: linear-gradient(135deg, #9147ff, #6441a5);
   --tw-accent-glow: rgba(145, 71, 255, 0.25);
   --tw-accent-glow-strong: rgba(145, 71, 255, 0.5);
@@ -122,15 +123,16 @@
   --tw-accent-hover: #ff3b68;
   --tw-accent-light: #fa1e4e;
   --tw-accent-dark: #a01231;
+  --tw-accent-deep: #1f060b;
   --tw-accent-gradient: linear-gradient(135deg, #fa1e4e, #a01231);
   --tw-accent-glow: rgba(250, 30, 78, 0.35);
   --tw-accent-glow-strong: rgba(250, 30, 78, 0.6);
   --tw-on-accent: #ffffff;
-  --tw-border: #a01231;
+  --tw-border: var(--tw-accent-dark);
   --tw-shadow: rgba(0, 0, 0, 0.7);
-  --tw-overlay-subtle: rgba(250, 30, 78, 0.05);
-  --tw-overlay-hover: rgba(250, 30, 78, 0.12);
-  --tw-spinner-border: rgba(250, 30, 78, 0.25);
+  --tw-overlay-subtle: color-mix(in srgb, var(--tw-accent) 5%, transparent);
+  --tw-overlay-hover: color-mix(in srgb, var(--tw-accent) 12%, transparent);
+  --tw-spinner-border: color-mix(in srgb, var(--tw-accent) 25%, transparent);
   --tw-ambient-text-shadow: rgba(0, 0, 0, 0.95);
 
   /* ── Status Colors ── */
@@ -209,15 +211,15 @@ html {
 
 [data-theme="gx"] html,
 html[data-theme="gx"] {
-  scrollbar-color: #a01231 var(--tw-bg);
+  scrollbar-color: var(--tw-accent-dark) var(--tw-bg);
 }
 
 [data-theme="gx"] ::-webkit-scrollbar-thumb {
-  background: #a01231;
+  background: var(--tw-accent-dark);
 }
 
 [data-theme="gx"] ::-webkit-scrollbar-thumb:hover {
-  background: #fa1e4e;
+  background: var(--tw-accent);
 }
 
 @keyframes spin {

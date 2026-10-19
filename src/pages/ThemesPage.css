@@ -276,7 +276,7 @@
   border: 1px solid transparent;
   background:
     linear-gradient(#1d1d1d, #1d1d1d) padding-box,
-    linear-gradient(#a01231, #1f060b) border-box;
+    linear-gradient(var(--tw-accent-dark), var(--tw-accent-deep)) border-box;
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
 }
 
