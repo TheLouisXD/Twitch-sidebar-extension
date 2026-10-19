@@ -1,21 +1,46 @@
 import { useState } from "react"
 import { useI18n } from "../i18n-context.js"
 import { localSet } from "../platform.js"
-import { THEME_KEY, DEFAULT_THEME, normalizeTheme, THEMES } from "../preferences.js"
+import {
+  THEME_KEY,
+  DEFAULT_THEME,
+  normalizeTheme,
+  THEMES,
+  ACCENT_KEY,
+  DEFAULT_ACCENT,
+  normalizeAccent,
+  getEffectiveAccent,
+  ACCENTS
+} from "../preferences.js"
 import { useStoredValue } from "../hooks/useStoredValue.js"
 import "./ThemesPage.css"
 
 export default function ThemesPage({ onBack }) {
   const { t } = useI18n()
   const { value: currentTheme } = useStoredValue(THEME_KEY, DEFAULT_THEME, normalizeTheme)
+  const { value: selectedAccent } = useStoredValue(ACCENT_KEY, DEFAULT_ACCENT, normalizeAccent)
   const [error, setError] = useState(null)
   const [saving, setSaving] = useState(false)
+  const effectiveAccent = getEffectiveAccent(selectedAccent, currentTheme)
 
   async function handleSelectTheme(themeId) {
     if (themeId === currentTheme || saving) return
     setSaving(true)
     try {
       await localSet({ [THEME_KEY]: themeId })
+      setError(null)
+    } catch {
+      setError("settings.saveError")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleSelectAccent(accentId) {
+    if (accentId === selectedAccent || saving) return
+    setSaving(true)
+    try {
+      await localSet({ [ACCENT_KEY]: accentId })
       setError(null)
     } catch {
       setError("settings.saveError")
@@ -130,6 +155,47 @@ export default function ThemesPage({ onBack }) {
           )
         })}
       </div>
+
+      <section className="accent-panel" aria-labelledby="accent-panel-title">
+        <h2 id="accent-panel-title" className="accent-panel-title">
+          {t("themes.accentTitle")}
+        </h2>
+        <div className="accent-options" role="radiogroup" aria-labelledby="accent-panel-title">
+          {ACCENTS.map((accent) => {
+            const isActive = accent.id === effectiveAccent
+            return (
+              <button
+                key={accent.id}
+                type="button"
+                className={`accent-option ${isActive ? "accent-option--active" : ""}`}
+                style={{ "--accent-swatch": accent.vars["--tw-accent"] }}
+                onClick={() => handleSelectAccent(accent.id)}
+                role="radio"
+                aria-checked={isActive}
+                aria-label={t(accent.nameKey)}
+                disabled={saving}
+              >
+                {isActive && (
+                  <span className="accent-option-check" aria-hidden="true">
+                    <svg
+                      width="9"
+                      height="9"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </div>
+      </section>
     </div>
   )
 }

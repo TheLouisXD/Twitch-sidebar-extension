@@ -18,6 +18,9 @@
  * @property {number} pollIntervalMinutes
  * @property {boolean} rememberSession
  * @property {"default"|"gx"} theme
+ * @property {AccentColor|null} accentColor
+ *
+ * @typedef {"red"|"blue"|"purple"|"yellow"|"orange"|"green"|"sky"} AccentColor
  *
  * @typedef {object} TwitchCardProps
  * @property {Channel} channel

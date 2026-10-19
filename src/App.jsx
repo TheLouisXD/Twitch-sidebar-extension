@@ -8,7 +8,16 @@ import { extension, sendMessage } from "./platform.js"
 import { useI18n } from "./i18n-context.js"
 import SessionStatus from "./components/SessionStatus.jsx"
 import { useStoredValue, asBoolean } from "./hooks/useStoredValue.js"
-import { THEME_KEY, DEFAULT_THEME, normalizeTheme } from "./preferences.js"
+import {
+  THEME_KEY,
+  DEFAULT_THEME,
+  normalizeTheme,
+  ACCENT_KEY,
+  DEFAULT_ACCENT,
+  normalizeAccent,
+  getEffectiveAccent,
+  getAccentVars
+} from "./preferences.js"
 
 export default function App() {
   const { t } = useI18n()
@@ -16,12 +25,24 @@ export default function App() {
   const [page, setPage] = useState("main")
   const { value: showOffline } = useStoredValue("showOffline", false, asBoolean)
   const { value: theme } = useStoredValue(THEME_KEY, DEFAULT_THEME, normalizeTheme)
+  const { value: accentColor } = useStoredValue(ACCENT_KEY, DEFAULT_ACCENT, normalizeAccent)
   const [error, setError] = useState(null)
   const [restoreAttempt, setRestoreAttempt] = useState(0)
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme)
   }, [theme])
+
+  useEffect(() => {
+    const rootElement = document.documentElement
+    const vars = getAccentVars(getEffectiveAccent(accentColor, theme))
+    if (!vars) return
+    for (const [property, value] of Object.entries(vars))
+      rootElement.style.setProperty(property, value)
+    return () => {
+      for (const property of Object.keys(vars)) rootElement.style.removeProperty(property)
+    }
+  }, [accentColor, theme])
 
   useEffect(() => {
     let active = true

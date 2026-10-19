@@ -99,7 +99,8 @@ const {
   asBoolean
 } = await import(`data:text/javascript;base64,${Buffer.from(code).toString("base64")}`)
 const { createElement } = await import("react")
-const { render, screen, waitFor, act, cleanup, fireEvent } = await import("@testing-library/react")
+const { render, screen, waitFor, act, cleanup, fireEvent, within } =
+  await import("@testing-library/react")
 const { default: userEvent } = await import("@testing-library/user-event")
 const mount = (Component, props = {}) =>
   render(createElement(I18nProvider, null, createElement(Component, props)))
@@ -348,6 +349,97 @@ test("changing theme updates storage", async () => {
   const gxCard = await screen.findByRole("radio", { name: /GX/i })
   await userEvent.click(gxCard)
   assert.equal(local.theme, "gx")
+})
+
+test("themes page offers seven accent colors and shows the theme default", async () => {
+  mount(ThemesPage)
+  const panel = await screen.findByRole("region", { name: "Accent color" })
+  const options = within(panel).getAllByRole("radio")
+  assert.equal(options.length, 7)
+  assert.deepEqual(
+    options.map((option) => option.getAttribute("aria-label")),
+    ["Red", "Blue", "Purple", "Yellow", "Orange", "Green", "Sky blue"]
+  )
+  assert.equal(
+    within(panel).getByRole("radio", { name: "Purple" }).getAttribute("aria-checked"),
+    "true"
+  )
+})
+
+test("GX keeps red as its default accent until the user chooses a color", async () => {
+  local.theme = "gx"
+  mount(ThemesPage)
+  const panel = await screen.findByRole("region", { name: "Accent color" })
+  await waitFor(() =>
+    assert.equal(
+      within(panel).getByRole("radio", { name: "Red" }).getAttribute("aria-checked"),
+      "true"
+    )
+  )
+})
+
+test("accent panel title and color names are localized", async () => {
+  local.language = "es"
+  mount(ThemesPage)
+  const panel = await screen.findByRole("region", { name: "Color de la interfaz" })
+  assert.ok(within(panel).getByRole("radio", { name: "Celeste" }))
+  assert.equal(within(panel).getAllByRole("radio").length, 7)
+})
+
+test("choosing an accent color persists it and keeps it across themes", async () => {
+  mount(ThemesPage)
+  const panel = await screen.findByRole("region", { name: "Accent color" })
+  await userEvent.click(within(panel).getByRole("radio", { name: "Blue" }))
+  await waitFor(() => assert.equal(local.accentColor, "blue"))
+  assert.equal(
+    within(panel).getByRole("radio", { name: "Blue" }).getAttribute("aria-checked"),
+    "true"
+  )
+
+  await userEvent.click(screen.getByRole("radio", { name: /GX/i }))
+  await waitFor(() => assert.equal(local.theme, "gx"))
+  assert.equal(
+    within(panel).getByRole("radio", { name: "Blue" }).getAttribute("aria-checked"),
+    "true"
+  )
+})
+
+test("accent color applies to the interface and survives theme changes", async () => {
+  mount(App)
+  const rootElement = dom.window.document.documentElement
+  await waitFor(() => assert.equal(rootElement.style.getPropertyValue("--tw-accent"), "#9147ff"))
+
+  await act(async () => {
+    changeStorage({ theme: "gx" })
+  })
+  await waitFor(() => assert.equal(rootElement.style.getPropertyValue("--tw-accent"), "#fa1e4e"))
+
+  await act(async () => {
+    changeStorage({ accentColor: "green" })
+  })
+  await waitFor(() => assert.equal(rootElement.style.getPropertyValue("--tw-accent"), "#22c55e"))
+  assert.equal(rootElement.style.getPropertyValue("--tw-on-accent"), "#000000")
+
+  await act(async () => {
+    changeStorage({ theme: "default" })
+  })
+  await waitFor(() => assert.equal(rootElement.style.getPropertyValue("--tw-accent"), "#22c55e"))
+})
+
+test("accent save errors use the preferences error banner", async () => {
+  const originalSet = globalThis.browser.storage.local.set
+  globalThis.browser.storage.local.set = async () => {
+    throw new Error("denied")
+  }
+  try {
+    mount(ThemesPage)
+    const panel = await screen.findByRole("region", { name: "Accent color" })
+    await userEvent.click(within(panel).getByRole("radio", { name: "Green" }))
+    assert.ok(await screen.findByRole("alert"))
+    assert.ok(screen.getByText("Could not load or save preferences. Please try again."))
+  } finally {
+    globalThis.browser.storage.local.set = originalSet
+  }
 })
 
 test("settings profile renders cached avatar and followers, and does not render account type or creation date", async () => {
