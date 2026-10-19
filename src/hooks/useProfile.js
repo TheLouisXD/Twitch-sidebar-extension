@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { extension, sendMessage } from "../platform.js"
 import { sampleAverageColor } from "../image-color.js"
+import { formatAvatarUrl } from "../twitch.js"
 import { USER_PROFILE_KEY, getCachedUserProfile } from "../cache.js"
 
 function profilesEqual(a, b) {
@@ -31,17 +32,28 @@ export function useProfile() {
         setColors(targetProfile.colors)
         return
       }
-      const imageUrl = targetProfile.avatar_data || targetProfile.profile_image_url
-      if (!imageUrl) return
+      // The cached data URL is preferred, but sampling must not die with it: if
+      // it cannot be read (blocked by the CSP, memory limits), fall back to the
+      // CDN avatar so the background keeps its tint.
+      const sources = [
+        targetProfile.avatar_data,
+        formatAvatarUrl(targetProfile.profile_image_url)
+      ].filter((source, index, all) => source && all.indexOf(source) === index)
+      if (!sources.length) return
       // Decorative image work must never delay preferences or sign-out.
-      sampleAverageColor(imageUrl, { signal: controller.signal }).then((color) => {
-        if (!active || !color) return
-        const [r, g, b] = color
-        setColors({
-          "--profile-tint": `rgba(${r}, ${g}, ${b}, 0.45)`,
-          "--profile-dark": `rgb(${Math.round(r * 0.15)}, ${Math.round(g * 0.15)}, ${Math.round(b * 0.15)})`
-        })
-      })
+      const sample = async () => {
+        for (const source of sources) {
+          const color = await sampleAverageColor(source, { signal: controller.signal })
+          if (!active || controller.signal.aborted || !color) continue
+          const [r, g, b] = color
+          setColors({
+            "--profile-tint": `rgba(${r}, ${g}, ${b}, 0.45)`,
+            "--profile-dark": `rgb(${Math.round(r * 0.15)}, ${Math.round(g * 0.15)}, ${Math.round(b * 0.15)})`
+          })
+          return
+        }
+      }
+      sample()
     }
 
     // Listen to background cache updates from storage

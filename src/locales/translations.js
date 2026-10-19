@@ -19,6 +19,7 @@ export const translations = {
 
     // Main
     "main.loading": "Cargando canales...",
+    "main.reloading": "Recargando canales",
     "main.favorites": "Favoritos",
     "main.favoritesCount": "Total de favoritos en vivo",
     "main.live": "En vivo",
@@ -92,6 +93,7 @@ export const translations = {
 
     // Main
     "main.loading": "Loading channels...",
+    "main.reloading": "Reloading channels",
     "main.favorites": "Favorites",
     "main.favoritesCount": "Total live favorites",
     "main.live": "Live",

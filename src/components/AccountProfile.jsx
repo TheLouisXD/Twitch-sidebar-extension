@@ -1,8 +1,17 @@
+import { useState } from "react"
 import { useI18n } from "../i18n-context.js"
 import { formatAvatarUrl } from "../twitch.js"
 
 export default function AccountProfile({ user, loading, error }) {
   const { t } = useI18n()
+  // The cached data URL is the preferred source for instant display, but if the
+  // runtime blocks it (e.g. a stale manifest without `data:` in `img-src`), fall
+  // back to the CDN avatar instead of leaving an empty frame.
+  const [failedAvatars, setFailedAvatars] = useState(() => new Set())
+  const avatarSrc =
+    [user?.avatar_data, formatAvatarUrl(user?.profile_image_url)].find(
+      (candidate) => candidate && !failedAvatars.has(candidate)
+    ) ?? null
 
   if (loading && !user)
     return (
@@ -20,12 +29,13 @@ export default function AccountProfile({ user, loading, error }) {
     <>
       <div className="settings-profile">
         <div className="settings-avatar-wrap">
-          {user?.avatar_data || user?.profile_image_url ? (
+          {avatarSrc ? (
             <img
               className="settings-avatar"
-              src={user?.avatar_data || formatAvatarUrl(user?.profile_image_url)}
+              src={avatarSrc}
               alt={user?.display_name ?? ""}
               decoding="async"
+              onError={() => setFailedAvatars((current) => new Set(current).add(avatarSrc))}
             />
           ) : (
             <div className="settings-avatar-placeholder" />

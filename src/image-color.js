@@ -32,14 +32,20 @@ export function sampleAverageColor(imageUrl, { signal, timeoutMs = 3000 } = {}) 
         const pixels = ctx.getImageData(0, 0, 16, 16).data
         const sums = [0, 0, 0]
         let count = 0
-        for (let i = 0; i < pixels.length; i += 4) {
-          const brightness = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3
-          if (pixels[i + 3] > 0 && brightness > 30 && brightness < 240) {
-            sums[0] += pixels[i]
-            sums[1] += pixels[i + 1]
-            sums[2] += pixels[i + 2]
-            count++
-          }
+        const addPixel = (index, midTonesOnly) => {
+          if (pixels[index + 3] === 0) return
+          const brightness = (pixels[index] + pixels[index + 1] + pixels[index + 2]) / 3
+          if (midTonesOnly && (brightness <= 30 || brightness >= 240)) return
+          sums[0] += pixels[index]
+          sums[1] += pixels[index + 1]
+          sums[2] += pixels[index + 2]
+          count++
+        }
+        for (let i = 0; i < pixels.length; i += 4) addPixel(i, true)
+        if (!count) {
+          // Almost white or almost black avatars have no mid-tone pixels; average
+          // every opaque pixel so the tint is not lost entirely.
+          for (let i = 0; i < pixels.length; i += 4) addPixel(i, false)
         }
         finish(count ? sums.map((sum) => Math.round(sum / count)) : null)
       } catch {

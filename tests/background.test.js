@@ -392,6 +392,7 @@ for (const browser of ["firefox", "chrome"]) {
     assert.equal(harness.session.twitch_access_token, undefined)
     assert.equal(harness.local.twitch_refresh_token, undefined)
     assert.equal(harness.local.twitch_channels_cache, undefined)
+    assert.equal(harness.local.twitch_follows_cache, undefined)
     assert.equal(harness.local.twitch_profiles_cache, undefined)
     assert.equal(harness.state.badge, "")
   })
@@ -407,6 +408,19 @@ for (const browser of ["firefox", "chrome"]) {
     assert.ok(harness.requests.some(({ url }) => url.pathname.endsWith("/streams")))
     assert.equal(harness.state.badge, "2")
     assert.equal(result.updatedAt, harness.local.twitch_channels_cache.ts)
+    assert.equal(harness.local.twitch_follows_cache.follows.length, 2)
+
+    // Subsequent open while follows and profiles caches are warm queries only /streams.
+    harness.requests.length = 0
+    harness.state.live = ["2"]
+    const second = await harness.message({ type: "LOAD_CHANNELS" })
+    assert.equal(second.channels.live.length, 1)
+    assert.equal(second.channels.live[0].user_id, "2")
+    assert.deepEqual(
+      harness.requests.map(({ url }) => url.pathname),
+      ["/helix/streams"]
+    )
+    assert.equal(harness.state.badge, "1")
   })
 
   test(`${browser}: a scheduled alarm updates cached channels and the live badge without a panel`, async () => {
@@ -484,6 +498,11 @@ for (const browser of ["firefox", "chrome"]) {
     const harness = createHarness(browser, {
       notification_streamers: ["1"],
       twitch_channels_cache: { data: { live: [{ user_id: "1" }], offline: [] }, ts: Date.now() },
+      twitch_follows_cache: {
+        follows: [{ broadcaster_id: "1", broadcaster_login: "ch1", broadcaster_name: "Ch 1" }],
+        userId: "42",
+        ts: Date.now()
+      },
       twitch_profiles_cache: { map: { 1: { user_id: "1" } }, ts: Date.now() },
       twitch_user_profile_cache: { profile: { id: "42" }, ts: Date.now() }
     })
@@ -497,6 +516,7 @@ for (const browser of ["firefox", "chrome"]) {
     // Signing out leaves no account data behind, favorites included.
     assert.equal(harness.local.notification_streamers, undefined)
     assert.equal(harness.local.twitch_channels_cache, undefined)
+    assert.equal(harness.local.twitch_follows_cache, undefined)
     assert.equal(harness.local.twitch_profiles_cache, undefined)
     assert.equal(harness.local.twitch_user_profile_cache, undefined)
     assert.equal(harness.state.badge, "")

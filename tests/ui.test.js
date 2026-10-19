@@ -99,7 +99,7 @@ const {
   asBoolean
 } = await import(`data:text/javascript;base64,${Buffer.from(code).toString("base64")}`)
 const { createElement } = await import("react")
-const { render, screen, waitFor, act, cleanup } = await import("@testing-library/react")
+const { render, screen, waitFor, act, cleanup, fireEvent } = await import("@testing-library/react")
 const { default: userEvent } = await import("@testing-library/user-event")
 const mount = (Component, props = {}) =>
   render(createElement(I18nProvider, null, createElement(Component, props)))
@@ -520,6 +520,125 @@ test("settings profile updates seamlessly in background when cache changes witho
   assert.equal(screen.queryByRole("status"), null)
 })
 
+test("settings avatar falls back to the CDN URL when the cached data URL cannot load", async () => {
+  local.twitch_user_profile_cache = {
+    profile: {
+      id: "99",
+      display_name: "FallbackUser",
+      login: "fallbackuser",
+      profile_image_url: "https://static-cdn.jtvnw.net/fallback-300x300.png",
+      avatar_data: "data:image/png;base64,AAA",
+      followers: 10
+    },
+    ts: Date.now()
+  }
+  const pending = deferred()
+  handlers.GET_PROFILE = () => pending.promise
+
+  mount(SettingsPage, { showOffline: false })
+  assert.ok(await screen.findByText("FallbackUser"))
+  const img = screen.getByAltText("FallbackUser")
+  assert.equal(img.src, "data:image/png;base64,AAA")
+
+  // A runtime that blocks the data URL (CSP) must not leave an empty frame.
+  await act(async () => {
+    fireEvent.error(img)
+  })
+  assert.equal(img.src, "https://static-cdn.jtvnw.net/fallback-150x150.png")
+
+  await act(async () => {
+    fireEvent.error(img)
+  })
+  assert.equal(screen.queryByAltText("FallbackUser"), null)
+  assert.ok(dom.window.document.querySelector(".settings-avatar-placeholder"))
+})
+
+test("settings gradient falls back to the CDN avatar when the cached data URL cannot be sampled", async () => {
+  local.twitch_user_profile_cache = {
+    profile: {
+      id: "99",
+      display_name: "GradientUser",
+      login: "gradientuser",
+      profile_image_url: "https://static-cdn.jtvnw.net/gradient-300x300.png",
+      avatar_data: "data:image/png;base64,AAA",
+      followers: 10
+    },
+    ts: Date.now()
+  }
+  const pending = deferred()
+  handlers.GET_PROFILE = () => pending.promise
+
+  const attempts = []
+  const originalImage = globalThis.Image
+  const jsdomDocument = dom.window.document
+  const originalCreateElement = jsdomDocument.createElement.bind(jsdomDocument)
+  globalThis.Image = class {
+    set src(value) {
+      if (!value) return
+      attempts.push(value.startsWith("data:") ? "data-url" : value)
+      queueMicrotask(() => (value.startsWith("data:") ? this.onerror?.() : this.onload?.()))
+    }
+  }
+  jsdomDocument.createElement = (tag) => {
+    if (tag !== "canvas") return originalCreateElement(tag)
+    return {
+      getContext: () => ({
+        drawImage() {},
+        getImageData: () => ({ data: Uint8ClampedArray.from([240, 60, 40, 255, 240, 60, 40, 255]) })
+      })
+    }
+  }
+
+  try {
+    mount(SettingsPage, { showOffline: false })
+    assert.ok(await screen.findByText("GradientUser"))
+    const root = dom.window.document.querySelector(".settings-root")
+    await waitFor(() => {
+      assert.equal(root.style.getPropertyValue("--profile-tint"), "rgba(240, 60, 40, 0.45)")
+    })
+    assert.equal(root.style.getPropertyValue("--profile-dark"), "rgb(36, 9, 6)")
+    assert.deepEqual(attempts, ["data-url", "https://static-cdn.jtvnw.net/gradient-150x150.png"])
+  } finally {
+    globalThis.Image = originalImage
+    jsdomDocument.createElement = originalCreateElement
+  }
+})
+
+test("settings stays functional without a gradient when every avatar source fails", async () => {
+  local.twitch_user_profile_cache = {
+    profile: {
+      id: "99",
+      display_name: "NoColorUser",
+      login: "nocoloruser",
+      profile_image_url: "https://static-cdn.jtvnw.net/broken.png",
+      avatar_data: "data:image/png;base64,BBB",
+      followers: 3
+    },
+    ts: Date.now()
+  }
+  const pending = deferred()
+  handlers.GET_PROFILE = () => pending.promise
+
+  const originalImage = globalThis.Image
+  globalThis.Image = class {
+    set src(value) {
+      if (!value) return
+      queueMicrotask(() => this.onerror?.())
+    }
+  }
+
+  try {
+    mount(SettingsPage, { showOffline: false })
+    assert.ok(await screen.findByText("NoColorUser"))
+    const root = dom.window.document.querySelector(".settings-root")
+    assert.equal(root.style.getPropertyValue("--profile-tint"), "")
+    assert.equal(root.style.getPropertyValue("--profile-dark"), "")
+    assert.ok(screen.getByText("Followers"))
+  } finally {
+    globalThis.Image = originalImage
+  }
+})
+
 test("settings root applies profile dynamic tint and dark colors from profile", async () => {
   const pending = deferred()
   handlers.GET_PROFILE = () => pending.promise
@@ -542,4 +661,30 @@ test("settings root applies profile dynamic tint and dark colors from profile", 
   assert.ok(root)
   assert.equal(root.style.getPropertyValue("--profile-tint"), "rgba(224, 128, 48, 0.45)")
   assert.equal(root.style.getPropertyValue("--profile-dark"), "rgb(34, 19, 7)")
+})
+
+test("main page renders 12-blade iOS spinner with 'Recargando canales' and toggles sliding drawer", async () => {
+  local.language = "es"
+  const pending = deferred()
+  handlers.LOAD_CHANNELS = () => pending.promise
+
+  mount(App)
+  assert.ok(await screen.findByText("Channel One"))
+
+  const drawer = dom.window.document.querySelector(".main-reload-drawer")
+  assert.ok(drawer)
+  await waitFor(() => assert.equal(drawer.classList.contains("main-reload-drawer--open"), true))
+  assert.equal(drawer.getAttribute("aria-hidden"), "false")
+  assert.ok(drawer.textContent.includes("Recargando canales"))
+  assert.equal(drawer.querySelectorAll(".spinner .spinner-blade").length, 12)
+
+  await act(async () => {
+    pending.resolve({
+      channels: local.twitch_channels_cache.data,
+      updatedAt: Date.now()
+    })
+  })
+
+  await waitFor(() => assert.equal(drawer.classList.contains("main-reload-drawer--open"), false))
+  assert.equal(drawer.getAttribute("aria-hidden"), "true")
 })

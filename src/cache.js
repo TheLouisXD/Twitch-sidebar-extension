@@ -1,10 +1,12 @@
 import { localGet, localSet, localRemove, sendMessage } from "./platform.js"
 
 export const CHANNELS_KEY = "twitch_channels_cache"
+export const FOLLOWS_KEY = "twitch_follows_cache"
 export const PROFILES_KEY = "twitch_profiles_cache"
 export const USER_PROFILE_KEY = "twitch_user_profile_cache"
 export const NOTIFICATIONS_KEY = "notification_streamers"
 export const EMPTY_NOTIFICATION_IDS = []
+export const FOLLOWS_TTL = 60 * 60 * 1000
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
 
 function isFresh(timestamp, maxAge) {
@@ -42,12 +44,42 @@ export function decodeChannelCache(entry) {
   return Array.isArray(entry?.data?.live) && Array.isArray(entry?.data?.offline) ? entry : null
 }
 
+export function decodeFollowsCache(entry) {
+  if (!Array.isArray(entry?.follows)) return null
+  const valid = entry.follows.every(
+    (follow) =>
+      follow &&
+      typeof follow.broadcaster_id === "string" &&
+      typeof follow.broadcaster_login === "string" &&
+      typeof follow.broadcaster_name === "string"
+  )
+  return valid ? entry : null
+}
+
+export async function getCachedFollows() {
+  const { [FOLLOWS_KEY]: entry } = await localGet(FOLLOWS_KEY)
+  const decoded = decodeFollowsCache(entry)
+  if (!decoded) return { follows: null, userId: null, ts: 0, fresh: false }
+  return {
+    follows: decoded.follows,
+    userId: typeof decoded.userId === "string" ? decoded.userId : null,
+    ts: decoded.ts,
+    fresh: isFresh(decoded.ts, FOLLOWS_TTL)
+  }
+}
+
+export function setCachedFollows(follows, userId = null) {
+  return localSet({ [FOLLOWS_KEY]: { follows, userId, ts: Date.now() } })
+}
+
 export function decodeNotificationIds(ids) {
   return Array.isArray(ids) ? ids.filter((id) => typeof id === "string" && /^\d+$/.test(id)) : []
 }
 
-export function setCachedChannels(data) {
-  return localSet({ [CHANNELS_KEY]: { data, ts: Date.now() } })
+export async function setCachedChannels(data) {
+  const entry = { data, ts: Date.now() }
+  await localSet({ [CHANNELS_KEY]: entry })
+  return entry
 }
 
 export async function getCachedProfiles() {
@@ -73,10 +105,10 @@ export async function setCachedUserProfile(profile) {
   return localSet({ [USER_PROFILE_KEY]: { profile, ts: Date.now() } })
 }
 
-// Channel and profile caches belong to the signed-in account. The favorite list
+// Channel, follow and profile caches belong to the signed-in account. The favorite list
 // is dropped as well on purpose: signing out must leave no account data behind.
 export function clearAllCache() {
-  return localRemove([CHANNELS_KEY, PROFILES_KEY, USER_PROFILE_KEY, NOTIFICATIONS_KEY])
+  return localRemove([CHANNELS_KEY, FOLLOWS_KEY, PROFILES_KEY, USER_PROFILE_KEY, NOTIFICATIONS_KEY])
 }
 
 export async function getNotificationStreamers() {

@@ -73,5 +73,10 @@ for (const browser of browsers) {
     }
     // Avatar <img> elements need the CDN in img-src as well.
     assert.ok(policy["img-src"].includes(avatarOrigin))
+    // The cached avatar is stored as a data: URL, so img-src must allow it too.
+    assert.ok(
+      policy["img-src"].includes("data:"),
+      `${browser} img-src must allow data: URLs (cached avatar is a data URL)`
+    )
   })
 }

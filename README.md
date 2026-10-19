@@ -25,9 +25,9 @@ npm run build:all
 - `src/platform.js`: adapta `browser.*` con Promises y `chrome.*` con callbacks, incluyendo errores de las APIs.
 - `src/background.js`: mensajes, sondeo configurable, badge, notificaciones y apertura del panel.
 - `src/session.js`: restauración, validación, renovación compartida, migración de credenciales y cierre de sesión. El access token queda en `storage.session`; la ubicación del refresh token depende de «Recordar sesión».
-- `src/twitch.js`: consultas y paginación de Twitch; las respuestas fallidas no reemplazan la caché con listas vacías.
+- `src/twitch.js`: consultas y paginación de Twitch con lotes en paralelo (concurrencia máxima de 4), priorización de `streams` y escritura progresiva; las respuestas fallidas no reemplazan la caché con listas vacías.
 - `src/oauth.js`: estado aleatorio y comprobación del redirect OAuth.
-- `src/cache.js`: cachés y preferencias; las escrituras concurrentes de notificaciones se serializan en el proceso de fondo.
+- `src/cache.js`: cachés de canales, follows (TTL de 1 h) y perfiles (TTL de 24 h), además de preferencias; las escrituras concurrentes de notificaciones se serializan en el proceso de fondo.
 - `src/preferences.js`: intervalo de actualización, tema y persistencia de sesión.
 - `src/hooks/`: lecturas sincronizadas del almacenamiento y carga del perfil, independientes del trabajo decorativo de imágenes.
 - `src/locales/translations.js`: textos de interfaz en español e inglés.
@@ -38,13 +38,13 @@ El proceso de fondo realiza el login completo y conserva la sesión al cerrar el
 
 ## Preferencias de la lista
 
-En Configuración se puede elegir una actualización en segundo plano cada 1, 2, 3, 5, 10, 15, 30 o 60 minutos; el valor predeterminado es 3 minutos. El cambio reprograma la alarma y se conserva al reiniciar el navegador. Al abrir el panel se muestra primero la caché y se consulta de nuevo Twitch. El contador del panel muestra el total de canales en vivo, incluso al buscar, y el badge de la extensión usa la misma lista guardada.
+En Configuración se puede elegir una actualización en segundo plano cada 1, 2, 3, 5, 10, 15, 30 o 60 minutos; el valor predeterminado es 3 minutos. El cambio reprograma la alarma y se conserva al reiniciar el navegador. Al abrir el panel se muestra primero la caché al instante y se refresca siempre el estado en vivo (`streams`) en Twitch: si la caché de follows (vigencia de 1 hora) y la de perfiles (24 horas) están vigentes, solo se consultan los lotes de `streams` en paralelo; si la caché de follows ha expirado, se consultan primero los `streams` de los follows conocidos (guardando de forma progresiva la lista en vivo en cuanto responden) mientras se reconcilia la lista completa de `channels/followed` en paralelo. El contador del panel muestra el total de canales en vivo, incluso al buscar, y el badge de la extensión se actualiza directamente desde el resultado del sondeo y los eventos de almacenamiento sin releer `storage.local`.
 
 Los canales en vivo marcados como favoritos se agrupan en una sección «Favoritos» propia, con su propio contador, y quedan fuera de la sección «En vivo». Cada sección conserva el orden por espectadores y los canales desconectados permanecen en su sección. Este comportamiento es fijo y no tiene ajuste asociado.
 
 «Recordar sesión» está activado inicialmente para mantener el comportamiento anterior. Al desactivarlo, el refresh token se mueve de `storage.local` a `storage.session` y se elimina la copia persistente. La sesión dura hasta cerrar el navegador, deshabilitar o recargar la extensión. Reactivar la opción permite restaurar la sesión al reiniciar. Las migraciones y renovaciones se serializan; un fallo de escritura intenta restaurar el modo anterior y se muestra como error de guardado. `storage.local` no cifra estas credenciales.
 
-«Cerrar sesión» revoca en Twitch todos los credenciales guardados, el access token y el refresh token, porque este último sigue siendo válido aunque se revoque el primero. También borra las cachés de canales y perfiles y la lista de favoritos, de modo que no queda ningún dato de la cuenta en el navegador; el tema, el idioma y el resto de preferencias sí se conservan.
+«Cerrar sesión» revoca en Twitch todos los credenciales guardados, el access token y el refresh token, porque este último sigue siendo válido aunque se revoque el primero. También borra las cachés de canales, follows y perfiles y la lista de favoritos, de modo que no queda ningún dato de la cuenta en el navegador; el tema, el idioma y el resto de preferencias sí se conservan.
 
 Un fallo temporal al comprobar la sesión permite reintentar sin mostrar un login falso. La interfaz y el fondo intercambian el estado `authenticated`, sin devolver credenciales en los mensajes de login/restauración. Las tarjetas admiten Tab y Enter; la campana también responde a Espacio y muestra su estado accesible.
 
