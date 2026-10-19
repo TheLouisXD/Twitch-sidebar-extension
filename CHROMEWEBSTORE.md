@@ -1,6 +1,6 @@
 # Chrome Web Store Listing — Twitch Live Sidebar
 
-> Last Updated: 2025-05-18
+> Last Updated: 2026-10-19
 
 ## Store Listing
 
@@ -16,8 +16,8 @@ Check which of your followed Twitch channels are currently live directly from yo
 FEATURES
 • Live Stream Status — Instantly see which followed channels are streaming.
 • Native Side Panel — Open Twitch directly alongside your browsing experience.
-• Favorites Priority — Star your favorite streamers to keep them pinned at the top of your list.
-• Stream Previews & Viewers — View live game titles, viewer counts, and avatar previews.
+• Dedicated Favorites Section — Star your favorite streamers to group them at the top of your list.
+• Viewer Counts & Game Titles — See how many viewers each channel has and what it is playing.
 • Fast Search — Quickly filter through all your followed channels.
 • Customizable Themes — Choose between Default Twitch dark mode and GX gaming theme.
 • Configurable Refresh Intervals — Set automatic background polling intervals according to your preference.
@@ -28,10 +28,10 @@ HOW TO USE
 1. Click the Twitch Live Sidebar icon in your browser toolbar to open the side panel.
 2. Sign in with your Twitch account to grant read access to your followed channels.
 3. Browse live channels, search for specific creators, and click any stream to watch on Twitch.
-4. Click the star icon next to any channel to prioritize it at the top of your list.
+4. Click the star icon next to any channel to move it into your Favorites section.
 
 PRIVACY
-Twitch Live Sidebar respects your privacy. It does not collect, track, or sell any personal data or browsing activity. All authentication tokens and user preferences are stored securely and locally on your device.
+Twitch Live Sidebar respects your privacy. It does not collect, track, or sell any personal data or browsing activity. All authentication tokens and user preferences are stored securely and locally on your device. Signing out revokes the granted access with Twitch and deletes the cached channel data and your favorites list from the browser; your theme and language settings are kept.
 
 PERMISSIONS
 • "storage" — Saves your local settings (such as refresh interval, theme, and starred channels) and stream cache.
@@ -41,8 +41,10 @@ PERMISSIONS
 
 SUPPORT
 Need help or want to suggest a feature?
-GitHub Repository: https://github.com/thelouisxd/twitch-sidebar
-Issues: https://github.com/thelouisxd/twitch-sidebar/issues
+GitHub Repository: https://github.com/TheLouisXD/Twitch-sidebar-extension
+Issues: https://github.com/TheLouisXD/Twitch-sidebar-extension/issues
+
+Version 1.2 — Added the dedicated Favorites section, Roboto fonts, the instantly cached account profile with a dynamic gradient from your avatar color, accessibility and performance fixes.
 
 Version 1.1 — Added favorite streamer priority, customizable themes, refined accessibility, and performance improvements.
 
@@ -71,16 +73,16 @@ English
 
 ## Permissions Justification
 
-| Permission                                            | Type             | Justification                                                                                                                                              |
-| ----------------------------------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `storage`                                             | permissions      | Used to store user preferences (polling interval, favorite creators, theme) and temporarily cache followed stream lists for instant sidebar loading.       |
-| `identity`                                            | permissions      | Used to launch official Twitch OAuth2 web authentication flow via `chrome.identity.launchWebAuthFlow` so users can authenticate with their Twitch account. |
-| `sidePanel`                                           | permissions      | Used to display the followed streams viewer within Chrome's native side panel interface.                                                                   |
-| `alarms`                                              | permissions      | Used to schedule background checks to refresh the live status of followed channels at the user-configured interval.                                        |
-| `https://api.twitch.tv/*`                             | host_permissions | Required to fetch user's followed channels, live stream metadata, viewer counts, and profile info from Twitch's official Helix REST API.                   |
-| `https://id.twitch.tv/*`                              | host_permissions | Required to validate authentication tokens and revoke access tokens upon logging out.                                                                      |
-| `https://static-cdn.jtvnw.net/*`                      | host_permissions | Required to display streamer profile avatars and stream thumbnail preview images directly from Twitch CDN.                                                 |
-| `https://twitch-auth-worker.thelouisxd.workers.dev/*` | host_permissions | Required to securely exchange OAuth2 authorization codes for access tokens with the server-side backend without exposing client secrets.                   |
+| Permission                                            | Type             | Justification                                                                                                                                                        |
+| ----------------------------------------------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `storage`                                             | permissions      | Used to store user preferences (polling interval, favorite creators, theme) and temporarily cache followed stream lists for instant sidebar loading.                 |
+| `identity`                                            | permissions      | Used to launch official Twitch OAuth2 web authentication flow via `chrome.identity.launchWebAuthFlow` so users can authenticate with their Twitch account.           |
+| `sidePanel`                                           | permissions      | Used to display the followed streams viewer within Chrome's native side panel interface.                                                                             |
+| `alarms`                                              | permissions      | Used to schedule background checks to refresh the live status of followed channels at the user-configured interval.                                                  |
+| `https://api.twitch.tv/*`                             | host_permissions | Required to fetch user's followed channels, live stream metadata, viewer counts, and profile info from Twitch's official Helix REST API.                             |
+| `https://id.twitch.tv/*`                              | host_permissions | Required to open Twitch's official sign-in page and to validate the stored access token when the session is restored. Revocation is proxied through the auth worker. |
+| `https://static-cdn.jtvnw.net/*`                      | host_permissions | Required to display streamer profile avatars served from Twitch's CDN.                                                                                               |
+| `https://twitch-auth-worker.thelouisxd.workers.dev/*` | host_permissions | Required to securely exchange OAuth2 authorization codes for access tokens with the server-side backend without exposing client secrets.                             |
 
 ---
 

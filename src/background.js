@@ -26,12 +26,7 @@ import {
 } from "./session.js"
 import { fetchAllFollowed, fetchUser, fetchTwitch } from "./twitch.js"
 import { randomState, parseAuthRedirect } from "./oauth.js"
-import {
-  getPreferences,
-  POLL_INTERVAL_KEY,
-  FAVORITES_FIRST_KEY,
-  POLL_INTERVAL_OPTIONS
-} from "./preferences.js"
+import { getPreferences, POLL_INTERVAL_KEY, POLL_INTERVAL_OPTIONS } from "./preferences.js"
 
 const ALARM_NAME = "twitch_poll_streams"
 let pollTask
@@ -249,8 +244,6 @@ async function route(message) {
   switch (message.type) {
     case "TWITCH_AUTH":
       return authenticate()
-    case "TWITCH_GET_REDIRECT_URL":
-      return { redirectUrl: extension.identity.getRedirectURL() }
     case "SESSION_RESTORE":
       return { authenticated: Boolean(await restoreSession()) }
     case "GET_PROFILE":
@@ -270,18 +263,11 @@ async function route(message) {
       await ensureAlarm()
       return { pollIntervalMinutes: (await getPreferences()).pollIntervalMinutes }
     }
-    case "SET_FAVORITES_FIRST": {
-      if (typeof message.enabled !== "boolean")
-        throw new Error("Invalid favorite sorting preference")
-      await localSet({ [FAVORITES_FIRST_KEY]: message.enabled })
-      return { favoritesFirst: message.enabled }
-    }
     case "SET_REMEMBER_SESSION": {
       if (typeof message.enabled !== "boolean")
         throw new Error("Invalid session persistence preference")
       return setRememberSession(message.enabled)
     }
-    case "TOGGLE_FAVORITE":
     case "TOGGLE_NOTIFICATION":
       return changeStreamerPreference(NOTIFICATIONS_KEY, message.broadcasterId)
     case "REMOVE_FAVORITE":

@@ -1,12 +1,9 @@
 import { localGet, localSet, localRemove, sendMessage } from "./platform.js"
-import { POLL_INTERVAL_KEY, normalizePollInterval } from "./preferences.js"
 
 export const CHANNELS_KEY = "twitch_channels_cache"
 export const PROFILES_KEY = "twitch_profiles_cache"
 export const USER_PROFILE_KEY = "twitch_user_profile_cache"
 export const NOTIFICATIONS_KEY = "notification_streamers"
-export const FAVORITES_KEY = NOTIFICATIONS_KEY
-export const PREV_LIVE_KEY = "previously_live"
 export const EMPTY_NOTIFICATION_IDS = []
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
 
@@ -15,6 +12,8 @@ function isFresh(timestamp, maxAge) {
   return Number.isFinite(timestamp) && age >= 0 && age < maxAge
 }
 
+// The image origin must stay listed in `connect-src` of both manifests; `img-src`
+// only covers <img> tags and would not allow this fetch.
 export async function fetchImageAsDataUrl(url) {
   if (!url || typeof url !== "string") return null
   try {
@@ -34,16 +33,9 @@ export async function fetchImageAsDataUrl(url) {
 }
 
 export async function getCachedChannels() {
-  const { [CHANNELS_KEY]: entry, [POLL_INTERVAL_KEY]: interval } = await localGet([
-    CHANNELS_KEY,
-    POLL_INTERVAL_KEY
-  ])
+  const { [CHANNELS_KEY]: entry } = await localGet(CHANNELS_KEY)
   if (!decodeChannelCache(entry)) return null
-  return {
-    data: entry.data,
-    ts: entry.ts,
-    fresh: isFresh(entry.ts, normalizePollInterval(interval) * 60 * 1000)
-  }
+  return { data: entry.data, ts: entry.ts }
 }
 
 export function decodeChannelCache(entry) {
@@ -81,14 +73,10 @@ export async function setCachedUserProfile(profile) {
   return localSet({ [USER_PROFILE_KEY]: { profile, ts: Date.now() } })
 }
 
+// Channel and profile caches belong to the signed-in account. The favorite list
+// is dropped as well on purpose: signing out must leave no account data behind.
 export function clearAllCache() {
-  return localRemove([
-    CHANNELS_KEY,
-    PROFILES_KEY,
-    USER_PROFILE_KEY,
-    NOTIFICATIONS_KEY,
-    PREV_LIVE_KEY
-  ])
+  return localRemove([CHANNELS_KEY, PROFILES_KEY, USER_PROFILE_KEY, NOTIFICATIONS_KEY])
 }
 
 export async function getNotificationStreamers() {
@@ -96,15 +84,9 @@ export async function getNotificationStreamers() {
   return new Set(decodeNotificationIds(ids))
 }
 
-export const getFavoriteStreamers = getNotificationStreamers
-
 // All read/modify/write operations run in the background, shared by all sidebars.
 export async function toggleNotificationStreamer(broadcasterId) {
   return (await sendMessage({ type: "TOGGLE_NOTIFICATION", broadcasterId })).active
-}
-
-export async function toggleFavoriteStreamer(broadcasterId) {
-  return (await sendMessage({ type: "TOGGLE_FAVORITE", broadcasterId })).active
 }
 
 export function removeNotificationStreamer(broadcasterId) {

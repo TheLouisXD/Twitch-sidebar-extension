@@ -1,6 +1,6 @@
 import test from "node:test"
 import assert from "node:assert/strict"
-import { normalizePollInterval, normalizeTheme, orderLiveChannels } from "../src/preferences.js"
+import { normalizePollInterval, normalizeTheme } from "../src/preferences.js"
 import { search } from "../src/search.js"
 
 const channels = [
@@ -10,40 +10,17 @@ const channels = [
   { user_id: "4", user_name: "Canal Cuatro", viewer_count: 10, game_name: "Otro" }
 ]
 
-test("favorite priority preserves viewer order within groups and never mutates the cached list", () => {
-  const favorites = new Set(["2", "4", "offline-channel"])
-  const ordered = orderLiveChannels(channels, favorites, true)
+test("search keeps the viewer order of the live list and never mutates it", () => {
+  const { filteredLive, filteredOffline } = search(channels, [...channels].reverse(), "Juego")
   assert.deepEqual(
-    ordered.map(({ user_id }) => user_id),
-    ["2", "4", "1", "3"]
+    filteredLive.map(({ user_id }) => user_id),
+    ["1", "2", "3"]
   )
   assert.deepEqual(
     channels.map(({ user_id }) => user_id),
     ["1", "2", "3", "4"]
   )
-  assert.equal(orderLiveChannels(channels, favorites, false), channels)
-})
-
-test("changing bell preferences immediately changes priority while searching preserves that order", () => {
-  const favorites = new Set(["2", "4"])
-  favorites.delete("2")
-  favorites.add("3")
-  const ordered = orderLiveChannels(channels, favorites, true)
-  assert.deepEqual(
-    ordered.map(({ user_id }) => user_id),
-    ["3", "4", "1", "2"]
-  )
-  assert.deepEqual(
-    search(ordered, [], "Juego").filteredLive.map(({ user_id }) => user_id),
-    ["3", "1", "2"]
-  )
-  assert.equal(channels.length, 4)
-})
-
-test("all or no favorites keep the existing viewer order", () => {
-  assert.deepEqual(orderLiveChannels(channels, new Set(), true), channels)
-  assert.deepEqual(orderLiveChannels(channels, new Set(["1", "2", "3", "4"]), true), channels)
-  assert.deepEqual(orderLiveChannels([], new Set(["1"]), true), [])
+  assert.deepEqual(filteredOffline, [])
 })
 
 test("stored intervals use supported choices with a three-minute default", () => {

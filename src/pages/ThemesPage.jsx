@@ -100,7 +100,7 @@ export default function ThemesPage({ onBack }) {
                       <circle cx="8.5" cy="8.5" r="1.5" />
                       <polyline points="21 15 16 10 5 21" />
                     </svg>
-                    <span className="theme-card-placeholder-label">Preview</span>
+                    <span className="theme-card-placeholder-label">{t("themes.preview")}</span>
                   </div>
                 )}
                 {isActive && (

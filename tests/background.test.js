@@ -211,6 +211,7 @@ function createHarness(mode, saved = {}, savedSession = {}) {
     }
     if (path.endsWith("/revoke")) {
       state.revocations = (state.revocations ?? 0) + 1
+      state.revokedTokens = [...(state.revokedTokens ?? []), JSON.parse(options.body).token]
       return response({ revoked: true })
     }
     throw new Error(`Unexpected request: ${url}`)
@@ -336,6 +337,7 @@ for (const browser of ["firefox", "chrome"]) {
     harness.local.twitch_channels_cache = { data: { live: [], offline: [] }, ts: Date.now() }
     harness.state.validationStatus = 401
     assert.match((await harness.message({ type: "SESSION_RESTORE" })).error, /Sign in required/)
+    assert.deepEqual(harness.state.revokedTokens, ["revoked"])
     assert.equal(harness.session.twitch_access_token, undefined)
     assert.equal(harness.local.twitch_channels_cache, undefined)
   })
@@ -357,7 +359,7 @@ for (const browser of ["firefox", "chrome"]) {
   test(`${browser}: concurrent favorite writes and repeated removal are safe`, async () => {
     const harness = createHarness(browser)
     await Promise.all(
-      ["1", "2"].map((id) => harness.message({ type: "TOGGLE_FAVORITE", broadcasterId: id }))
+      ["1", "2"].map((id) => harness.message({ type: "TOGGLE_NOTIFICATION", broadcasterId: id }))
     )
     assert.equal(harness.local.notification_streamers.length, 2)
     await Promise.all(
@@ -384,10 +386,13 @@ for (const browser of ["firefox", "chrome"]) {
     release()
     await Promise.all([poll, logout])
     assert.ok((harness.state.revocations ?? 0) >= 1)
+    // The rotation started by the poll was discarded, so the credentials that
+    // reach Twitch are still the ones stored before the logout.
+    assert.deepEqual(harness.state.revokedTokens.sort(), ["old", "original"])
     assert.equal(harness.session.twitch_access_token, undefined)
     assert.equal(harness.local.twitch_refresh_token, undefined)
     assert.equal(harness.local.twitch_channels_cache, undefined)
-    assert.equal(harness.local.previously_live, undefined)
+    assert.equal(harness.local.twitch_profiles_cache, undefined)
     assert.equal(harness.state.badge, "")
   })
 
@@ -475,22 +480,26 @@ for (const browser of ["firefox", "chrome"]) {
     assert.equal(harness.state.alarm.periodInMinutes, 3)
   })
 
-  test(`${browser}: favorite priority is optional, persistent and uses existing bell preferences`, async () => {
-    const harness = createHarness(browser, { notification_streamers: ["1"] })
-    assert.equal(
-      (await harness.message({ type: "SET_FAVORITES_FIRST", enabled: true })).favoritesFirst,
-      true
-    )
-    assert.equal(harness.local.favoritesFirst, true)
-    assert.deepEqual(harness.local.notification_streamers, ["1"])
-    assert.match(
-      (await harness.message({ type: "SET_FAVORITES_FIRST", enabled: "true" })).error,
-      /Invalid favorite/
-    )
-    assert.equal(harness.local.favoritesFirst, true)
-    await harness.message({ type: "SET_FAVORITES_FIRST", enabled: false })
-    assert.equal(harness.local.favoritesFirst, false)
-    assert.deepEqual(harness.local.notification_streamers, ["1"])
+  test(`${browser}: logout revokes every stored credential and clears account data`, async () => {
+    const harness = createHarness(browser, {
+      notification_streamers: ["1"],
+      twitch_channels_cache: { data: { live: [{ user_id: "1" }], offline: [] }, ts: Date.now() },
+      twitch_profiles_cache: { map: { 1: { user_id: "1" } }, ts: Date.now() },
+      twitch_user_profile_cache: { profile: { id: "42" }, ts: Date.now() }
+    })
+    harness.signedIn()
+    await harness.settled()
+    assert.equal(harness.state.badge, "1")
+    assert.equal((await harness.message({ type: "SESSION_LOGOUT" })).ok, true)
+    assert.deepEqual(harness.state.revokedTokens.sort(), ["old", "original"])
+    assert.equal(harness.session.twitch_access_token, undefined)
+    assert.equal(harness.local.twitch_refresh_token, undefined)
+    // Signing out leaves no account data behind, favorites included.
+    assert.equal(harness.local.notification_streamers, undefined)
+    assert.equal(harness.local.twitch_channels_cache, undefined)
+    assert.equal(harness.local.twitch_profiles_cache, undefined)
+    assert.equal(harness.local.twitch_user_profile_cache, undefined)
+    assert.equal(harness.state.badge, "")
   })
 
   test(`${browser}: a failed old refresh cannot cancel a newer login`, async () => {
@@ -570,7 +579,7 @@ for (const browser of ["firefox", "chrome"]) {
     assert.equal(harness.local.twitch_refresh_token, undefined)
     assert.equal(harness.session.twitch_refresh_token, "rotated")
     await harness.message({ type: "SESSION_LOGOUT" })
-    assert.ok((harness.state.revocations ?? 0) >= 1)
+    assert.deepEqual(harness.state.revokedTokens.sort(), ["new", "rotated"])
     assert.equal(harness.session.twitch_access_token, undefined)
     assert.equal(harness.session.twitch_refresh_token, undefined)
     assert.equal(harness.local.twitch_refresh_token, undefined)
