@@ -780,3 +780,90 @@ test("main page renders 12-blade iOS spinner with 'Recargando canales' and toggl
   await waitFor(() => assert.equal(drawer.classList.contains("main-reload-drawer--open"), false))
   assert.equal(drawer.getAttribute("aria-hidden"), "true")
 })
+
+const offlineChannel = {
+  ...channel,
+  user_id: "2",
+  user_login: "offlineone",
+  user_name: "Offline One",
+  isLive: false,
+  game_name: "Offline Game",
+  viewer_count: 0
+}
+
+test("offline-only search hides the empty state and respects the showOffline preference", async () => {
+  local.showOffline = true
+  local.twitch_channels_cache = {
+    data: { live: [], offline: [offlineChannel] },
+    ts: Date.now()
+  }
+
+  mount(App)
+  assert.ok(await screen.findByText("Offline One"))
+  assert.equal(screen.queryByText("No channels live right now."), null)
+
+  const search = screen.getByRole("textbox", { name: "Search channel..." })
+  fireEvent.change(search, { target: { value: "offline" } })
+  assert.equal(screen.queryByText(/No results for/), null)
+  assert.ok(screen.getByText("Offline", { selector: ".main-section-title" }))
+  assert.ok(screen.getByText("Offline One"))
+
+  fireEvent.change(search, { target: { value: "" } })
+  assert.ok(screen.getByText("Offline One"))
+  assert.equal(screen.queryByText("No channels live right now."), null)
+
+  fireEvent.change(search, { target: { value: "offline" } })
+  await act(async () => {
+    changeStorage({ showOffline: false })
+  })
+  assert.ok(await screen.findByText('No results for "offline".'))
+  assert.equal(screen.queryByText("Offline One"), null)
+
+  await act(async () => {
+    changeStorage({ showOffline: true })
+  })
+  assert.ok(await screen.findByText("Offline One"))
+  assert.equal(screen.queryByText(/No results for/), null)
+  assert.equal(dom.window.document.querySelectorAll(".empty-state").length, 0)
+})
+
+test("a search without live or visible offline matches shows one empty state", async () => {
+  local.showOffline = true
+  local.twitch_channels_cache = {
+    data: { live: [channel], offline: [offlineChannel] },
+    ts: Date.now()
+  }
+
+  mount(App)
+  assert.ok(await screen.findByText("Channel One"))
+  fireEvent.change(screen.getByRole("textbox", { name: "Search channel..." }), {
+    target: { value: "zzz" }
+  })
+
+  assert.ok(screen.getByText('No results for "zzz".'))
+  assert.equal(dom.window.document.querySelectorAll(".empty-state").length, 1)
+  assert.equal(screen.queryByText("Offline"), null)
+})
+
+test("live and offline matches keep both sections visible without an empty state", async () => {
+  local.showOffline = true
+  local.notification_streamers = []
+  local.twitch_channels_cache = {
+    data: { live: [channel], offline: [offlineChannel] },
+    ts: Date.now()
+  }
+
+  mount(App)
+  assert.ok(await screen.findByText("Channel One"))
+  fireEvent.change(screen.getByRole("textbox", { name: "Search channel..." }), {
+    target: { value: "one" }
+  })
+
+  const liveSection = dom.window.document.querySelector(".main-live-section")
+  const offlineRow = dom.window.document.querySelector(".main-section-row--offline")
+  assert.ok(liveSection?.textContent.includes("Channel One"))
+  assert.ok(offlineRow?.textContent.includes("Offline"))
+  assert.ok(screen.getByText("Offline One"))
+  assert.equal(screen.queryByText(/No results for/), null)
+  assert.equal(dom.window.document.querySelectorAll(".empty-state").length, 0)
+})
