@@ -27,10 +27,12 @@ export default function StreamerList({
   const hasFavorites = favoriteChannels.length > 0
   const hasRegularLive = regularLiveChannels.length > 0
   const hasAnyLive = hasFavorites || hasRegularLive
+  const hasVisibleOffline = Boolean(showOffline) && filteredOffline.length > 0
+  const hasVisibleResults = hasAnyLive || hasVisibleOffline
 
   return (
     <div className="main-scroll">
-      {!hasAnyLive ? (
+      {!hasVisibleResults ? (
         <EmptyState icon="🎮" message={query ? t("main.noResults", query) : t("main.noLive")} />
       ) : (
         <>
@@ -82,7 +84,7 @@ export default function StreamerList({
         </>
       )}
 
-      {showOffline && filteredOffline.length > 0 && (
+      {hasVisibleOffline && (
         <>
           <div className="main-section-row main-section-row--offline">
             <span className="main-section-title">{t("main.offline")}</span>
