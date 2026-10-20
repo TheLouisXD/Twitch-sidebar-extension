@@ -42,7 +42,7 @@ En Configuración se puede elegir una actualización en segundo plano cada 1, 2,
 
 Los canales en vivo marcados como favoritos se agrupan en una sección «Favoritos» propia, con su propio contador, y quedan fuera de la sección «En vivo». Cada sección conserva el orden por espectadores y los canales desconectados permanecen en su sección. Este comportamiento es fijo y no tiene ajuste asociado.
 
-En Temas se elige el tema «Por defecto» o «GX» y, debajo de las tarjetas, un color de acento entre rojo, azul, morado, amarillo, naranja, verde y celeste. Sin elección explícita, cada tema conserva el acento que ya tenía (morado en «Por defecto» y rojo en «GX»); la elección se guarda y se mantiene al cambiar de tema o al volver a abrir la extensión.
+En Temas se elige el tema «Por defecto» o «GX» y, debajo de las tarjetas, un color de acento entre rojo, azul, morado, amarillo, naranja, verde y celeste. Sin elección explícita, cada tema conserva el acento que ya tenía (morado en «Por defecto» y rojo en «GX»); la elección se guarda, se aplica también a los elementos decorativos del tema GX y se mantiene al cambiar de tema o al volver a abrir la extensión.
 
 «Recordar sesión» está activado inicialmente para mantener el comportamiento anterior. Al desactivarlo, el refresh token se mueve de `storage.local` a `storage.session` y se elimina la copia persistente. La sesión dura hasta cerrar el navegador, deshabilitar o recargar la extensión. Reactivar la opción permite restaurar la sesión al reiniciar. Las migraciones y renovaciones se serializan; un fallo de escritura intenta restaurar el modo anterior y se muestra como error de guardado. `storage.local` no cifra estas credenciales.
 

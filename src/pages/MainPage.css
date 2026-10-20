@@ -366,38 +366,38 @@
 [data-theme="gx"] .main-header {
   border-bottom: 2px solid transparent;
   background:
-    linear-gradient(to right, #fa1e4e, #1f060b) bottom / 100% 2px no-repeat,
+    linear-gradient(to right, var(--tw-accent), var(--tw-accent-deep)) bottom / 100% 2px no-repeat,
     var(--tw-surface);
 }
 
 [data-theme="gx"] .main-logo {
-  color: #fa1e4e;
+  color: var(--tw-accent);
   font-size: 15px;
   letter-spacing: 0.04em;
 }
 
 [data-theme="gx"] .main-logo svg {
-  fill: #fa1e4e;
+  fill: var(--tw-accent);
 }
 
 [data-theme="gx"] .main-settings-btn {
-  color: #fa1e4e;
+  color: var(--tw-accent);
 }
 
 [data-theme="gx"] .main-settings-btn:hover {
-  color: #ffffff;
-  background: rgba(250, 30, 78, 0.2);
+  color: var(--tw-text-primary);
+  background: color-mix(in srgb, var(--tw-accent) 20%, transparent);
 }
 
 [data-theme="gx"] .main-section-title {
-  color: #fa1e4e;
+  color: var(--tw-accent);
   font-size: 12px;
   letter-spacing: 0.06em;
 }
 
 [data-theme="gx"] .main-badge {
-  background: #fa1e4e;
-  color: #ffffff;
+  background: var(--tw-accent);
+  color: var(--tw-on-accent);
   border-radius: 4px;
   font-size: 11px;
   line-height: 16px;
@@ -423,7 +423,7 @@
 }
 
 [data-theme="gx"] .main-section-row--offline {
-  border-top: 1px solid rgba(160, 18, 49, 0.35);
+  border-top: 1px solid color-mix(in srgb, var(--tw-accent-dark) 35%, transparent);
 }
 
 @keyframes spin {

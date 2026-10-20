@@ -27,12 +27,13 @@ export const THEMES = [
 // Until the user picks a color, each theme keeps the accent it already had.
 export const DEFAULT_ACCENTS = { default: "purple", gx: "red" }
 
-function accentVars(base, hover, light, dark, onAccent, glow) {
+function accentVars(base, hover, light, dark, onAccent, glow, deep) {
   return {
     "--tw-accent": base,
     "--tw-accent-hover": hover,
     "--tw-accent-light": light,
     "--tw-accent-dark": dark,
+    "--tw-accent-deep": deep,
     "--tw-accent-gradient": `linear-gradient(135deg, ${base}, ${dark})`,
     "--tw-accent-glow": `rgba(${glow}, 0.3)`,
     "--tw-accent-glow-strong": `rgba(${glow}, 0.55)`,
@@ -44,37 +45,93 @@ export const ACCENTS = [
   {
     id: "red",
     nameKey: "themes.accentRed",
-    vars: accentVars("#fa1e4e", "#ff3b68", "#ff6b8a", "#a01231", "#ffffff", "250, 30, 78")
+    vars: accentVars(
+      "#fa1e4e",
+      "#ff3b68",
+      "#ff6b8a",
+      "#a01231",
+      "#ffffff",
+      "250, 30, 78",
+      "#1f060b"
+    )
   },
   {
     id: "blue",
     nameKey: "themes.accentBlue",
-    vars: accentVars("#2563eb", "#3b82f6", "#60a5fa", "#1e3a8a", "#ffffff", "37, 99, 235")
+    vars: accentVars(
+      "#2563eb",
+      "#3b82f6",
+      "#60a5fa",
+      "#1e3a8a",
+      "#ffffff",
+      "37, 99, 235",
+      "#0b1736"
+    )
   },
   {
     id: "purple",
     nameKey: "themes.accentPurple",
-    vars: accentVars("#9147ff", "#a25ceb", "#a970ff", "#6030a8", "#ffffff", "145, 71, 255")
+    vars: accentVars(
+      "#9147ff",
+      "#a25ceb",
+      "#a970ff",
+      "#6030a8",
+      "#ffffff",
+      "145, 71, 255",
+      "#1b0b33"
+    )
   },
   {
     id: "yellow",
     nameKey: "themes.accentYellow",
-    vars: accentVars("#eab308", "#facc15", "#fde047", "#a16207", "#000000", "234, 179, 8")
+    vars: accentVars(
+      "#eab308",
+      "#facc15",
+      "#fde047",
+      "#a16207",
+      "#000000",
+      "234, 179, 8",
+      "#3a2a03"
+    )
   },
   {
     id: "orange",
     nameKey: "themes.accentOrange",
-    vars: accentVars("#ea580c", "#f97316", "#fdba74", "#9a3412", "#000000", "234, 88, 12")
+    vars: accentVars(
+      "#ea580c",
+      "#f97316",
+      "#fdba74",
+      "#9a3412",
+      "#000000",
+      "234, 88, 12",
+      "#361304"
+    )
   },
   {
     id: "green",
     nameKey: "themes.accentGreen",
-    vars: accentVars("#22c55e", "#4ade80", "#86efac", "#15803d", "#000000", "34, 197, 94")
+    vars: accentVars(
+      "#22c55e",
+      "#4ade80",
+      "#86efac",
+      "#15803d",
+      "#000000",
+      "34, 197, 94",
+      "#052e16"
+    )
   },
   {
     id: "sky",
     nameKey: "themes.accentSky",
-    vars: accentVars("#0ea5e9", "#38bdf8", "#7dd3fc", "#0369a1", "#000000", "14, 165, 233")
+    vars: accentVars(
+      "#0ea5e9",
+      "#38bdf8",
+      "#7dd3fc",
+      "#0369a1",
+      "#000000",
+      "14, 165, 233",
+      "#082f49"
+    )
   }
 ]
 
