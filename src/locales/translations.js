@@ -14,8 +14,6 @@ export const translations = {
     "login.error": "No se pudo iniciar sesión.",
     "login.madeWith": "Hecho con ❤︎ por",
     "login.privacy": "Solo se solicita acceso de lectura a tus follows.",
-    "login.dataUse":
-      "Al iniciar sesión, tu identificador de cuenta se envía a Twitch y las credenciales OAuth al servicio de autenticación de la extensión para mantener la sesión.",
 
     // Main
     "main.loading": "Cargando canales...",
@@ -96,8 +94,6 @@ export const translations = {
     "login.error": "Could not sign in.",
     "login.madeWith": "made with ❤︎ by",
     "login.privacy": "Only read access to your follows is requested.",
-    "login.dataUse":
-      "Signing in sends your account ID to Twitch and OAuth credentials to the extension's authentication service to maintain your session.",
 
     // Main
     "main.loading": "Loading channels...",
