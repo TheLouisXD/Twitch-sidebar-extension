@@ -70,7 +70,13 @@ const TwitchCard = React.memo(function TwitchCard({
       <div className={`tc-info${isLive && avatarUrl ? " tc-info--ambient" : ""}`}>
         {isLive && avatarUrl && (
           <div className="tc-ambient" aria-hidden="true">
-            <img className="tc-ambient-image" src={avatarUrl} alt="" decoding="async" />
+            <img
+              className="tc-ambient-image"
+              src={avatarUrl}
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
           </div>
         )}
         <div className="tc-name-row">
