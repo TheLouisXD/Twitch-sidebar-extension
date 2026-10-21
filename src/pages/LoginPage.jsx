@@ -24,7 +24,7 @@ export default function LoginPage({ onLogin, initialError }) {
 
   return (
     <div className="login-root">
-      <div className="login-box">
+      <main className="login-box">
         <img className="login-logo" src="./icons/icon128.png" alt="Twitch Sidebar Icon" />
         <h1 className="login-title">Twitch Sidebar</h1>
         <p className="login-subtitle">{t("login.subtitle")}</p>
@@ -39,11 +39,36 @@ export default function LoginPage({ onLogin, initialError }) {
             {t(loading ? "login.connecting" : "login.button")}
           </span>
         </button>
-        <div className="login-data-notice">
-          <p className="login-privacy">{t("login.privacy")}</p>
-          <p className="login-privacy">{t("login.dataUse")}</p>
+        <p className="login-privacy">{t("login.privacy")}</p>
+      </main>
+
+      <footer className="login-footer">
+        <div className="login-lang-wrap">
+          <select
+            className="login-lang-select"
+            value={lang}
+            aria-label={t("settings.language")}
+            onChange={(event) => changeLang(event.target.value)}
+          >
+            <option value="es">Español</option>
+            <option value="en">English</option>
+          </select>
+          {/* Local pixel chevron: the extension does not bundle an icon font. */}
+          <svg
+            className="login-lang-chevron"
+            viewBox="0 0 10 6"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <rect x="0" y="0" width="2" height="2" fill="currentColor" />
+            <rect x="8" y="0" width="2" height="2" fill="currentColor" />
+            <rect x="2" y="2" width="2" height="2" fill="currentColor" />
+            <rect x="6" y="2" width="2" height="2" fill="currentColor" />
+            <rect x="4" y="4" width="2" height="2" fill="currentColor" />
+          </svg>
         </div>
-        <p className="login-privacy">
+
+        <p className="login-credit">
           {t("login.madeWith")}{" "}
           <a
             href="https://www.twitch.tv/thelouisxd"
@@ -54,16 +79,7 @@ export default function LoginPage({ onLogin, initialError }) {
             ThelouisXD
           </a>
         </p>
-        <select
-          className="login-lang-select"
-          value={lang}
-          aria-label={t("settings.language")}
-          onChange={(event) => changeLang(event.target.value)}
-        >
-          <option value="es">Español</option>
-          <option value="en">English</option>
-        </select>
-      </div>
+      </footer>
     </div>
   )
 }

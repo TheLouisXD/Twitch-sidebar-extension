@@ -523,19 +523,21 @@ test("favorite live channels appear in a dedicated Favorites section and are exc
   assert.equal(screen.queryByText("Live"), null)
 })
 
-test("login page renders English texts, the data notice and the author link", async () => {
+test("login page renders English texts, the privacy note and the author link", async () => {
   mount(LoginPage, { onLogin: () => {} })
   assert.ok(screen.getByText("See who is live on Twitch without opening Twitch /ᐠ • ˕ •マ ?"))
   const button = screen.getByRole("button", { name: "Sign in with Twitch" })
   assert.ok(button)
 
-  // Store disclosures promise a transmission notice before sign-in.
   assert.ok(screen.getByText("Only read access to your follows is requested."))
-  assert.ok(
-    screen.getByText(
+  assert.equal(dom.window.document.querySelector(".login-data-notice"), null)
+  assert.equal(
+    screen.queryByText(
       "Signing in sends your account ID to Twitch and OAuth credentials to the extension's authentication service to maintain your session."
-    )
+    ),
+    null
   )
+  assert.ok(dom.window.document.querySelector(".login-lang-chevron"))
 
   const link = screen.getByRole("link", { name: "ThelouisXD" })
   assert.ok(link)
