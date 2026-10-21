@@ -31,7 +31,7 @@ HOW TO USE
 4. Click the star icon next to any channel to move it into your Favorites section.
 
 PRIVACY
-Twitch Live Sidebar respects your privacy. It does not collect, track, or sell any personal data or browsing activity. All authentication tokens and user preferences are stored securely and locally on your device. Signing out revokes the granted access with Twitch and deletes the cached channel data and your favorites list from the browser; your theme and language settings are kept.
+Twitch Live Sidebar respects your privacy. It does not collect, track, or sell any personal data or browsing activity. All authentication tokens and user preferences are stored securely and locally on your device. Signing in sends your account ID to Twitch and OAuth credentials to the extension's authentication proxy, which only processes them to maintain your session. Signing out revokes the granted access with Twitch and deletes the cached channel data and your favorites list from the browser; your theme and language settings are kept.
 
 PERMISSIONS
 • "storage" — Saves your local settings (such as refresh interval, theme, and starred channels) and stream cache.
@@ -43,6 +43,8 @@ SUPPORT
 Need help or want to suggest a feature?
 GitHub Repository: https://github.com/TheLouisXD/Twitch-sidebar-extension
 Issues: https://github.com/TheLouisXD/Twitch-sidebar-extension/issues
+
+Version 1.3 — Streamlined the login screen with a smaller privacy note, a bottom-pinned language selector and credit, and a pixel chevron.
 
 Version 1.2 — Added the dedicated Favorites section, Roboto fonts, the instantly cached account profile with a dynamic gradient from your avatar color, accessibility and performance fixes.
 

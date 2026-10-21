@@ -47,7 +47,7 @@ The Firefox redirect observed for the fixed Gecko ID is documented in README.md.
 
 The manifest declares required `authenticationInfo` and `personallyIdentifyingInfo` data types because OAuth credentials are sent to the authentication Worker and the account ID is sent to Twitch. This categorization follows the actual requests and [Mozilla's taxonomy](https://extensionworkshop.com/documentation/develop/firefox-builtin-data-consent/); it is not a declaration of analytics or browsing-history collection.
 
-The login panel explains transmission before sign-in. Firefox versions predating Mozilla's native data consent need a custom consent experience meeting Mozilla's publishing policy if distributed through AMO; publication targeting those versions needs that additional work or a higher minimum version. The runtime compatibility checks do not constitute AMO publication approval.
+The login panel shows only the read-access notice; the full authentication-data disclosure remains in the store privacy policy. Firefox versions predating Mozilla's native data consent need a custom consent experience meeting Mozilla's publishing policy if distributed through AMO; publication targeting those versions needs that additional work or a higher minimum version. The runtime compatibility checks do not constitute AMO publication approval.
 
 ## Worker validation
 
