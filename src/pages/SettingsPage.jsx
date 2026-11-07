@@ -128,7 +128,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
       )}
 
       <AccountProfile {...profile} />
-      <div className="settings-section" style={{ marginTop: "16px" }}>
+      <div className="settings-section settings-section--spaced">
         <div className="settings-section-title">{t("settings.preferences")}</div>
         <div className="settings-info-list">
           <div className="settings-info-item">
@@ -148,7 +148,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
             onClick={onThemes}
             id="settings-themes-btn"
           >
-            <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span className="settings-item-row">
               <svg
                 width="15"
                 height="15"
@@ -164,7 +164,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
               </svg>
               <span className="settings-info-label">{t("settings.theme")}</span>
             </span>
-            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <div className="settings-item-value-row">
               <span className="settings-preference-hint">
                 {theme === "gx" ? t("settings.themeGx") : t("settings.themeDefault")}
               </span>
@@ -173,14 +173,14 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
                 height="16"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                style={{ color: "var(--tw-text-secondary)", flexShrink: 0 }}
+                className="settings-chevron"
               >
                 <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
               </svg>
             </div>
           </button>
           <div className="settings-info-item">
-            <div style={{ display: "flex", flexDirection: "column" }}>
+            <div className="settings-stack">
               <span className="settings-info-label">{t("settings.showOffline")}</span>
               <span className="settings-info-label">{t("settings.showOfflineTooltip")}</span>
             </div>
@@ -238,7 +238,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
             onClick={onNotifications}
             id="settings-notifications-btn"
           >
-            <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span className="settings-item-row">
               <svg
                 width="15"
                 height="15"
@@ -258,21 +258,21 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
               height="16"
               viewBox="0 0 24 24"
               fill="currentColor"
-              style={{ color: "var(--tw-text-secondary)", flexShrink: 0 }}
+              className="settings-chevron"
             >
               <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
             </svg>
           </button>
         </div>
       </div>
-      <div className="settings-section" style={{ marginTop: "16px" }}>
+      <div className="settings-section settings-section--spaced">
         <div className="settings-section-title">{t("settings.backup")}</div>
         <div className="settings-backup-group">
           <input
             id="settings-import-file-input"
             type="file"
             accept=".json"
-            style={{ display: "none" }}
+            className="settings-file-input"
             ref={fileInputRef}
             onChange={handleFileImport}
           />

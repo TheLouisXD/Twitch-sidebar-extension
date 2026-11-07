@@ -1,49 +1,5 @@
-.notif-root {
-  width: 100%;
-  min-height: 100vh;
-  background: var(--tw-bg);
-  color: var(--tw-text-primary);
-  font-family: var(--tw-font-family);
-  display: flex;
-  flex-direction: column;
-}
-
 .notif-header {
-  display: flex;
-  align-items: center;
   gap: 10px;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--tw-surface-light);
-  background: var(--tw-surface);
-  flex-shrink: 0;
-}
-
-.notif-back-btn {
-  background: none;
-  border: none;
-  color: var(--tw-text-secondary);
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition:
-    color 0.15s,
-    background 0.15s;
-  flex-shrink: 0;
-}
-
-.notif-back-btn:hover {
-  color: var(--tw-text-primary);
-  background: var(--tw-surface-hover);
-}
-
-.notif-header-title {
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--tw-text-primary);
-  flex: 1;
 }
 
 .notif-header-star {
@@ -56,15 +12,6 @@
   align-items: center;
   justify-content: center;
   padding: 48px 0;
-}
-
-.notif-spinner {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 3px solid var(--tw-surface-light);
-  border-top-color: var(--tw-accent);
-  animation: spin 0.8s linear infinite;
 }
 
 .notif-list {

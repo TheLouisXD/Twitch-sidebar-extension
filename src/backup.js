@@ -7,11 +7,7 @@ import {
   ACCENT_KEY,
   getPreferences
 } from "./preferences.js"
-import {
-  NOTIFICATIONS_KEY,
-  decodeNotificationIds,
-  getNotificationStreamers
-} from "./cache.js"
+import { NOTIFICATIONS_KEY, decodeNotificationIds, getNotificationStreamers } from "./cache.js"
 
 export const APP_SIGNATURE = "twitch-live-sidebar"
 export const BACKUP_VERSION = 1
