@@ -56,7 +56,7 @@ export default function NotificationsPage({ onBack }) {
         </button>
         <span className="notif-header-title">{t("notifications.title")}</span>
         <svg
-          className="notif-header-star notif-header-bell"
+          className="notif-header-star"
           width="18"
           height="18"
           viewBox="0 0 24 24"

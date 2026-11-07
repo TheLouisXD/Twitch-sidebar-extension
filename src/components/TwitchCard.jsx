@@ -8,16 +8,12 @@ const TwitchCard = React.memo(function TwitchCard({
   channel,
   isLive,
   onClick,
-  isNotified = false,
-  isFavorite,
-  onToggleNotify,
+  isFavorite = false,
   onToggleFavorite
 }) {
   const { t } = useI18n()
   const { user_name, user_login, game_name, profile_image_url, viewer_count, user_id } = channel
   const avatarUrl = formatAvatarUrl(profile_image_url)
-  const favorite = isFavorite !== undefined ? isFavorite : isNotified
-  const toggleFavorite = onToggleFavorite || onToggleNotify
 
   function formatViewers(n) {
     if (!Number.isFinite(n)) return "0"
@@ -28,13 +24,15 @@ const TwitchCard = React.memo(function TwitchCard({
 
   function handleStarClick(e) {
     e.stopPropagation()
-    if (toggleFavorite) toggleFavorite(user_id)
+    if (onToggleFavorite) onToggleFavorite(user_id)
   }
 
   const isValidLogin = typeof user_login === "string" && /^[a-zA-Z0-9_]+$/.test(user_login)
   const channelHref = isValidLogin ? `https://www.twitch.tv/${user_login}` : "#"
 
-  const favLabel = favorite ? t("notifications.bell.deactivate") : t("notifications.bell.activate")
+  const favLabel = isFavorite
+    ? t("notifications.bell.deactivate")
+    : t("notifications.bell.activate")
 
   return (
     <div
@@ -82,18 +80,18 @@ const TwitchCard = React.memo(function TwitchCard({
         <div className="tc-name-row">
           <span className="tc-name">{user_name}</span>
           <button
-            className={`tc-star-btn tc-bell-btn${favorite ? " tc-star-btn--active tc-bell-btn--active" : ""}`}
+            className={`tc-star-btn${isFavorite ? " tc-star-btn--active" : ""}`}
             onClick={handleStarClick}
             aria-label={`${favLabel}: ${user_name}`}
-            aria-pressed={favorite}
+            aria-pressed={isFavorite}
             title={favLabel}
           >
             <svg
               width="14"
               height="14"
               viewBox="0 0 24 24"
-              fill={favorite ? "#f5c518" : "none"}
-              stroke={favorite ? "#f5c518" : "var(--tw-text-secondary)"}
+              fill={isFavorite ? "#f5c518" : "none"}
+              stroke={isFavorite ? "#f5c518" : "var(--tw-text-secondary)"}
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"

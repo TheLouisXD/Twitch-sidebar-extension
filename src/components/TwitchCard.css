@@ -151,8 +151,7 @@
 }
 
 /* The star button stays clickable above the full-card channel link. */
-.tc-star-btn,
-.tc-bell-btn {
+.tc-star-btn {
   pointer-events: auto;
   position: relative;
   z-index: 2;
@@ -176,29 +175,19 @@
 }
 
 .tc-card:hover .tc-star-btn,
-.tc-card:hover .tc-bell-btn,
 .tc-star-btn:focus-visible,
-.tc-bell-btn:focus-visible,
-.tc-star-btn--active,
-.tc-bell-btn--active {
+.tc-star-btn--active {
   opacity: 1;
 }
 
-.tc-star-btn:hover,
-.tc-bell-btn:hover {
+.tc-star-btn:hover {
   transform: scale(1.25);
   background: var(--tw-overlay-hover);
 }
 
-.tc-star-btn:focus-visible,
-.tc-bell-btn:focus-visible {
+.tc-star-btn:focus-visible {
   outline: 2px solid var(--tw-accent-light);
   outline-offset: -1px;
-}
-
-.tc-star-btn--active,
-.tc-bell-btn--active {
-  opacity: 1;
 }
 
 .tc-game {

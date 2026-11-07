@@ -121,10 +121,6 @@ export async function toggleNotificationStreamer(broadcasterId) {
   return (await sendMessage({ type: "TOGGLE_NOTIFICATION", broadcasterId })).active
 }
 
-export function removeNotificationStreamer(broadcasterId) {
-  return sendMessage({ type: "REMOVE_NOTIFICATION", broadcasterId })
-}
-
 export function removeFavoriteStreamer(broadcasterId) {
   return sendMessage({ type: "REMOVE_FAVORITE", broadcasterId })
 }

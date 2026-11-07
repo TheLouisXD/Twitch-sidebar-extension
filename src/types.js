@@ -25,9 +25,9 @@
  * @typedef {object} TwitchCardProps
  * @property {Channel} channel
  * @property {boolean} isLive
- * @property {boolean} [isNotified]
+ * @property {boolean} [isFavorite]
  * @property {(login: string) => void} onClick
- * @property {(broadcasterId: string) => Promise<void>|void} [onToggleNotify]
+ * @property {(broadcasterId: string) => Promise<void>|void} [onToggleFavorite]
  *
  * @typedef {{type: "SESSION_RESTORE"|"SESSION_LOGOUT"|"TWITCH_AUTH"|"GET_PROFILE"|"LOAD_CHANNELS"|"POLL_NOW"}
  * | {type: "SET_POLL_INTERVAL", minutes: number}

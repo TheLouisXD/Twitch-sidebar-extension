@@ -7,22 +7,23 @@ import {
   ACCENT_KEY,
   getPreferences
 } from "./preferences.js"
-import { NOTIFICATIONS_KEY, getNotificationStreamers } from "./cache.js"
+import {
+  NOTIFICATIONS_KEY,
+  decodeNotificationIds,
+  getNotificationStreamers
+} from "./cache.js"
 
 export const APP_SIGNATURE = "twitch-live-sidebar"
 export const BACKUP_VERSION = 1
 export const MAX_FAVORITES = 500
 
-const padZero = (n) => String(n).padStart(2, "0")
-
 export function formatBackupFilename(date = new Date()) {
-  const year = date.getFullYear()
-  const month = padZero(date.getMonth() + 1)
-  const day = padZero(date.getDate())
-  const hours = padZero(date.getHours())
-  const minutes = padZero(date.getMinutes())
-  const seconds = padZero(date.getSeconds())
-  return `twitch_live_sidebar_${year}-${month}-${day}_${hours}-${minutes}-${seconds}.json`
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60_000)
+    .toISOString()
+    .slice(0, 19)
+    .replace("T", "_")
+    .replaceAll(":", "-")
+  return `twitch_live_sidebar_${local}.json`
 }
 
 export async function createBackupPayload() {
@@ -92,17 +93,7 @@ export function validateBackupData(input) {
     cleanPrefs.language = rawPrefs.language
   }
 
-  const rawFavs = Array.isArray(parsed.favorites) ? parsed.favorites : []
-  const cleanFavs = []
-  const seen = new Set()
-
-  for (const id of rawFavs) {
-    if (typeof id === "string" && /^\d+$/.test(id) && !seen.has(id)) {
-      seen.add(id)
-      cleanFavs.push(id)
-      if (cleanFavs.length >= MAX_FAVORITES) break
-    }
-  }
+  const cleanFavs = [...new Set(decodeNotificationIds(parsed.favorites))].slice(0, MAX_FAVORITES)
 
   return {
     valid: true,
