@@ -1,10 +1,16 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { localSet, sendMessage } from "../platform.js"
 import { POLL_INTERVAL_OPTIONS } from "../preferences.js"
 import { usePreferences } from "../hooks/usePreferences.js"
 import { useProfile } from "../hooks/useProfile.js"
 import AccountProfile from "../components/AccountProfile.jsx"
 import { useI18n } from "../i18n-context.js"
+import {
+  createBackupPayload,
+  exportBackupFile,
+  validateBackupData,
+  applyBackupData
+} from "../backup.js"
 import "./SettingsPage.css"
 
 export default function SettingsPage({ onLogout, onBack, showOffline, onNotifications, onThemes }) {
@@ -19,6 +25,50 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
   } = usePreferences()
   const [error, setError] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [feedback, setFeedback] = useState(null)
+  const fileInputRef = useRef(null)
+
+  async function handleExport() {
+    setSaving(true)
+    setError(null)
+    setFeedback(null)
+    try {
+      const payload = await createBackupPayload()
+      const result = await exportBackupFile(payload)
+      if (result.success) {
+        setFeedback("settings.backupExportSuccess")
+      } else if (result.error) {
+        setError(result.error)
+      }
+    } catch {
+      setError("settings.backupError")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleFileImport(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ""
+    setSaving(true)
+    setError(null)
+    setFeedback(null)
+    try {
+      const text = await file.text()
+      const validation = validateBackupData(text)
+      if (!validation.valid) {
+        setError(validation.error)
+        return
+      }
+      await applyBackupData(validation.data)
+      setFeedback("settings.backupSuccess")
+    } catch {
+      setError("settings.backupError")
+    } finally {
+      setSaving(false)
+    }
+  }
 
   async function handleToggleOffline() {
     const newValue = !showOffline
@@ -214,6 +264,42 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
             </svg>
           </button>
         </div>
+      </div>
+      <div className="settings-section" style={{ marginTop: "16px" }}>
+        <div className="settings-section-title">{t("settings.backup")}</div>
+        <div className="settings-backup-group">
+          <input
+            id="settings-import-file-input"
+            type="file"
+            accept=".json"
+            style={{ display: "none" }}
+            ref={fileInputRef}
+            onChange={handleFileImport}
+          />
+          <button
+            id="settings-import-btn"
+            type="button"
+            className="settings-backup-btn"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={saving}
+          >
+            {t("settings.import")}
+          </button>
+          <button
+            id="settings-export-btn"
+            type="button"
+            className="settings-backup-btn"
+            onClick={handleExport}
+            disabled={saving}
+          >
+            {t("settings.export")}
+          </button>
+        </div>
+        {feedback && (
+          <div className="settings-backup-feedback" role="status">
+            {t(feedback)}
+          </div>
+        )}
       </div>
       <div className="settings-logout-section">
         <button id="settings-logout-btn" className="settings-logout-btn" onClick={onLogout}>

@@ -351,3 +351,70 @@
 [data-theme="gx"] .settings-logout-btn:hover {
   background: var(--tw-danger-hover);
 }
+
+/* ─── Backup section ─── */
+.settings-backup-group {
+  display: flex;
+  gap: 10px;
+  margin: 4px 0 6px;
+}
+
+.settings-backup-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--tw-text-primary);
+  background: var(--tw-surface);
+  border: 1px solid var(--tw-border);
+  border-radius: 5px;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    transform 0.1s,
+    box-shadow 0.15s;
+}
+
+.settings-backup-btn:hover {
+  background: var(--tw-surface-hover);
+  border-color: var(--tw-accent);
+  transform: translateY(-1px);
+}
+
+.settings-backup-btn:active {
+  transform: translateY(0);
+}
+
+.settings-backup-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.settings-backup-feedback {
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin-top: 6px;
+  background: color-mix(in srgb, var(--tw-accent) 15%, transparent);
+  color: var(--tw-text-primary);
+  border: 1px solid var(--tw-accent-glow);
+}
+
+[data-theme="gx"] .settings-backup-btn {
+  background: #10121a;
+  border: 1px solid color-mix(in srgb, var(--tw-accent-dark) 60%, transparent);
+  border-radius: 2px;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%);
+}
+
+[data-theme="gx"] .settings-backup-btn:hover {
+  background: var(--tw-surface-hover);
+  border-color: var(--tw-accent);
+  box-shadow: 0 0 8px var(--tw-accent-glow);
+}

@@ -869,3 +869,27 @@ test("live and offline matches keep both sections visible without an empty state
   assert.equal(screen.queryByText(/No results for/), null)
   assert.equal(dom.window.document.querySelectorAll(".empty-state").length, 0)
 })
+
+test("settings page renders backup section with parallel import and export buttons in Spanish and English", async () => {
+  local.language = "es"
+  const pending = deferred()
+  handlers.GET_PROFILE = () => pending.promise
+
+  mount(SettingsPage, { showOffline: false })
+  assert.ok(await screen.findByText("Copia de seguridad"))
+
+  const importBtn = screen.getByRole("button", { name: "+ importar" })
+  const exportBtn = screen.getByRole("button", { name: "- exportar" })
+  assert.ok(importBtn)
+  assert.ok(exportBtn)
+  assert.equal(importBtn.parentElement, exportBtn.parentElement)
+  assert.ok(importBtn.parentElement.classList.contains("settings-backup-group"))
+
+  // Test in English
+  await act(async () => {
+    changeStorage({ language: "en" })
+  })
+  assert.ok(await screen.findByText("Backup"))
+  assert.ok(screen.getByRole("button", { name: "+ import" }))
+  assert.ok(screen.getByRole("button", { name: "- export" }))
+})
