@@ -16,13 +16,7 @@ export async function fetchTwitch(token, path, params = new URLSearchParams()) {
   return result
 }
 
-/**
- * Reduces avatar image resolution from 300x300 to 150x150 for faster network transfer.
- * Preserves the original URL if not matching the standard pattern.
- * @param {string|null} url
- * @param {string} [size="150x150"]
- * @returns {string|null}
- */
+/** Downscale 300x300 Twitch CDN avatars; leave other URLs untouched. */
 export function formatAvatarUrl(url, size = "150x150") {
   if (!url || typeof url !== "string") return null
   if (url.startsWith("https://")) {

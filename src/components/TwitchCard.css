@@ -1,5 +1,3 @@
-/* ── TwitchCard.css ────────────────────────────────── */
-
 .tc-card {
   position: relative;
   border-radius: 8px;
@@ -40,7 +38,6 @@
   outline-offset: 2px;
 }
 
-/* Offline state */
 .tc-card--offline {
   opacity: 0.65;
 }
@@ -50,7 +47,6 @@
   border-color: var(--tw-border);
 }
 
-/* ── Avatar (cuadrado 1:1 para evitar que la foto de perfil se corte) ── */
 .tc-avatar-wrap {
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -69,12 +65,10 @@
   transition: filter 0.2s;
 }
 
-/* Grayscale para canales offline */
 .tc-avatar--offline {
   filter: grayscale(100%);
 }
 
-/* Fallback cuando no hay foto */
 .tc-avatar-fallback {
   width: 100%;
   height: 100%;
@@ -91,7 +85,6 @@
   background: var(--tw-offline-gradient);
 }
 
-/* ── Info (debajo de la foto) ── */
 .tc-info {
   position: relative;
   z-index: 2;
@@ -131,7 +124,6 @@
   text-shadow: 0 1px 3px var(--tw-ambient-text-shadow);
 }
 
-/* Name + star row */
 .tc-name-row {
   display: flex;
   align-items: center;
@@ -208,7 +200,6 @@
   color: var(--tw-text-muted);
 }
 
-/* ── GX Theme TwitchCard ── */
 [data-theme="gx"] .tc-card {
   border-radius: 2px;
   border: 1px solid transparent;

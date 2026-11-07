@@ -4,9 +4,7 @@ import { formatAvatarUrl } from "../twitch.js"
 
 export default function AccountProfile({ user, loading, error }) {
   const { t } = useI18n()
-  // The cached data URL is the preferred source for instant display, but if the
-  // runtime blocks it (e.g. a stale manifest without `data:` in `img-src`), fall
-  // back to the CDN avatar instead of leaving an empty frame.
+  // Fall back to the CDN avatar if the cached data URL is blocked by CSP.
   const [failedAvatars, setFailedAvatars] = useState(() => new Set())
   const avatarSrc =
     [user?.avatar_data, formatAvatarUrl(user?.profile_image_url)].find(

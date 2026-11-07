@@ -27,7 +27,6 @@
   border-color: var(--tw-accent);
 }
 
-/* ── GX Theme Search Bar ── */
 [data-theme="gx"] .search-bar-input {
   border-radius: 3px;
   border: 1px solid transparent;

@@ -51,20 +51,17 @@
 :root {
   color-scheme: dark;
 
-  /* ── Background Colors ── */
   --tw-bg: #0e0e10;
   --tw-surface: #18181b;
   --tw-surface-light: #1f1f23;
   --tw-surface-hover: #26262c;
   --tw-surface-hover-light: #2a2a2e;
 
-  /* ── Text Colors ── */
   --tw-text-primary: #efeff1;
   --tw-text-secondary: #adadb8;
   --tw-text-muted: #57575e;
   --tw-text-inverse: #000000;
 
-  /* ── Accents (Twitch Purple) ── */
   --tw-accent: #9147ff;
   --tw-accent-hover: #a25ceb;
   --tw-accent-light: #a970ff;
@@ -81,7 +78,6 @@
   --tw-spinner-border: rgba(255, 255, 255, 0.3);
   --tw-ambient-text-shadow: rgba(0, 0, 0, 0.9);
 
-  /* ── Status Colors ── */
   --tw-live: #eb0400;
   --tw-danger: #e91916;
   --tw-danger-hover: #ff6b6b;
@@ -98,27 +94,23 @@
   --tw-offline-dark: #333333;
   --tw-offline-gradient: linear-gradient(135deg, #555555, #333333);
 
-  /* ── Typography (Roboto) ── */
   --tw-font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --tw-font-size-base: 13px;
   --tw-font-size-title: 14px;
 }
 
 [data-theme="gx"] {
-  /* ── Background Colors (Almost Black / Opera GX) ── */
   --tw-bg: #06070d;
   --tw-surface: #10121a;
   --tw-surface-light: #181b26;
   --tw-surface-hover: #1f2230;
   --tw-surface-hover-light: #282c3f;
 
-  /* ── Text Colors ── */
   --tw-text-primary: #ffffff;
   --tw-text-secondary: #9da3b4;
   --tw-text-muted: #626779;
   --tw-text-inverse: #000000;
 
-  /* ── Accents (Opera GX Neon Red) ── */
   --tw-accent: #fa1e4e;
   --tw-accent-hover: #ff3b68;
   --tw-accent-light: #fa1e4e;
@@ -135,7 +127,6 @@
   --tw-spinner-border: color-mix(in srgb, var(--tw-accent) 25%, transparent);
   --tw-ambient-text-shadow: rgba(0, 0, 0, 0.95);
 
-  /* ── Status Colors ── */
   --tw-live: #fa1e4e;
   --tw-danger: #fa1e4e;
   --tw-danger-hover: #ff3b68;
@@ -152,7 +143,6 @@
   --tw-offline-dark: #22242c;
   --tw-offline-gradient: linear-gradient(135deg, #444754, #22242c);
 
-  /* ── Typography (Zen Dots Google Font) ── */
   --tw-font-family: "Zen Dots", sans-serif;
   --tw-font-size-base: 13px;
   --tw-font-size-title: 14px;
@@ -190,7 +180,6 @@ html {
   outline-offset: 2px;
 }
 
-/* Custom Scrollbar to match Twitch */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;

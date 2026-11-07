@@ -1,5 +1,3 @@
-/* ── MainPage.css ─────────────────────────────────── */
-
 .main-root {
   width: 100%;
   min-height: 100vh;
@@ -10,7 +8,6 @@
   flex-direction: column;
 }
 
-/* ── Header ── */
 .main-header {
   display: flex;
   align-items: center;
@@ -50,7 +47,6 @@
   background: var(--tw-surface-hover);
 }
 
-/* ── Slide-down / slide-up reload indicator ── */
 .main-reload-drawer {
   display: grid;
   grid-template-rows: 0fr;
@@ -102,7 +98,6 @@
   }
 }
 
-/* ── iOS-style 12-blade spinner ── */
 .spinner {
   font-size: 48px;
   position: relative;
@@ -193,7 +188,6 @@
   }
 }
 
-/* ── Error banner ── */
 .main-error-banner {
   margin: 10px 12px 0;
   background: var(--tw-error-bg);
@@ -204,7 +198,6 @@
   font-size: 12px;
 }
 
-/* ── Loading state ── */
 .main-center {
   flex: 1;
   display: flex;
@@ -231,7 +224,6 @@
   font-size: 13px;
 }
 
-/* ── Section row ── */
 .main-section-row {
   display: flex;
   align-items: center;
@@ -271,26 +263,22 @@
   color: var(--tw-text-secondary);
 }
 
-/* ── Scroll container (wraps both sections) ── */
 .main-scroll {
   flex: 1;
   overflow-y: auto;
   padding-bottom: 16px;
 }
 
-/* ── Section spacing ── */
 .main-live-section {
   margin-top: 4px;
 }
 
-/* ── "En vivo ahora" section offset ── */
 .main-section-row--offline {
   margin-top: 8px;
   border-top: 1px solid var(--tw-surface-light);
   padding-top: 14px;
 }
 
-/* ── Channel grid ── */
 .main-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -305,7 +293,6 @@
   }
 }
 
-/* ── GX Theme Specific Overrides ── */
 [data-theme="gx"] .main-header {
   border-bottom: 2px solid transparent;
   background:

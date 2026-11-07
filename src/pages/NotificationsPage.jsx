@@ -87,7 +87,6 @@ export default function NotificationsPage({ onBack }) {
           hint={t("notifications.emptyHint")}
         />
       ) : (
-        /* Streamer list */
         <div className="notif-list">
           {streamers.map((ch) => (
             <div key={ch.user_id} className="notif-item">
