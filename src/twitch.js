@@ -3,7 +3,6 @@ import { AuthError } from "./auth.js"
 import { getCachedFollows, getCachedProfiles, getCachedUserProfile } from "./cache.js"
 
 export const BATCH_CONCURRENCY = 4
-const now = () => globalThis.performance?.now?.() ?? Date.now()
 
 export async function fetchTwitch(token, path, params = new URLSearchParams()) {
   const response = await fetch(`${API_URL}/${path}?${params}`, {
@@ -128,31 +127,14 @@ function haveFollowsChanged(previous, next) {
 }
 
 export async function fetchAllFollowed(token, options = {}) {
-  const startedAt = now()
-  const timings = {
-    usersMs: 0,
-    followsMs: 0,
-    profilesMs: 0,
-    streamsMs: 0,
-    totalMs: 0
-  }
   const [{ map: cachedProfiles, fresh: profilesFresh }, cachedFollows, cachedUser] =
     await Promise.all([getCachedProfiles(), getCachedFollows(), getCachedUserProfile()])
   const profileMap = profilesFresh ? { ...cachedProfiles } : {}
   const knownAvatarMap = { ...cachedProfiles, ...profileMap }
   let progressed = false
 
-  const resolveUser = async () => {
-    if (cachedUser?.fresh && cachedUser.profile?.id) {
-      return cachedUser.profile
-    }
-    const t0 = now()
-    try {
-      return await fetchUser(token)
-    } finally {
-      timings.usersMs += now() - t0
-    }
-  }
+  const resolveUser = async () =>
+    cachedUser?.fresh && cachedUser.profile?.id ? cachedUser.profile : fetchUser(token)
 
   let user
   let follows
@@ -160,42 +142,34 @@ export async function fetchAllFollowed(token, options = {}) {
   let followsListChanged = false
   let streams
 
-  if (cachedFollows.fresh && cachedFollows.follows) {
-    follows = cachedFollows.follows
-    user = cachedUser?.profile?.id ? cachedUser.profile : null
-    const ids = [...new Set(follows.map((follow) => follow.broadcaster_id))]
+  const loadStreamsAndProfiles = async (followList) => {
+    const ids = [...new Set(followList.map((follow) => follow.broadcaster_id))]
     const missing = ids.filter((id) => !Object.hasOwn(profileMap, id))
-
     let profilesDone = missing.length === 0
     const profilesPromise = missing.length
-      ? (async () => {
-          const t0 = now()
-          try {
-            return await fetchBatch(token, "users", "id", missing)
-          } finally {
-            timings.profilesMs += now() - t0
-            profilesDone = true
-          }
-        })()
+      ? fetchBatch(token, "users", "id", missing).finally(() => {
+          profilesDone = true
+        })
       : Promise.resolve([])
     profilesPromise.catch(() => {})
 
-    const tStreams = now()
-    try {
-      streams = await fetchBatch(token, "streams", "user_id", ids)
-    } finally {
-      timings.streamsMs += now() - tStreams
-    }
+    streams = await fetchBatch(token, "streams", "user_id", ids)
 
     if (!profilesDone && options.onProgress) {
       progressed = true
-      await options.onProgress(buildChannelSnapshot(follows, streams, knownAvatarMap))
+      await options.onProgress(buildChannelSnapshot(followList, streams, knownAvatarMap))
     }
 
     const profiles = await profilesPromise
     for (const profile of profiles) {
       profileMap[profile.id] = formatAvatarUrl(profile.profile_image_url)
     }
+  }
+
+  if (cachedFollows.fresh && cachedFollows.follows) {
+    follows = cachedFollows.follows
+    user = cachedUser?.profile?.id ? cachedUser.profile : null
+    await loadStreamsAndProfiles(follows)
   } else if (cachedFollows.follows?.length) {
     // Prioritize live stream state using the cached follow IDs while reconciling
     // the full follow list concurrently.
@@ -205,24 +179,16 @@ export async function fetchAllFollowed(token, options = {}) {
 
     const reconcilePromise = (async () => {
       const resolvedUser = await resolveUser()
-      const tFollows = now()
       try {
         const resolvedFollows = await fetchFollowed(token, resolvedUser.id)
         return { resolvedUser, resolvedFollows }
       } finally {
-        timings.followsMs += now() - tFollows
         reconcileDone = true
       }
     })()
     reconcilePromise.catch(() => {})
 
-    const tStreams = now()
-    let initialStreams
-    try {
-      initialStreams = await fetchBatch(token, "streams", "user_id", previousIds)
-    } finally {
-      timings.streamsMs += now() - tStreams
-    }
+    const initialStreams = await fetchBatch(token, "streams", "user_id", previousIds)
 
     if (!reconcileDone && options.onProgress) {
       progressed = true
@@ -243,26 +209,8 @@ export async function fetchAllFollowed(token, options = {}) {
     const missing = ids.filter((id) => !Object.hasOwn(profileMap, id))
 
     const [addedStreams, profiles] = await Promise.all([
-      addedIds.length
-        ? (async () => {
-            const t0 = now()
-            try {
-              return await fetchBatch(token, "streams", "user_id", addedIds)
-            } finally {
-              timings.streamsMs += now() - t0
-            }
-          })()
-        : Promise.resolve([]),
-      missing.length
-        ? (async () => {
-            const t0 = now()
-            try {
-              return await fetchBatch(token, "users", "id", missing)
-            } finally {
-              timings.profilesMs += now() - t0
-            }
-          })()
-        : Promise.resolve([])
+      addedIds.length ? fetchBatch(token, "streams", "user_id", addedIds) : [],
+      missing.length ? fetchBatch(token, "users", "id", missing) : []
     ])
 
     streams = addedStreams.length ? [...initialStreams, ...addedStreams] : initialStreams
@@ -271,55 +219,16 @@ export async function fetchAllFollowed(token, options = {}) {
     }
   } else {
     user = await resolveUser()
-    const tFollows = now()
-    try {
-      follows = await fetchFollowed(token, user.id)
-    } finally {
-      timings.followsMs += now() - tFollows
-    }
+    follows = await fetchFollowed(token, user.id)
     followsChanged = true
     followsListChanged = true
-
-    const ids = [...new Set(follows.map((follow) => follow.broadcaster_id))]
-    const missing = ids.filter((id) => !Object.hasOwn(profileMap, id))
-
-    let profilesDone = missing.length === 0
-    const profilesPromise = missing.length
-      ? (async () => {
-          const t0 = now()
-          try {
-            return await fetchBatch(token, "users", "id", missing)
-          } finally {
-            timings.profilesMs += now() - t0
-            profilesDone = true
-          }
-        })()
-      : Promise.resolve([])
-    profilesPromise.catch(() => {})
-
-    const tStreams = now()
-    try {
-      streams = await fetchBatch(token, "streams", "user_id", ids)
-    } finally {
-      timings.streamsMs += now() - tStreams
-    }
-
-    if (!profilesDone && options.onProgress) {
-      progressed = true
-      await options.onProgress(buildChannelSnapshot(follows, streams, knownAvatarMap))
-    }
-
-    const profiles = await profilesPromise
-    for (const profile of profiles) {
-      profileMap[profile.id] = formatAvatarUrl(profile.profile_image_url)
-    }
+    await loadStreamsAndProfiles(follows)
   }
 
   const missingCount = follows.some(
     (follow) => !Object.hasOwn(cachedProfiles, follow.broadcaster_id)
   )
   const data = buildChannelSnapshot(follows, streams, profileMap)
-  timings.totalMs = now() - startedAt
   return {
     data,
     profileMap,
@@ -328,7 +237,6 @@ export async function fetchAllFollowed(token, options = {}) {
     followsChanged,
     followsListChanged,
     user,
-    progressed,
-    timings
+    progressed
   }
 }
