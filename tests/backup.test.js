@@ -3,12 +3,22 @@ import assert from "node:assert/strict"
 
 const mockStorage = {}
 const mockSentMessages = []
+let failMessageType = null
 
 globalThis.browser = {
   runtime: {
     id: "backup-test-runner",
     sendMessage: async (msg) => {
       mockSentMessages.push(msg)
+      if (msg.type === failMessageType) {
+        return { error: "Migration failed" }
+      }
+      if (msg.type === "SET_POLL_INTERVAL") {
+        mockStorage.pollIntervalMinutes = msg.minutes
+      }
+      if (msg.type === "SET_REMEMBER_SESSION") {
+        mockStorage.rememberSession = msg.enabled
+      }
       return {}
     }
   },
@@ -250,6 +260,24 @@ test("applyBackupData saves valid preferences and favorites to storage and backg
 
   assert.ok(mockSentMessages.some((m) => m.type === "SET_POLL_INTERVAL" && m.minutes === 10))
   assert.ok(mockSentMessages.some((m) => m.type === "SET_REMEMBER_SESSION" && m.enabled === true))
+})
+
+test("applyBackupData rejects without overwriting rememberSession if migration fails", async () => {
+  for (const k of Object.keys(mockStorage)) delete mockStorage[k]
+  mockStorage.rememberSession = true
+  failMessageType = "SET_REMEMBER_SESSION"
+  try {
+    await assert.rejects(
+      applyBackupData({
+        preferences: { rememberSession: false, theme: "gx" },
+        favorites: ["111"]
+      }),
+      /Migration failed/
+    )
+    assert.equal(mockStorage.rememberSession, true)
+  } finally {
+    failMessageType = null
+  }
 })
 
 test("createBackupPayload generates complete backup with metadata, preferences, and favorites", async () => {

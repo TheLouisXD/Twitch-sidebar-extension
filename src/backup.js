@@ -3,8 +3,6 @@ import {
   POLL_INTERVAL_OPTIONS,
   THEME_OPTIONS,
   ACCENT_OPTIONS,
-  POLL_INTERVAL_KEY,
-  REMEMBER_SESSION_KEY,
   THEME_KEY,
   ACCENT_KEY,
   getPreferences
@@ -163,17 +161,13 @@ export async function applyBackupData(sanitizedData) {
   const storageUpdate = {}
 
   if (preferences.pollIntervalMinutes !== undefined) {
-    storageUpdate[POLL_INTERVAL_KEY] = preferences.pollIntervalMinutes
     await sendMessage({
       type: "SET_POLL_INTERVAL",
       minutes: preferences.pollIntervalMinutes
-    }).catch(() => {})
+    })
   }
   if (preferences.rememberSession !== undefined) {
-    storageUpdate[REMEMBER_SESSION_KEY] = preferences.rememberSession
-    await sendMessage({ type: "SET_REMEMBER_SESSION", enabled: preferences.rememberSession }).catch(
-      () => {}
-    )
+    await sendMessage({ type: "SET_REMEMBER_SESSION", enabled: preferences.rememberSession })
   }
   if (preferences.theme !== undefined) {
     storageUpdate[THEME_KEY] = preferences.theme

@@ -201,12 +201,13 @@
   margin-top: 1px;
 }
 
-/* ── Bell action button ── */
-.notif-item-remove {
+.notif-remove-btn {
   background: none;
   border: none;
+  color: var(--tw-text-secondary);
   cursor: pointer;
   padding: 6px;
+  gap: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -219,13 +220,13 @@
   opacity: 0.9;
 }
 
-.notif-item-remove:hover {
+.notif-remove-btn:hover {
   transform: scale(1.2);
   background: var(--tw-overlay-hover);
   opacity: 1;
 }
 
-.notif-item-remove:focus-visible {
+.notif-remove-btn:focus-visible {
   outline: 2px solid var(--tw-accent-light);
   outline-offset: -1px;
 }
