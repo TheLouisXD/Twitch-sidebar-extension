@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="default">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    
+
+
+
+
+
+
+
+:root {
+  color-scheme: dark;
+
+  --tw-bg: #0e0e10;
+  --tw-surface: #18181b;
+  --tw-surface-light: #1f1f23;
+  --tw-surface-hover: #26262c;
+  --tw-surface-hover-light: #2a2a2e;
+
+  --tw-text-primary: #efeff1;
+  --tw-text-secondary: #adadb8;
+  --tw-text-muted: #57575e;
+  --tw-text-inverse: #000000;
+
+  --tw-accent: #9147ff;
+  --tw-accent-hover: #a25ceb;
+  --tw-accent-light: #a970ff;
+  --tw-accent-dark: #6030a8;
+  --tw-accent-deep: #1b0b33;
+  --tw-accent-gradient: linear-gradient(135deg, #9147ff, #6441a5);
+  --tw-accent-glow: rgba(145, 71, 255, 0.25);
+  --tw-accent-glow-strong: rgba(145, 71, 255, 0.5);
+  --tw-on-accent: #ffffff;
+  --tw-border: #3a3a3d;
+  --tw-shadow: rgba(0, 0, 0, 0.3);
+  --tw-overlay-subtle: rgba(255, 255, 255, 0.03);
+  --tw-overlay-hover: rgba(255, 255, 255, 0.04);
+  --tw-spinner-border: rgba(255, 255, 255, 0.3);
+  --tw-ambient-text-shadow: rgba(0, 0, 0, 0.9);
+
+  --tw-live: #eb0400;
+  --tw-danger: #e91916;
+  --tw-danger-hover: #ff6b6b;
+  --tw-error-text: #f87171;
+  --tw-error-bg: rgba(235, 4, 0, 0.12);
+  --tw-error-border: rgba(235, 4, 0, 0.3);
+  --tw-warning: #f5c518;
+  --tw-warning-bg: rgba(245, 197, 24, 0.08);
+  --tw-warning-border: rgba(245, 197, 24, 0.2);
+  --tw-warning-hover-bg: rgba(245, 197, 24, 0.18);
+  --tw-warning-hover-border: rgba(245, 197, 24, 0.5);
+
+  --tw-offline: #555555;
+  --tw-offline-dark: #333333;
+  --tw-offline-gradient: linear-gradient(135deg, #555555, #333333);
+
+  --tw-font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --tw-font-size-base: 13px;
+  --tw-font-size-title: 14px;
+}
+
+[data-theme="gx"] {
+  --tw-bg: #06070d;
+  --tw-surface: #10121a;
+  --tw-gx-panel: #1d1d1d;
+  --tw-surface-light: #181b26;
+  --tw-surface-hover: #1f2230;
+  --tw-surface-hover-light: #282c3f;
+
+  --tw-text-primary: #ffffff;
+  --tw-text-secondary: #9da3b4;
+  --tw-text-muted: #626779;
+  --tw-text-inverse: #000000;
+
+  --tw-accent: #fa1e4e;
+  --tw-accent-hover: #ff3b68;
+  --tw-accent-light: #fa1e4e;
+  --tw-accent-dark: #a01231;
+  --tw-accent-deep: #1f060b;
+  --tw-accent-gradient: linear-gradient(135deg, #fa1e4e, #a01231);
+  --tw-accent-glow: rgba(250, 30, 78, 0.35);
+  --tw-accent-glow-strong: rgba(250, 30, 78, 0.6);
+  --tw-on-accent: #ffffff;
+  --tw-border: var(--tw-accent-dark);
+  --tw-shadow: rgba(0, 0, 0, 0.7);
+  --tw-overlay-subtle: color-mix(in srgb, var(--tw-accent) 5%, transparent);
+  --tw-overlay-hover: color-mix(in srgb, var(--tw-accent) 12%, transparent);
+  --tw-spinner-border: color-mix(in srgb, var(--tw-accent) 25%, transparent);
+  --tw-ambient-text-shadow: rgba(0, 0, 0, 0.95);
+
+  --tw-live: #fa1e4e;
+  --tw-danger: #fa1e4e;
+  --tw-danger-hover: #ff3b68;
+  --tw-error-text: #ff6b6b;
+  --tw-error-bg: rgba(250, 30, 78, 0.15);
+  --tw-error-border: rgba(250, 30, 78, 0.4);
+  --tw-warning: #ffb800;
+  --tw-warning-bg: rgba(255, 184, 0, 0.1);
+  --tw-warning-border: rgba(255, 184, 0, 0.3);
+  --tw-warning-hover-bg: rgba(255, 184, 0, 0.2);
+  --tw-warning-hover-border: rgba(255, 184, 0, 0.5);
+
+  --tw-offline: #444754;
+  --tw-offline-dark: #22242c;
+  --tw-offline-gradient: linear-gradient(135deg, #444754, #22242c);
+
+  --tw-font-family: "Zen Dots", sans-serif;
+  --tw-font-size-base: 13px;
+  --tw-font-size-title: 14px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--tw-font-family);
+  background-color: var(--tw-bg);
+  color: var(--tw-text-primary);
+  color-scheme: dark;
+}
+
+input,
+button,
+select,
+textarea {
+  font-family: inherit;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Firefox uses the standard scrollbar properties. */
+html {
+  color-scheme: dark;
+  scrollbar-width: thin;
+  scrollbar-color: var(--tw-surface-light) var(--tw-bg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--tw-accent);
+  outline-offset: 2px;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--tw-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--tw-surface-light);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--tw-text-muted);
+}
+
+[data-theme="gx"] html,
+html[data-theme="gx"] {
+  scrollbar-color: var(--tw-accent-dark) var(--tw-bg);
+}
+
+[data-theme="gx"] ::-webkit-scrollbar-thumb {
+  background: var(--tw-accent-dark);
+}
+
+[data-theme="gx"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--tw-accent);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.main-root, .notif-root, .themes-root, .settings-root {
+  width: 100%;
+  min-height: auto;
+  background: var(--tw-bg);
+  color: var(--tw-text-primary);
+  font-family: var(--tw-font-family);
+  display: flex;
+  flex-direction: column;
+}
+
+.main-header,
+.notif-header,
+.themes-header,
+.settings-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--tw-surface-light);
+  background: var(--tw-surface);
+  flex-shrink: 0;
+}
+
+[data-theme="gx"] .main-header,
+[data-theme="gx"] .settings-header {
+  border-bottom: 2px solid transparent;
+  background:
+    linear-gradient(to right, var(--tw-accent), var(--tw-accent-deep)) bottom / 100% 2px no-repeat,
+    var(--tw-surface);
+}
+
+.main-settings-btn,
+.notif-back-btn,
+.themes-back-btn,
+.settings-back-btn {
+  background: none;
+  border: none;
+  color: var(--tw-text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+
+.main-settings-btn:hover,
+.notif-back-btn:hover,
+.themes-back-btn:hover,
+.settings-back-btn:hover {
+  color: var(--tw-text-primary);
+  background: var(--tw-surface-hover);
+}
+
+[data-theme="gx"] .main-settings-btn,
+[data-theme="gx"] .settings-back-btn {
+  color: var(--tw-accent);
+}
+
+[data-theme="gx"] .main-settings-btn:hover,
+[data-theme="gx"] .settings-back-btn:hover {
+  color: var(--tw-text-primary);
+  background: color-mix(in srgb, var(--tw-accent) 20%, transparent);
+}
+
+.notif-header-title,
+.themes-header-title,
+.settings-header-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--tw-text-primary);
+  flex: 1;
+}
+
+.session-spinner,
+.notif-spinner,
+.settings-spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid var(--tw-surface-light);
+  border-top-color: var(--tw-accent);
+  animation: spin 0.8s linear infinite;
+}
+
+    .notif-header {
+  gap: 10px;
+}
+
+.notif-header-star {
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.notif-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 0;
+}
+
+.notif-list {
+  padding: 8px 0;
+  overflow-y: auto;
+}
+
+.notif-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--tw-surface-light);
+  transition: background 0.12s;
+}
+
+.notif-item:last-child {
+  border-bottom: none;
+}
+
+.notif-item:hover {
+  background: var(--tw-overlay-subtle);
+}
+
+.notif-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+}
+
+.notif-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 2px solid var(--tw-surface-hover-light);
+}
+
+.notif-avatar-fallback {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--tw-accent-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--tw-on-accent);
+}
+
+.notif-live-dot {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--tw-live);
+  border: 2px solid var(--tw-surface);
+}
+
+.notif-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tw-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notif-item-game {
+  font-size: 11px;
+  color: var(--tw-accent-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+.notif-remove-btn {
+  background: none;
+  border: none;
+  color: var(--tw-text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  gap: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition:
+    opacity 0.15s,
+    transform 0.15s,
+    background 0.15s;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.notif-remove-btn:hover {
+  transform: scale(1.2);
+  background: var(--tw-overlay-hover);
+  opacity: 1;
+}
+
+.notif-remove-btn:focus-visible {
+  outline: 2px solid var(--tw-accent-light);
+  outline-offset: -1px;
+}
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--tw-bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--tw-text-primary);
+      width: 360px;
+      overflow-x: hidden;
+    }
+  </style>
+</head>
+<body>
+
+  
+<div class="notif-root">
+  <header class="notif-header">
+    <button class="notif-back-btn" aria-label="Volver">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+      </svg>
+    </button>
+    <span class="notif-header-title">Notificaciones (1)</span>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--tw-warning)" class="notif-header-star">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+    </svg>
+  </header>
+  <div class="notif-list">
+    <div class="notif-item">
+      <div class="notif-avatar-wrap">
+        <svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#9147ff"/><circle cx="20" cy="16" r="8" fill="#fff"/><ellipse cx="20" cy="33" rx="14" ry="9" fill="#fff"/></svg>
+        <span class="notif-live-dot"></span>
+      </div>
+      <div class="notif-item-info">
+        <div class="notif-item-name">Ibai</div>
+        <div class="notif-item-game">Charlando • 64.2K espectadores</div>
+      </div>
+      <button class="notif-remove-btn" title="Eliminar favorito">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>
