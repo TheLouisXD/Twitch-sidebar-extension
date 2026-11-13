@@ -44,6 +44,8 @@ Need help or want to suggest a feature?
 GitHub Repository: https://github.com/TheLouisXD/Twitch-sidebar-extension
 Issues: https://github.com/TheLouisXD/Twitch-sidebar-extension/issues
 
+Version 1.4 — Added backup export and import for settings and favorite channels, offline search support, lazy-loaded ambient avatars, and UI/CSS refinements.
+
 Version 1.3 — Streamlined the login screen with a smaller privacy note, a bottom-pinned language selector and credit, and a pixel chevron.
 
 Version 1.2 — Added the dedicated Favorites section, Roboto fonts, the instantly cached account profile with a dynamic gradient from your avatar color, accessibility and performance fixes.
