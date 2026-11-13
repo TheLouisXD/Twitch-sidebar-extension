@@ -900,8 +900,8 @@ test("settings page renders backup section with parallel import and export butto
   mount(SettingsPage, { showOffline: false })
   assert.ok(await screen.findByText("Copia de seguridad"))
 
-  const importBtn = screen.getByRole("button", { name: "+ importar" })
-  const exportBtn = screen.getByRole("button", { name: "- exportar" })
+  const importBtn = screen.getByRole("button", { name: "importar" })
+  const exportBtn = screen.getByRole("button", { name: "exportar" })
   assert.ok(importBtn)
   assert.ok(exportBtn)
   assert.equal(importBtn.parentElement, exportBtn.parentElement)
@@ -912,8 +912,8 @@ test("settings page renders backup section with parallel import and export butto
     changeStorage({ language: "en" })
   })
   assert.ok(await screen.findByText("Backup"))
-  assert.ok(screen.getByRole("button", { name: "+ import" }))
-  assert.ok(screen.getByRole("button", { name: "- export" }))
+  assert.ok(screen.getByRole("button", { name: "import" }))
+  assert.ok(screen.getByRole("button", { name: "export" }))
 })
 
 test("settings backup import displays inline errors, rejects oversized files, and applies valid backups", async () => {
@@ -1008,7 +1008,7 @@ test("settings backup export triggers download and shows inline confirmation", a
 
   try {
     mount(SettingsPage, { showOffline: false })
-    const exportBtn = await screen.findByRole("button", { name: "- export" })
+    const exportBtn = await screen.findByRole("button", { name: "export" })
     await act(async () => {
       fireEvent.click(exportBtn)
     })
