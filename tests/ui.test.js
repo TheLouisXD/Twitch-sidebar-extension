@@ -49,11 +49,25 @@ globalThis.browser = {
   },
   storage: {
     local: {
-      async get(key) {
-        return readOverride ? readOverride(key) : { [key]: local[key] }
+      async get(keys) {
+        if (readOverride) return readOverride(keys)
+        if (Array.isArray(keys)) {
+          return Object.fromEntries(keys.map((key) => [key, local[key]]))
+        }
+        return { [keys]: local[keys] }
       },
       async set(values) {
         changeStorage(values)
+      },
+      async remove(keys) {
+        const list = Array.isArray(keys) ? keys : [keys]
+        const changes = Object.fromEntries(
+          list.filter((key) => key in local).map((key) => [key, { oldValue: local[key] }])
+        )
+        for (const key of list) delete local[key]
+        if (Object.keys(changes).length) {
+          for (const listener of listeners) listener(changes, "local")
+        }
       }
     },
     onChanged: {
@@ -138,9 +152,17 @@ beforeEach(() => {
         profile_image_url: "https://static-cdn.jtvnw.net/tester.png"
       }
     }),
+    SET_POLL_INTERVAL: async ({ minutes }) => {
+      changeStorage({ pollIntervalMinutes: minutes })
+      return { pollIntervalMinutes: minutes }
+    },
     SET_REMEMBER_SESSION: async ({ enabled }) => {
       changeStorage({ rememberSession: enabled })
       return { rememberSession: enabled }
+    },
+    SET_NOTIFICATIONS: async ({ ids }) => {
+      changeStorage({ notification_streamers: ids })
+      return { favorites: ids }
     },
     REMOVE_NOTIFICATION: async ({ broadcasterId }) => {
       changeStorage({
@@ -892,4 +914,110 @@ test("settings page renders backup section with parallel import and export butto
   assert.ok(await screen.findByText("Backup"))
   assert.ok(screen.getByRole("button", { name: "+ import" }))
   assert.ok(screen.getByRole("button", { name: "- export" }))
+})
+
+test("settings backup import displays inline errors, rejects oversized files, and applies valid backups", async () => {
+  local.language = "en"
+  local.theme = "default"
+  local.notification_streamers = ["111"]
+  const pending = deferred()
+  handlers.GET_PROFILE = () => pending.promise
+
+  mount(SettingsPage, { showOffline: false })
+  await screen.findByText("Backup")
+
+  const fileInput = dom.window.document.getElementById("settings-import-file-input")
+  assert.ok(fileInput)
+
+  let readOversized = false
+  await act(async () => {
+    fireEvent.change(fileInput, {
+      target: {
+        files: [
+          {
+            size: 300 * 1024,
+            text: async () => {
+              readOversized = true
+              return "{}"
+            }
+          }
+        ]
+      }
+    })
+  })
+  assert.equal(readOversized, false)
+  const oversizedAlert = await screen.findByRole("alert")
+  assert.equal(oversizedAlert.textContent, "The file is not a valid extension backup.")
+  assert.ok(oversizedAlert.classList.contains("settings-backup-feedback--error"))
+
+  await act(async () => {
+    fireEvent.change(fileInput, {
+      target: {
+        files: [{ size: 12, text: async () => "{ bad json" }]
+      }
+    })
+  })
+  const invalidAlert = await screen.findByRole("alert")
+  assert.equal(invalidAlert.textContent, "The file is not a valid extension backup.")
+
+  const validBackup = JSON.stringify({
+    app: "twitch-live-sidebar",
+    version: 1,
+    preferences: {
+      pollIntervalMinutes: 10,
+      theme: "gx",
+      accentColor: "sky",
+      showOffline: true,
+      language: "es"
+    },
+    favorites: ["222", "bad"]
+  })
+  await act(async () => {
+    fireEvent.change(fileInput, {
+      target: {
+        files: [{ size: validBackup.length, text: async () => validBackup }]
+      }
+    })
+  })
+
+  const successBanner = await screen.findByText("Configuración y favoritos importados con éxito.")
+  assert.equal(successBanner.getAttribute("role"), "status")
+  assert.equal(local.theme, "gx")
+  assert.equal(local.accentColor, "sky")
+  assert.equal(local.pollIntervalMinutes, 10)
+  assert.equal(local.showOffline, true)
+  assert.equal(local.language, "es")
+  assert.deepEqual(local.notification_streamers, ["222"])
+})
+
+test("settings backup export triggers download and shows inline confirmation", async () => {
+  local.language = "en"
+  const pending = deferred()
+  handlers.GET_PROFILE = () => pending.promise
+
+  let written = ""
+  const prevPicker = globalThis.window.showSaveFilePicker
+  globalThis.window.showSaveFilePicker = async () => ({
+    createWritable: async () => ({
+      write: async (content) => {
+        written = content
+      },
+      close: async () => {}
+    })
+  })
+
+  try {
+    mount(SettingsPage, { showOffline: false })
+    const exportBtn = await screen.findByRole("button", { name: "- export" })
+    await act(async () => {
+      fireEvent.click(exportBtn)
+    })
+    const status = await screen.findByText("Backup exported successfully.")
+    assert.equal(status.getAttribute("role"), "status")
+    const parsed = JSON.parse(written)
+    assert.equal(parsed.app, "twitch-live-sidebar")
+    assert.equal(parsed.version, 1)
+  } finally {
+    globalThis.window.showSaveFilePicker = prevPicker
+  }
 })

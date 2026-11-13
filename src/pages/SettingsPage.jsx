@@ -6,6 +6,7 @@ import { useProfile } from "../hooks/useProfile.js"
 import AccountProfile from "../components/AccountProfile.jsx"
 import { useI18n } from "../i18n-context.js"
 import {
+  MAX_BACKUP_BYTES,
   createBackupPayload,
   exportBackupFile,
   validateBackupData,
@@ -25,23 +26,22 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
   } = usePreferences()
   const [error, setError] = useState(null)
   const [saving, setSaving] = useState(false)
-  const [feedback, setFeedback] = useState(null)
+  const [backupFeedback, setBackupFeedback] = useState(null)
   const fileInputRef = useRef(null)
 
   async function handleExport() {
     setSaving(true)
-    setError(null)
-    setFeedback(null)
+    setBackupFeedback(null)
     try {
       const payload = await createBackupPayload()
       const result = await exportBackupFile(payload)
       if (result.success) {
-        setFeedback("settings.backupExportSuccess")
+        setBackupFeedback({ type: "success", key: "settings.backupExportSuccess" })
       } else if (result.error) {
-        setError(result.error)
+        setBackupFeedback({ type: "error", key: result.error })
       }
     } catch {
-      setError("settings.backupError")
+      setBackupFeedback({ type: "error", key: "settings.backupError" })
     } finally {
       setSaving(false)
     }
@@ -51,20 +51,23 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
     const file = e.target.files?.[0]
     if (!file) return
     e.target.value = ""
+    if (file.size > MAX_BACKUP_BYTES) {
+      setBackupFeedback({ type: "error", key: "settings.backupInvalidFile" })
+      return
+    }
     setSaving(true)
-    setError(null)
-    setFeedback(null)
+    setBackupFeedback(null)
     try {
       const text = await file.text()
       const validation = validateBackupData(text)
       if (!validation.valid) {
-        setError(validation.error)
+        setBackupFeedback({ type: "error", key: validation.error })
         return
       }
       await applyBackupData(validation.data)
-      setFeedback("settings.backupSuccess")
+      setBackupFeedback({ type: "success", key: "settings.backupSuccess" })
     } catch {
-      setError("settings.backupError")
+      setBackupFeedback({ type: "error", key: "settings.backupError" })
     } finally {
       setSaving(false)
     }
@@ -138,6 +141,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
               aria-label={t("settings.language")}
               value={lang}
               onChange={(e) => changeLang(e.target.value)}
+              disabled={saving}
             >
               <option value="es">Español</option>
               <option value="en">English</option>
@@ -188,6 +192,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
               id="settings-offline-toggle"
               className={`settings-toggle ${showOffline ? "settings-toggle--on" : ""}`}
               onClick={handleToggleOffline}
+              disabled={saving}
               role="switch"
               aria-checked={showOffline}
               aria-label={t("settings.showOffline")}
@@ -271,7 +276,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
           <input
             id="settings-import-file-input"
             type="file"
-            accept=".json"
+            accept=".json,application/json"
             className="settings-file-input"
             ref={fileInputRef}
             onChange={handleFileImport}
@@ -295,9 +300,14 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
             {t("settings.export")}
           </button>
         </div>
-        {feedback && (
-          <div className="settings-backup-feedback" role="status">
-            {t(feedback)}
+        {backupFeedback && (
+          <div
+            className={`settings-backup-feedback${
+              backupFeedback.type === "error" ? " settings-backup-feedback--error" : ""
+            }`}
+            role={backupFeedback.type === "error" ? "alert" : "status"}
+          >
+            {t(backupFeedback.key)}
           </div>
         )}
       </div>

@@ -32,6 +32,7 @@
  * @typedef {{type: "SESSION_RESTORE"|"SESSION_LOGOUT"|"TWITCH_AUTH"|"GET_PROFILE"|"LOAD_CHANNELS"|"POLL_NOW"}
  * | {type: "SET_POLL_INTERVAL", minutes: number}
  * | {type: "SET_REMEMBER_SESSION", enabled: boolean}
+ * | {type: "SET_NOTIFICATIONS", ids: string[]}
  * | {type: "TOGGLE_NOTIFICATION"|"REMOVE_NOTIFICATION", broadcasterId: string}} ExtensionMessage
  */
 export {}

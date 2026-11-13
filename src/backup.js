@@ -1,17 +1,21 @@
-import { localGet, localSet, sendMessage } from "./platform.js"
+import { localGet, localRemove, localSet, sendMessage } from "./platform.js"
 import {
   POLL_INTERVAL_OPTIONS,
   THEME_OPTIONS,
   ACCENT_OPTIONS,
+  POLL_INTERVAL_KEY,
+  REMEMBER_SESSION_KEY,
   THEME_KEY,
   ACCENT_KEY,
+  normalizePollInterval,
   getPreferences
 } from "./preferences.js"
-import { NOTIFICATIONS_KEY, decodeNotificationIds, getNotificationStreamers } from "./cache.js"
+import { MAX_FAVORITES, decodeNotificationIds, getNotificationStreamers } from "./cache.js"
 
+export { MAX_FAVORITES }
 export const APP_SIGNATURE = "twitch-live-sidebar"
 export const BACKUP_VERSION = 1
-export const MAX_FAVORITES = 500
+export const MAX_BACKUP_BYTES = 256 * 1024
 
 export function formatBackupFilename(date = new Date()) {
   const local = new Date(date.getTime() - date.getTimezoneOffset() * 60_000)
@@ -34,20 +38,49 @@ export async function createBackupPayload() {
     preferences: {
       pollIntervalMinutes: preferences.pollIntervalMinutes,
       showOffline: showOffline === true,
-      rememberSession: preferences.rememberSession !== false,
+      rememberSession: preferences.rememberSession,
       theme: preferences.theme,
       accentColor: preferences.accentColor,
       language: language === "es" ? "es" : "en"
     },
-    favorites: [...favoritesSet]
+    favorites: [...favoritesSet].slice(0, MAX_FAVORITES)
   }
+}
+
+function sanitizePreferences(raw) {
+  const source = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {}
+  const clean = {}
+
+  if (POLL_INTERVAL_OPTIONS.includes(source.pollIntervalMinutes)) {
+    clean.pollIntervalMinutes = source.pollIntervalMinutes
+  }
+  if (typeof source.showOffline === "boolean") {
+    clean.showOffline = source.showOffline
+  }
+  if (typeof source.rememberSession === "boolean") {
+    clean.rememberSession = source.rememberSession
+  }
+  if (THEME_OPTIONS.includes(source.theme)) {
+    clean.theme = source.theme
+  }
+  if (ACCENT_OPTIONS.includes(source.accentColor) || source.accentColor === null) {
+    clean.accentColor = source.accentColor
+  }
+  if (source.language === "es" || source.language === "en") {
+    clean.language = source.language
+  }
+
+  return clean
 }
 
 export function validateBackupData(input) {
   let parsed = input
   if (typeof input === "string") {
+    if (input.length > MAX_BACKUP_BYTES) {
+      return { valid: false, error: "settings.backupInvalidFile" }
+    }
     try {
-      parsed = JSON.parse(input)
+      parsed = JSON.parse(input.replace(/^\uFEFF/, ""))
     } catch {
       return { valid: false, error: "settings.backupInvalidFile" }
     }
@@ -61,43 +94,16 @@ export function validateBackupData(input) {
     return { valid: false, error: "settings.backupInvalidFile" }
   }
 
-  const rawPrefs =
-    parsed.preferences &&
-    typeof parsed.preferences === "object" &&
-    !Array.isArray(parsed.preferences)
-      ? parsed.preferences
-      : {}
-
-  const cleanPrefs = {}
-
-  if (POLL_INTERVAL_OPTIONS.includes(rawPrefs.pollIntervalMinutes)) {
-    cleanPrefs.pollIntervalMinutes = rawPrefs.pollIntervalMinutes
-  }
-  if (typeof rawPrefs.showOffline === "boolean") {
-    cleanPrefs.showOffline = rawPrefs.showOffline
-  }
-  if (typeof rawPrefs.rememberSession === "boolean") {
-    cleanPrefs.rememberSession = rawPrefs.rememberSession
-  }
-  if (THEME_OPTIONS.includes(rawPrefs.theme)) {
-    cleanPrefs.theme = rawPrefs.theme
-  }
-  if (ACCENT_OPTIONS.includes(rawPrefs.accentColor) || rawPrefs.accentColor === null) {
-    cleanPrefs.accentColor = rawPrefs.accentColor
-  }
-  if (rawPrefs.language === "es" || rawPrefs.language === "en") {
-    cleanPrefs.language = rawPrefs.language
+  if (parsed.favorites !== undefined && !Array.isArray(parsed.favorites)) {
+    return { valid: false, error: "settings.backupInvalidFile" }
   }
 
-  const cleanFavs = [...new Set(decodeNotificationIds(parsed.favorites))].slice(0, MAX_FAVORITES)
-
-  return {
-    valid: true,
-    data: {
-      preferences: cleanPrefs,
-      favorites: cleanFavs
-    }
+  const data = { preferences: sanitizePreferences(parsed.preferences) }
+  if (parsed.favorites !== undefined) {
+    data.favorites = [...new Set(decodeNotificationIds(parsed.favorites))].slice(0, MAX_FAVORITES)
   }
+
+  return { valid: true, data }
 }
 
 export async function exportBackupFile(payload) {
@@ -136,7 +142,8 @@ export async function exportBackupFile(payload) {
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+    const timer = setTimeout(() => URL.revokeObjectURL(url), 1000)
+    timer?.unref?.()
     return { success: true, filename }
   }
 
@@ -144,37 +151,79 @@ export async function exportBackupFile(payload) {
 }
 
 export async function applyBackupData(sanitizedData) {
-  const { preferences, favorites } = sanitizedData
+  const input = sanitizedData && typeof sanitizedData === "object" ? sanitizedData : {}
+  const preferences = sanitizePreferences(input.preferences)
+  const hasFavorites = Array.isArray(input.favorites)
+  const favorites = hasFavorites
+    ? [...new Set(decodeNotificationIds(input.favorites))].slice(0, MAX_FAVORITES)
+    : undefined
+
+  const localKeys = [
+    THEME_KEY,
+    ACCENT_KEY,
+    "showOffline",
+    "language",
+    ...(preferences.pollIntervalMinutes !== undefined ? [POLL_INTERVAL_KEY] : []),
+    ...(preferences.rememberSession !== undefined ? [REMEMBER_SESSION_KEY] : [])
+  ]
+  const previousLocal = await localGet(localKeys)
+  const prevRememberSession = previousLocal[REMEMBER_SESSION_KEY] !== false
+
   const storageUpdate = {}
+  if (preferences.theme !== undefined) storageUpdate[THEME_KEY] = preferences.theme
+  if (preferences.accentColor !== undefined) storageUpdate[ACCENT_KEY] = preferences.accentColor
+  if (preferences.showOffline !== undefined) storageUpdate.showOffline = preferences.showOffline
+  if (preferences.language !== undefined) storageUpdate.language = preferences.language
 
-  if (preferences.pollIntervalMinutes !== undefined) {
-    await sendMessage({
-      type: "SET_POLL_INTERVAL",
-      minutes: preferences.pollIntervalMinutes
-    })
-  }
-  if (preferences.rememberSession !== undefined) {
-    await sendMessage({ type: "SET_REMEMBER_SESSION", enabled: preferences.rememberSession })
-  }
-  if (preferences.theme !== undefined) {
-    storageUpdate[THEME_KEY] = preferences.theme
-  }
-  if (preferences.accentColor !== undefined) {
-    storageUpdate[ACCENT_KEY] = preferences.accentColor
-  }
-  if (preferences.showOffline !== undefined) {
-    storageUpdate.showOffline = preferences.showOffline
-  }
-  if (preferences.language !== undefined) {
-    storageUpdate.language = preferences.language
-  }
+  let rememberChanged = false
+  let pollChanged = false
+  let localChanged = false
 
-  if (Object.keys(storageUpdate).length > 0) {
-    await localSet(storageUpdate)
-  }
-
-  if (Array.isArray(favorites)) {
-    await localSet({ [NOTIFICATIONS_KEY]: favorites })
+  try {
+    if (preferences.rememberSession !== undefined) {
+      await sendMessage({ type: "SET_REMEMBER_SESSION", enabled: preferences.rememberSession })
+      rememberChanged = true
+    }
+    if (preferences.pollIntervalMinutes !== undefined) {
+      await sendMessage({
+        type: "SET_POLL_INTERVAL",
+        minutes: preferences.pollIntervalMinutes
+      })
+      pollChanged = true
+    }
+    if (Object.keys(storageUpdate).length > 0) {
+      await localSet(storageUpdate)
+      localChanged = true
+    }
+    if (hasFavorites) {
+      await sendMessage({ type: "SET_NOTIFICATIONS", ids: favorites })
+    }
+  } catch (error) {
+    // Best-effort rollback so a partial failure does not leave mixed settings behind.
+    const rollbacks = []
+    if (localChanged) {
+      const restoreLocal = {}
+      const removeKeys = []
+      for (const key of Object.keys(storageUpdate)) {
+        if (previousLocal[key] === undefined) removeKeys.push(key)
+        else restoreLocal[key] = previousLocal[key]
+      }
+      if (Object.keys(restoreLocal).length > 0) rollbacks.push(localSet(restoreLocal))
+      if (removeKeys.length > 0) rollbacks.push(localRemove(removeKeys))
+    }
+    if (pollChanged) {
+      rollbacks.push(
+        sendMessage({
+          type: "SET_POLL_INTERVAL",
+          minutes: normalizePollInterval(previousLocal[POLL_INTERVAL_KEY])
+        })
+      )
+    }
+    if (rememberChanged) {
+      rollbacks.push(sendMessage({ type: "SET_REMEMBER_SESSION", enabled: prevRememberSession }))
+    }
+    await Promise.allSettled(rollbacks)
+    throw error
   }
 
   return true

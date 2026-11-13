@@ -4,6 +4,7 @@ import assert from "node:assert/strict"
 const mockStorage = {}
 const mockSentMessages = []
 let failMessageType = null
+let failLocalSet = false
 
 globalThis.browser = {
   runtime: {
@@ -18,6 +19,9 @@ globalThis.browser = {
       }
       if (msg.type === "SET_REMEMBER_SESSION") {
         mockStorage.rememberSession = msg.enabled
+      }
+      if (msg.type === "SET_NOTIFICATIONS") {
+        mockStorage.notification_streamers = msg.ids
       }
       return {}
     }
@@ -34,7 +38,11 @@ globalThis.browser = {
         return { ...mockStorage }
       },
       set: async (items) => {
+        if (failLocalSet) throw new Error("Storage write failed")
         Object.assign(mockStorage, items)
+      },
+      remove: async (keys) => {
+        for (const k of Array.isArray(keys) ? keys : [keys]) delete mockStorage[k]
       }
     }
   }
@@ -44,6 +52,7 @@ const {
   APP_SIGNATURE,
   BACKUP_VERSION,
   MAX_FAVORITES,
+  MAX_BACKUP_BYTES,
   formatBackupFilename,
   validateBackupData,
   exportBackupFile,
@@ -52,7 +61,7 @@ const {
 } = await import("../src/backup.js")
 
 test("formatBackupFilename formats filename with extension name and timestamp", () => {
-  const fixedDate = new Date(2026, 10, 3, 16, 30, 45) // Note: month 10 is November in JS 0-indexed Date
+  const fixedDate = new Date(2026, 10, 3, 16, 30, 45)
   const filename = formatBackupFilename(fixedDate)
   assert.equal(filename, "twitch_live_sidebar_2026-11-03_16-30-45.json")
 
@@ -88,13 +97,16 @@ test("validateBackupData validates genuine extension backup payload", () => {
   })
   assert.deepEqual(result.data.favorites, ["123456", "789012"])
 
-  // Stringified JSON parsing
   const fromString = validateBackupData(JSON.stringify(validPayload))
   assert.equal(fromString.valid, true)
   assert.deepEqual(fromString.data, result.data)
+
+  const withBom = validateBackupData(`\uFEFF${JSON.stringify(validPayload)}`)
+  assert.equal(withBom.valid, true)
+  assert.deepEqual(withBom.data, result.data)
 })
 
-test("validateBackupData rejects invalid JSON and non-objects", () => {
+test("validateBackupData rejects invalid JSON, non-objects, and oversized payloads", () => {
   assert.deepEqual(validateBackupData("{ invalid json }"), {
     valid: false,
     error: "settings.backupInvalidFile"
@@ -108,6 +120,10 @@ test("validateBackupData rejects invalid JSON and non-objects", () => {
     error: "settings.backupInvalidFile"
   })
   assert.deepEqual(validateBackupData(12345), {
+    valid: false,
+    error: "settings.backupInvalidFile"
+  })
+  assert.deepEqual(validateBackupData("x".repeat(MAX_BACKUP_BYTES + 1)), {
     valid: false,
     error: "settings.backupInvalidFile"
   })
@@ -137,38 +153,65 @@ test("validateBackupData rejects payloads from other extensions or wrong version
   })
 })
 
-test("validateBackupData filters out injection attempts and unwhitelisted values", () => {
-  const maliciousPayload = {
+test("validateBackupData filters out injection attempts, prototype keys, and unwhitelisted values", () => {
+  const rawJson = JSON.stringify({
     app: APP_SIGNATURE,
     version: BACKUP_VERSION,
     preferences: {
-      pollIntervalMinutes: 9999, // not in POLL_INTERVAL_OPTIONS
-      showOffline: "yes", // not boolean
-      rememberSession: { $gt: "" }, // injection attempt
-      theme: "<script>alert(1)</script>", // not in THEME_OPTIONS
-      accentColor: "invalid_color", // not in ACCENT_OPTIONS
-      language: "fr", // not 'es' | 'en'
-      maliciousField: "rm -rf /", // unknown property
-      __proto__: { isAdmin: true }
+      pollIntervalMinutes: 9999,
+      showOffline: "yes",
+      rememberSession: { $gt: "" },
+      theme: "<script>alert(1)</script>",
+      accentColor: "invalid_color",
+      language: "fr",
+      maliciousField: "rm -rf /"
     },
     favorites: [
       "123456",
       "789012",
-      "123456", // duplicate
-      "-45", // negative number
-      "123; DROP TABLE", // SQL injection attempt
-      "<script>alert(1)</script>", // XSS attempt
-      12345, // not string
-      null,
-      undefined
+      "123456",
+      "-45",
+      "123; DROP TABLE",
+      "<script>alert(1)</script>",
+      "9".repeat(33),
+      12345,
+      null
     ]
-  }
+  }).replace(
+    '"maliciousField":"rm -rf /"',
+    '"maliciousField":"rm -rf /","__proto__":{"isAdmin":true},"constructor":{"prototype":{"polluted":true}}'
+  )
 
-  const result = validateBackupData(maliciousPayload)
+  const result = validateBackupData(rawJson)
   assert.equal(result.valid, true)
   assert.deepEqual(result.data.preferences, {})
   assert.deepEqual(result.data.favorites, ["123456", "789012"])
   assert.equal(Object.prototype.isAdmin, undefined)
+  assert.equal(Object.prototype.polluted, undefined)
+  assert.equal(Object.hasOwn(result.data.preferences, "__proto__"), false)
+  assert.equal(Object.hasOwn(result.data.preferences, "constructor"), false)
+})
+
+test("validateBackupData handles null accentColor, omitted favorites, and invalid favorites types", () => {
+  const withNullAccent = validateBackupData({
+    app: APP_SIGNATURE,
+    version: BACKUP_VERSION,
+    preferences: { accentColor: null }
+  })
+  assert.equal(withNullAccent.valid, true)
+  assert.equal(withNullAccent.data.preferences.accentColor, null)
+  assert.equal("favorites" in withNullAccent.data, false)
+
+  const withInvalidFavs = validateBackupData({
+    app: APP_SIGNATURE,
+    version: BACKUP_VERSION,
+    preferences: {},
+    favorites: "not-an-array"
+  })
+  assert.deepEqual(withInvalidFavs, {
+    valid: false,
+    error: "settings.backupInvalidFile"
+  })
 })
 
 test("validateBackupData caps favorites at MAX_FAVORITES", () => {
@@ -232,7 +275,65 @@ test("exportBackupFile handles user cancellation gracefully", async () => {
   assert.equal(result.cancelled, true)
 })
 
-test("applyBackupData saves valid preferences and favorites to storage and background", async () => {
+test("exportBackupFile falls back to Blob download and defers revokeObjectURL", async () => {
+  const prevWindow = globalThis.window
+  const prevDocument = globalThis.document
+  const prevCreate = URL.createObjectURL
+  const prevRevoke = URL.revokeObjectURL
+  const prevSetTimeout = globalThis.setTimeout
+
+  let clicked = false
+  let revokedUrl = null
+  let scheduledDelay = null
+  let scheduledCallback = null
+  const anchor = {
+    href: "",
+    download: "",
+    click() {
+      clicked = true
+      assert.equal(revokedUrl, null)
+    }
+  }
+
+  globalThis.window = {}
+  globalThis.document = {
+    createElement: (tag) => {
+      assert.equal(tag, "a")
+      return anchor
+    },
+    body: {
+      appendChild() {},
+      removeChild() {}
+    }
+  }
+  URL.createObjectURL = () => "blob:mock-backup"
+  URL.revokeObjectURL = (url) => {
+    revokedUrl = url
+  }
+  globalThis.setTimeout = (fn, ms) => {
+    scheduledCallback = fn
+    scheduledDelay = ms
+    return { unref() {} }
+  }
+
+  try {
+    const result = await exportBackupFile({ app: APP_SIGNATURE, version: BACKUP_VERSION })
+    assert.equal(result.success, true)
+    assert.equal(clicked, true)
+    assert.equal(revokedUrl, null)
+    assert.ok(scheduledDelay >= 1000)
+    scheduledCallback()
+    assert.equal(revokedUrl, "blob:mock-backup")
+  } finally {
+    globalThis.window = prevWindow
+    globalThis.document = prevDocument
+    URL.createObjectURL = prevCreate
+    URL.revokeObjectURL = prevRevoke
+    globalThis.setTimeout = prevSetTimeout
+  }
+})
+
+test("applyBackupData saves valid preferences and favorites and preserves omitted favorites", async () => {
   for (const k of Object.keys(mockStorage)) delete mockStorage[k]
   mockSentMessages.length = 0
 
@@ -257,24 +358,52 @@ test("applyBackupData saves valid preferences and favorites to storage and backg
   assert.equal(mockStorage.showOffline, false)
   assert.equal(mockStorage.language, "es")
   assert.deepEqual(mockStorage.notification_streamers, ["111", "222"])
-
   assert.ok(mockSentMessages.some((m) => m.type === "SET_POLL_INTERVAL" && m.minutes === 10))
   assert.ok(mockSentMessages.some((m) => m.type === "SET_REMEMBER_SESSION" && m.enabled === true))
+  assert.ok(mockSentMessages.some((m) => m.type === "SET_NOTIFICATIONS"))
+
+  await applyBackupData({ preferences: { theme: "default" } })
+  assert.equal(mockStorage.theme, "default")
+  assert.deepEqual(mockStorage.notification_streamers, ["111", "222"])
 })
 
-test("applyBackupData rejects without overwriting rememberSession if migration fails", async () => {
+test("applyBackupData rolls back earlier writes when a later step fails", async () => {
   for (const k of Object.keys(mockStorage)) delete mockStorage[k]
   mockStorage.rememberSession = true
+  mockStorage.pollIntervalMinutes = 3
+  mockStorage.theme = "default"
+  mockStorage.notification_streamers = ["999"]
+
   failMessageType = "SET_REMEMBER_SESSION"
   try {
     await assert.rejects(
       applyBackupData({
-        preferences: { rememberSession: false, theme: "gx" },
+        preferences: { rememberSession: false, pollIntervalMinutes: 15, theme: "gx" },
         favorites: ["111"]
       }),
       /Migration failed/
     )
     assert.equal(mockStorage.rememberSession, true)
+    assert.equal(mockStorage.pollIntervalMinutes, 3)
+    assert.equal(mockStorage.theme, "default")
+    assert.deepEqual(mockStorage.notification_streamers, ["999"])
+  } finally {
+    failMessageType = null
+  }
+
+  failMessageType = "SET_NOTIFICATIONS"
+  try {
+    await assert.rejects(
+      applyBackupData({
+        preferences: { rememberSession: false, pollIntervalMinutes: 15, theme: "gx" },
+        favorites: ["111"]
+      }),
+      /Migration failed/
+    )
+    assert.equal(mockStorage.rememberSession, true)
+    assert.equal(mockStorage.pollIntervalMinutes, 3)
+    assert.equal(mockStorage.theme, "default")
+    assert.deepEqual(mockStorage.notification_streamers, ["999"])
   } finally {
     failMessageType = null
   }

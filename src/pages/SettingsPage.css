@@ -360,6 +360,12 @@
   border: 1px solid var(--tw-accent-glow);
 }
 
+.settings-backup-feedback--error {
+  background: var(--tw-error-bg);
+  border-color: var(--tw-error-border);
+  color: var(--tw-error-text);
+}
+
 [data-theme="gx"] .settings-backup-btn {
   background: var(--tw-surface);
   border: 1px solid color-mix(in srgb, var(--tw-accent-dark) 60%, transparent);
