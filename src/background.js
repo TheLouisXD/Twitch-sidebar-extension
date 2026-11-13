@@ -4,8 +4,10 @@ import { extension, callExtension, isFirefox, localGet, localSet } from "./platf
 import {
   CHANNELS_KEY,
   NOTIFICATIONS_KEY,
+  MAX_FAVORITES,
   clearAllCache,
   decodeChannelCache,
+  decodeNotificationIds,
   getCachedChannels,
   setCachedChannels,
   setCachedFollows,
@@ -205,7 +207,7 @@ function authenticate() {
 }
 
 function changeStreamerPreference(key, id, remove = false) {
-  if (typeof id !== "string" || !/^\d+$/.test(id)) throw new Error("Invalid broadcaster ID")
+  if (typeof id !== "string" || !/^\d{1,32}$/.test(id)) throw new Error("Invalid broadcaster ID")
   const expected = getSessionRevision()
   const task = notificationQueue.then(async () => {
     const { [key]: stored } = await localGet(key)
@@ -215,6 +217,19 @@ function changeStreamerPreference(key, id, remove = false) {
     else ids.add(id)
     await localSet({ [key]: [...ids] })
     return { active: ids.has(id) }
+  })
+  notificationQueue = task.catch(() => {})
+  return task
+}
+
+function setNotificationStreamers(ids) {
+  if (!Array.isArray(ids)) throw new Error("Invalid favorites list")
+  const clean = [...new Set(decodeNotificationIds(ids))].slice(0, MAX_FAVORITES)
+  const expected = getSessionRevision()
+  const task = notificationQueue.then(async () => {
+    assertSession(expected)
+    await localSet({ [NOTIFICATIONS_KEY]: clean })
+    return { favorites: clean }
   })
   notificationQueue = task.catch(() => {})
   return task
@@ -304,6 +319,8 @@ async function route(message) {
         throw new Error("Invalid session persistence preference")
       return setRememberSession(message.enabled)
     }
+    case "SET_NOTIFICATIONS":
+      return setNotificationStreamers(message.ids)
     case "TOGGLE_NOTIFICATION":
       return changeStreamerPreference(NOTIFICATIONS_KEY, message.broadcasterId)
     case "REMOVE_FAVORITE":

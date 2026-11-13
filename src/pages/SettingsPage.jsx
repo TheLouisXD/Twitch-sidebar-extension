@@ -1,10 +1,17 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { localSet, sendMessage } from "../platform.js"
 import { POLL_INTERVAL_OPTIONS } from "../preferences.js"
 import { usePreferences } from "../hooks/usePreferences.js"
 import { useProfile } from "../hooks/useProfile.js"
 import AccountProfile from "../components/AccountProfile.jsx"
 import { useI18n } from "../i18n-context.js"
+import {
+  MAX_BACKUP_BYTES,
+  createBackupPayload,
+  exportBackupFile,
+  validateBackupData,
+  applyBackupData
+} from "../backup.js"
 import "./SettingsPage.css"
 
 export default function SettingsPage({ onLogout, onBack, showOffline, onNotifications, onThemes }) {
@@ -19,6 +26,52 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
   } = usePreferences()
   const [error, setError] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [backupFeedback, setBackupFeedback] = useState(null)
+  const fileInputRef = useRef(null)
+
+  async function handleExport() {
+    setSaving(true)
+    setBackupFeedback(null)
+    try {
+      const payload = await createBackupPayload()
+      const result = await exportBackupFile(payload)
+      if (result.success) {
+        setBackupFeedback({ type: "success", key: "settings.backupExportSuccess" })
+      } else if (result.error) {
+        setBackupFeedback({ type: "error", key: result.error })
+      }
+    } catch {
+      setBackupFeedback({ type: "error", key: "settings.backupError" })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleFileImport(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ""
+    if (file.size > MAX_BACKUP_BYTES) {
+      setBackupFeedback({ type: "error", key: "settings.backupInvalidFile" })
+      return
+    }
+    setSaving(true)
+    setBackupFeedback(null)
+    try {
+      const text = await file.text()
+      const validation = validateBackupData(text)
+      if (!validation.valid) {
+        setBackupFeedback({ type: "error", key: validation.error })
+        return
+      }
+      await applyBackupData(validation.data)
+      setBackupFeedback({ type: "success", key: "settings.backupSuccess" })
+    } catch {
+      setBackupFeedback({ type: "error", key: "settings.backupError" })
+    } finally {
+      setSaving(false)
+    }
+  }
 
   async function handleToggleOffline() {
     const newValue = !showOffline
@@ -78,7 +131,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
       )}
 
       <AccountProfile {...profile} />
-      <div className="settings-section" style={{ marginTop: "16px" }}>
+      <div className="settings-section settings-section--spaced">
         <div className="settings-section-title">{t("settings.preferences")}</div>
         <div className="settings-info-list">
           <div className="settings-info-item">
@@ -88,6 +141,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
               aria-label={t("settings.language")}
               value={lang}
               onChange={(e) => changeLang(e.target.value)}
+              disabled={saving}
             >
               <option value="es">Español</option>
               <option value="en">English</option>
@@ -98,7 +152,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
             onClick={onThemes}
             id="settings-themes-btn"
           >
-            <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span className="settings-item-row">
               <svg
                 width="15"
                 height="15"
@@ -114,7 +168,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
               </svg>
               <span className="settings-info-label">{t("settings.theme")}</span>
             </span>
-            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <div className="settings-item-value-row">
               <span className="settings-preference-hint">
                 {theme === "gx" ? t("settings.themeGx") : t("settings.themeDefault")}
               </span>
@@ -123,14 +177,14 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
                 height="16"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                style={{ color: "var(--tw-text-secondary)", flexShrink: 0 }}
+                className="settings-chevron"
               >
                 <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
               </svg>
             </div>
           </button>
           <div className="settings-info-item">
-            <div style={{ display: "flex", flexDirection: "column" }}>
+            <div className="settings-stack">
               <span className="settings-info-label">{t("settings.showOffline")}</span>
               <span className="settings-info-label">{t("settings.showOfflineTooltip")}</span>
             </div>
@@ -138,6 +192,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
               id="settings-offline-toggle"
               className={`settings-toggle ${showOffline ? "settings-toggle--on" : ""}`}
               onClick={handleToggleOffline}
+              disabled={saving}
               role="switch"
               aria-checked={showOffline}
               aria-label={t("settings.showOffline")}
@@ -188,7 +243,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
             onClick={onNotifications}
             id="settings-notifications-btn"
           >
-            <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span className="settings-item-row">
               <svg
                 width="15"
                 height="15"
@@ -208,12 +263,53 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
               height="16"
               viewBox="0 0 24 24"
               fill="currentColor"
-              style={{ color: "var(--tw-text-secondary)", flexShrink: 0 }}
+              className="settings-chevron"
             >
               <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
             </svg>
           </button>
         </div>
+      </div>
+      <div className="settings-section settings-section--spaced">
+        <div className="settings-section-title">{t("settings.backup")}</div>
+        <div className="settings-backup-group">
+          <input
+            id="settings-import-file-input"
+            type="file"
+            accept=".json,application/json"
+            className="settings-file-input"
+            ref={fileInputRef}
+            onChange={handleFileImport}
+          />
+          <button
+            id="settings-import-btn"
+            type="button"
+            className="settings-backup-btn"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={saving}
+          >
+            {t("settings.import")}
+          </button>
+          <button
+            id="settings-export-btn"
+            type="button"
+            className="settings-backup-btn"
+            onClick={handleExport}
+            disabled={saving}
+          >
+            {t("settings.export")}
+          </button>
+        </div>
+        {backupFeedback && (
+          <div
+            className={`settings-backup-feedback${
+              backupFeedback.type === "error" ? " settings-backup-feedback--error" : ""
+            }`}
+            role={backupFeedback.type === "error" ? "alert" : "status"}
+          >
+            {t(backupFeedback.key)}
+          </div>
+        )}
       </div>
       <div className="settings-logout-section">
         <button id="settings-logout-btn" className="settings-logout-btn" onClick={onLogout}>

@@ -50,8 +50,8 @@ export default function StreamerList({
                     key={ch.user_id}
                     channel={ch}
                     isLive
-                    isNotified={notifiedIds.has(ch.user_id)}
-                    onToggleNotify={handleToggleNotify}
+                    isFavorite={notifiedIds.has(ch.user_id)}
+                    onToggleFavorite={handleToggleNotify}
                     onClick={handleCardClick}
                   />
                 ))}
@@ -73,8 +73,8 @@ export default function StreamerList({
                     key={ch.user_id}
                     channel={ch}
                     isLive
-                    isNotified={notifiedIds.has(ch.user_id)}
-                    onToggleNotify={handleToggleNotify}
+                    isFavorite={notifiedIds.has(ch.user_id)}
+                    onToggleFavorite={handleToggleNotify}
                     onClick={handleCardClick}
                   />
                 ))}
@@ -96,8 +96,8 @@ export default function StreamerList({
                 key={ch.user_id}
                 channel={ch}
                 isLive={false}
-                isNotified={notifiedIds.has(ch.user_id)}
-                onToggleNotify={handleToggleNotify}
+                isFavorite={notifiedIds.has(ch.user_id)}
+                onToggleFavorite={handleToggleNotify}
                 onClick={handleCardClick}
               />
             ))}

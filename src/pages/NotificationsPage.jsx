@@ -56,7 +56,7 @@ export default function NotificationsPage({ onBack }) {
         </button>
         <span className="notif-header-title">{t("notifications.title")}</span>
         <svg
-          className="notif-header-star notif-header-bell"
+          className="notif-header-star"
           width="18"
           height="18"
           viewBox="0 0 24 24"
@@ -87,7 +87,6 @@ export default function NotificationsPage({ onBack }) {
           hint={t("notifications.emptyHint")}
         />
       ) : (
-        /* Streamer list */
         <div className="notif-list">
           {streamers.map((ch) => (
             <div key={ch.user_id} className="notif-item">

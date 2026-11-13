@@ -1,5 +1,3 @@
-/* ── LoginPage.css ─────────────────────────────────── */
-
 .login-root {
   width: 100%;
   min-height: 100vh;
@@ -45,7 +43,6 @@
   filter: brightness(0) invert(1);
 }
 
-/* ── Text ── */
 .login-title {
   margin: 0;
   font-size: clamp(26px, 8vw, 36px);
@@ -63,7 +60,6 @@
   line-height: 1.5;
 }
 
-/* ── Error box ── */
 .login-error-box {
   width: 100%;
   background: var(--tw-error-bg);
@@ -76,7 +72,6 @@
   box-sizing: border-box;
 }
 
-/* ── Login button ── */
 .login-btn {
   width: 100%;
   background: var(--tw-text-primary);
@@ -142,7 +137,6 @@
   text-underline-offset: 2px;
 }
 
-/* ── Language Selector ── */
 .login-lang-wrap {
   position: relative;
   display: inline-flex;
@@ -236,10 +230,4 @@
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   display: inline-block;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }

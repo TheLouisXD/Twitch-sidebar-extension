@@ -32,9 +32,7 @@ export function useProfile() {
         setColors(targetProfile.colors)
         return
       }
-      // The cached data URL is preferred, but sampling must not die with it: if
-      // it cannot be read (blocked by the CSP, memory limits), fall back to the
-      // CDN avatar so the background keeps its tint.
+      // Fall back to the CDN avatar if the cached data URL cannot be read.
       const sources = [
         targetProfile.avatar_data,
         formatAvatarUrl(targetProfile.profile_image_url)
@@ -56,7 +54,6 @@ export function useProfile() {
       sample()
     }
 
-    // Listen to background cache updates from storage
     const onChanged = (changes, area) => {
       if (area !== "local" || !changes[USER_PROFILE_KEY]) return
       const updated = changes[USER_PROFILE_KEY].newValue?.profile
@@ -69,7 +66,6 @@ export function useProfile() {
       extension.storage.onChanged.addListener(onChanged)
     }
 
-    // 1. Immediately display cached profile if available to eliminate loading delay
     getCachedUserProfile()
       .then((cached) => {
         if (!active || !cached?.profile) return
@@ -79,7 +75,6 @@ export function useProfile() {
       })
       .catch(() => {})
 
-    // 2. Fetch fresh profile in background and update if changed
     sendMessage({ type: "GET_PROFILE" })
       .then(({ profile }) => {
         if (!active || !profile) return

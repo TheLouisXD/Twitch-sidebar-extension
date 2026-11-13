@@ -1,5 +1,3 @@
-/* ── TwitchCard.css ────────────────────────────────── */
-
 .tc-card {
   position: relative;
   border-radius: 8px;
@@ -40,7 +38,6 @@
   outline-offset: 2px;
 }
 
-/* Offline state */
 .tc-card--offline {
   opacity: 0.65;
 }
@@ -50,7 +47,6 @@
   border-color: var(--tw-border);
 }
 
-/* ── Avatar (cuadrado 1:1 para evitar que la foto de perfil se corte) ── */
 .tc-avatar-wrap {
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -69,12 +65,10 @@
   transition: filter 0.2s;
 }
 
-/* Grayscale para canales offline */
 .tc-avatar--offline {
   filter: grayscale(100%);
 }
 
-/* Fallback cuando no hay foto */
 .tc-avatar-fallback {
   width: 100%;
   height: 100%;
@@ -91,7 +85,6 @@
   background: var(--tw-offline-gradient);
 }
 
-/* ── Info (debajo de la foto) ── */
 .tc-info {
   position: relative;
   z-index: 2;
@@ -131,7 +124,6 @@
   text-shadow: 0 1px 3px var(--tw-ambient-text-shadow);
 }
 
-/* Name + star row */
 .tc-name-row {
   display: flex;
   align-items: center;
@@ -151,8 +143,7 @@
 }
 
 /* The star button stays clickable above the full-card channel link. */
-.tc-star-btn,
-.tc-bell-btn {
+.tc-star-btn {
   pointer-events: auto;
   position: relative;
   z-index: 2;
@@ -176,29 +167,19 @@
 }
 
 .tc-card:hover .tc-star-btn,
-.tc-card:hover .tc-bell-btn,
 .tc-star-btn:focus-visible,
-.tc-bell-btn:focus-visible,
-.tc-star-btn--active,
-.tc-bell-btn--active {
+.tc-star-btn--active {
   opacity: 1;
 }
 
-.tc-star-btn:hover,
-.tc-bell-btn:hover {
+.tc-star-btn:hover {
   transform: scale(1.25);
   background: var(--tw-overlay-hover);
 }
 
-.tc-star-btn:focus-visible,
-.tc-bell-btn:focus-visible {
+.tc-star-btn:focus-visible {
   outline: 2px solid var(--tw-accent-light);
   outline-offset: -1px;
-}
-
-.tc-star-btn--active,
-.tc-bell-btn--active {
-  opacity: 1;
 }
 
 .tc-game {
@@ -219,19 +200,18 @@
   color: var(--tw-text-muted);
 }
 
-/* ── GX Theme TwitchCard ── */
 [data-theme="gx"] .tc-card {
   border-radius: 2px;
   border: 1px solid transparent;
   background:
-    linear-gradient(#1d1d1d, #1d1d1d) padding-box,
+    linear-gradient(var(--tw-gx-panel), var(--tw-gx-panel)) padding-box,
     linear-gradient(var(--tw-accent-dark), var(--tw-accent-deep)) border-box;
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
 }
 
 [data-theme="gx"] .tc-card:not(.tc-card--offline):hover {
   background:
-    linear-gradient(#1d1d1d, #1d1d1d) padding-box,
+    linear-gradient(var(--tw-gx-panel), var(--tw-gx-panel)) padding-box,
     linear-gradient(var(--tw-accent), var(--tw-accent-dark)) border-box;
   box-shadow: 0 4px 14px color-mix(in srgb, var(--tw-accent) 40%, transparent);
 }

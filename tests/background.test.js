@@ -469,6 +469,20 @@ for (const browser of ["firefox", "chrome"]) {
     assert.equal(restarted.state.alarm.periodInMinutes, 1)
   })
 
+  test(`${browser}: SET_NOTIFICATIONS filters invalid IDs and serializes with concurrent toggles`, async () => {
+    const harness = createHarness(browser)
+    const [bulk, toggled] = await Promise.all([
+      harness.message({
+        type: "SET_NOTIFICATIONS",
+        ids: ["10", "bad", "10", "9".repeat(33), "20"]
+      }),
+      harness.message({ type: "TOGGLE_NOTIFICATION", broadcasterId: "30" })
+    ])
+    assert.deepEqual([...bulk.favorites], ["10", "20"])
+    assert.equal(toggled.active, true)
+    assert.deepEqual([...harness.local.notification_streamers], ["10", "20", "30"])
+  })
+
   test(`${browser}: invalid refresh intervals leave the saved interval and alarm intact`, async () => {
     const harness = createHarness(browser, { pollIntervalMinutes: 10 })
     await harness.settled()

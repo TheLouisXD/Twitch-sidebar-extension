@@ -99,8 +99,6 @@ export default function ThemesPage({ onBack }) {
               aria-label={`${t(item.nameKey)}${isActive ? ` (${t("themes.active")})` : ""}`}
             >
               <div className="theme-card-preview-wrap">
-                {/* Espacio para la foto del tema: cuando tengas la imagen lista,
-                    asigna su ruta en THEMES (preferences.js) en previewUrl */}
                 {item.previewUrl ? (
                   <img
                     className="theme-card-img"

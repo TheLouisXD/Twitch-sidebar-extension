@@ -15,12 +15,12 @@ export const THEMES = [
   {
     id: "default",
     nameKey: "settings.themeDefault",
-    previewUrl: "" // Espacio para la foto del tema
+    previewUrl: ""
   },
   {
     id: "gx",
     nameKey: "settings.themeGx",
-    previewUrl: "" // Espacio para la foto del tema
+    previewUrl: ""
   }
 ]
 

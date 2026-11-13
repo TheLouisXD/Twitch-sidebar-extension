@@ -7,7 +7,6 @@ export const translations = {
     "settings.error": "No se pudo cargar el perfil.",
     "settings.saveError": "No se pudieron cargar o guardar las preferencias. Inténtalo de nuevo.",
     "notifications.error": "No se pudieron actualizar los favoritos.",
-    // Login
     "login.subtitle": "¿Quieres ver quién está en Twitch sin usar Twitch /ᐠ • ˕ •マ ?",
     "login.button": "Iniciar sesión en Twitch",
     "login.connecting": "Conectando...",
@@ -15,7 +14,6 @@ export const translations = {
     "login.madeWith": "Hecho con ❤︎ por",
     "login.privacy": "Solo se solicita acceso de lectura a tus follows.",
 
-    // Main
     "main.loading": "Cargando canales...",
     "main.reloading": "Recargando canales",
     "main.favorites": "Favoritos",
@@ -27,14 +25,11 @@ export const translations = {
     "main.noLive": "Ningún canal en vivo ahora.",
     "main.settings": "Configuración",
 
-    // Search
     "search.placeholder": "Buscar canal...",
 
-    // TwitchCard
     "card.offline": "Offline",
     "card.openChannel": (name) => `Abrir el canal de ${name}`,
 
-    // Settings
     "settings.title": "Configuración",
     "settings.back": "Volver",
     "settings.account": "Cuenta",
@@ -53,8 +48,14 @@ export const translations = {
     "settings.showOffline": "Mostrar canales offline",
     "settings.showOfflineTooltip": "Muestra los canales que no están emitiendo.",
     "settings.notifications": "Canales favoritos",
+    "settings.backup": "Copia de seguridad",
+    "settings.import": "+ importar",
+    "settings.export": "- exportar",
+    "settings.backupSuccess": "Configuración y favoritos importados con éxito.",
+    "settings.backupExportSuccess": "Copia de seguridad exportada con éxito.",
+    "settings.backupInvalidFile": "El archivo no corresponde a una copia válida de la extensión.",
+    "settings.backupError": "Error al procesar el archivo.",
 
-    // Notifications page -> Favorites
     "notifications.title": "Canales favoritos",
     "notifications.empty": "No tienes canales favoritos guardados.",
     "notifications.emptyHint": "Marca la ⭐ en cualquier canal para agregarlo a favoritos.",
@@ -64,7 +65,6 @@ export const translations = {
     "notifications.bell.activate": "Marcar como favorito",
     "notifications.bell.deactivate": "Quitar de favoritos",
 
-    // Themes page
     "themes.title": "Temas",
     "themes.active": "Activo",
     "themes.preview": "Vista previa",
@@ -87,7 +87,6 @@ export const translations = {
     "settings.error": "Could not load the profile.",
     "settings.saveError": "Could not load or save preferences. Please try again.",
     "notifications.error": "Could not update favorites.",
-    // Login
     "login.subtitle": "See who is live on Twitch without opening Twitch /ᐠ • ˕ •マ ?",
     "login.button": "Sign in with Twitch",
     "login.connecting": "Connecting...",
@@ -95,7 +94,6 @@ export const translations = {
     "login.madeWith": "made with ❤︎ by",
     "login.privacy": "Only read access to your follows is requested.",
 
-    // Main
     "main.loading": "Loading channels...",
     "main.reloading": "Reloading channels",
     "main.favorites": "Favorites",
@@ -107,14 +105,11 @@ export const translations = {
     "main.noLive": "No channels live right now.",
     "main.settings": "Settings",
 
-    // Search
     "search.placeholder": "Search channel...",
 
-    // TwitchCard
     "card.offline": "Offline",
     "card.openChannel": (name) => `Open ${name}'s channel`,
 
-    // Settings
     "settings.title": "Settings",
     "settings.back": "Back",
     "settings.account": "Account",
@@ -133,8 +128,14 @@ export const translations = {
     "settings.showOffline": "Show offline channels",
     "settings.showOfflineTooltip": "Shows channels that are not streaming.",
     "settings.notifications": "Favorite channels",
+    "settings.backup": "Backup",
+    "settings.import": "+ import",
+    "settings.export": "- export",
+    "settings.backupSuccess": "Settings and favorites imported successfully.",
+    "settings.backupExportSuccess": "Backup exported successfully.",
+    "settings.backupInvalidFile": "The file is not a valid extension backup.",
+    "settings.backupError": "Error processing backup file.",
 
-    // Notifications page -> Favorites
     "notifications.title": "Favorite channels",
     "notifications.empty": "You don't have any favorite channels saved.",
     "notifications.emptyHint": "Mark the ⭐ on any streamer card to add to favorites.",
@@ -144,7 +145,6 @@ export const translations = {
     "notifications.bell.activate": "Add to favorites",
     "notifications.bell.deactivate": "Remove from favorites",
 
-    // Themes page
     "themes.title": "Themes",
     "themes.active": "Active",
     "themes.preview": "Preview",

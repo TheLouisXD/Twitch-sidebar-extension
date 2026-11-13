@@ -5,6 +5,7 @@ export const FOLLOWS_KEY = "twitch_follows_cache"
 export const PROFILES_KEY = "twitch_profiles_cache"
 export const USER_PROFILE_KEY = "twitch_user_profile_cache"
 export const NOTIFICATIONS_KEY = "notification_streamers"
+export const MAX_FAVORITES = 500
 export const EMPTY_NOTIFICATION_IDS = []
 export const FOLLOWS_TTL = 60 * 60 * 1000
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
@@ -73,7 +74,9 @@ export function setCachedFollows(follows, userId = null) {
 }
 
 export function decodeNotificationIds(ids) {
-  return Array.isArray(ids) ? ids.filter((id) => typeof id === "string" && /^\d+$/.test(id)) : []
+  return Array.isArray(ids)
+    ? ids.filter((id) => typeof id === "string" && /^\d{1,32}$/.test(id))
+    : []
 }
 
 export async function setCachedChannels(data) {
@@ -119,10 +122,6 @@ export async function getNotificationStreamers() {
 // All read/modify/write operations run in the background, shared by all sidebars.
 export async function toggleNotificationStreamer(broadcasterId) {
   return (await sendMessage({ type: "TOGGLE_NOTIFICATION", broadcasterId })).active
-}
-
-export function removeNotificationStreamer(broadcasterId) {
-  return sendMessage({ type: "REMOVE_NOTIFICATION", broadcasterId })
 }
 
 export function removeFavoriteStreamer(broadcasterId) {
