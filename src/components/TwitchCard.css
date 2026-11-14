@@ -1,5 +1,6 @@
 .tc-card {
   position: relative;
+  min-width: 0;
   border-radius: 8px;
   overflow: hidden;
   background: var(--tw-surface);
@@ -47,6 +48,13 @@
   border-color: var(--tw-border);
 }
 
+.tc-media {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
 .tc-avatar-wrap {
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -60,6 +68,8 @@
 .tc-avatar {
   width: 100%;
   height: 100%;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: cover;
   display: block;
   transition: filter 0.2s;
@@ -88,6 +98,7 @@
 .tc-info {
   position: relative;
   z-index: 2;
+  min-width: 0;
   pointer-events: none;
   isolation: isolate;
   overflow: hidden;
@@ -124,15 +135,7 @@
   text-shadow: 0 1px 3px var(--tw-ambient-text-shadow);
 }
 
-.tc-name-row {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  min-width: 0;
-}
-
 .tc-name {
-  flex: 1;
   min-width: 0;
   font-size: 12px;
   font-weight: 700;
@@ -142,44 +145,61 @@
   text-overflow: ellipsis;
 }
 
-/* The star button stays clickable above the full-card channel link. */
+/* The star button stays in the top-right corner above the full-card channel link. */
 .tc-star-btn {
   pointer-events: auto;
-  position: relative;
-  z-index: 2;
-  background: none;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 3;
+  background: rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(2px);
   border: none;
   cursor: pointer;
-  padding: 4px;
-  min-inline-size: 24px;
-  min-block-size: 24px;
+  padding: 0;
+  width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border-radius: 4px;
-  opacity: 0.5;
+  border-radius: 6px;
+  color: #efeff1;
+  opacity: 0;
   transition:
-    opacity 0.15s,
-    transform 0.15s,
-    background 0.15s;
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    background 0.15s ease;
   line-height: 0;
 }
 
+.tc-star-btn::before {
+  content: "";
+  position: absolute;
+  inset: -9px;
+}
+
 .tc-card:hover .tc-star-btn,
+.tc-card:focus-within .tc-star-btn,
 .tc-star-btn:focus-visible,
 .tc-star-btn--active {
   opacity: 1;
 }
 
+@media (hover: none) {
+  .tc-star-btn {
+    opacity: 0.9;
+  }
+}
+
 .tc-star-btn:hover {
-  transform: scale(1.25);
-  background: var(--tw-overlay-hover);
+  transform: scale(1.16);
+  background: rgba(15, 23, 42, 0.78);
 }
 
 .tc-star-btn:focus-visible {
   outline: 2px solid var(--tw-accent-light);
-  outline-offset: -1px;
+  outline-offset: 1px;
 }
 
 .tc-game {
@@ -191,6 +211,9 @@
 }
 
 .tc-viewers {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   font-size: 10.5px;
   color: var(--tw-text-secondary);
 }
@@ -226,4 +249,129 @@
 
 [data-theme="gx"] .tc-viewers {
   font-size: 10px;
+}
+
+[data-theme="aero"] .tc-card {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+}
+
+[data-theme="aero"] .tc-card:hover {
+  box-shadow: none;
+}
+
+[data-theme="aero"] .tc-card:focus-within {
+  outline: 2px solid var(--tw-accent-dark);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+[data-theme="aero"] .tc-card--offline {
+  opacity: 0.68;
+}
+
+[data-theme="aero"] .tc-media {
+  filter: drop-shadow(0 2px 5px rgba(15, 45, 78, 0.16));
+}
+
+[data-theme="aero"] .tc-avatar-wrap {
+  padding: 9.5%;
+  overflow: visible;
+}
+
+[data-theme="aero"] .tc-avatar,
+[data-theme="aero"] .tc-avatar-fallback {
+  border-radius: 4px;
+  border: 1px solid rgba(40, 82, 120, 0.34);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.65),
+    inset 0 1px 2px rgba(0, 0, 0, 0.16);
+}
+
+[data-theme="aero"] .tc-star-btn {
+  top: -4px;
+  right: -4px;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  backdrop-filter: none;
+  color: #0f172a;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+}
+
+[data-theme="aero"] .tc-star-btn::before {
+  inset: -8px;
+}
+
+[data-theme="aero"] .tc-star-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+[data-theme="aero"] .tc-star-btn:not(.tc-star-btn--active) svg {
+  fill: rgba(255, 255, 255, 0.94);
+  stroke: #0f172a;
+}
+
+[data-theme="aero"] .tc-star-btn--active svg {
+  fill: #facc15;
+  stroke: #713f12;
+}
+
+[data-theme="aero"] .tc-star-btn:hover {
+  background: transparent;
+}
+
+[data-theme="aero"] .tc-star-btn:focus-visible {
+  outline-color: var(--tw-accent-dark);
+}
+
+[data-theme="aero"] .tc-ambient {
+  display: none;
+}
+
+[data-theme="aero"] .tc-info {
+  padding: 4px 2px 0;
+  text-align: center;
+  align-items: center;
+  gap: 1px;
+}
+
+[data-theme="aero"] .tc-info--ambient > :not(.tc-ambient) {
+  text-shadow: none;
+}
+
+[data-theme="aero"] .tc-name,
+[data-theme="aero"] .tc-game,
+[data-theme="aero"] .tc-viewers,
+[data-theme="aero"] .tc-offline-label {
+  width: 100%;
+}
+
+[data-theme="aero"] .tc-viewers {
+  justify-content: center;
+}
+
+[data-theme="aero"] .tc-name {
+  font-size: 11px;
+}
+
+[data-theme="aero"] .tc-game,
+[data-theme="aero"] .tc-viewers,
+[data-theme="aero"] .tc-offline-label {
+  font-size: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tc-card,
+  .tc-star-btn {
+    transition: opacity 0.1s ease;
+  }
+
+  .tc-card:hover,
+  .tc-star-btn:hover {
+    transform: none;
+  }
 }

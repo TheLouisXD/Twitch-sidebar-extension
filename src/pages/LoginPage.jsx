@@ -25,7 +25,13 @@ export default function LoginPage({ onLogin, initialError }) {
   return (
     <div className="login-root">
       <main className="login-box">
-        <img className="login-logo" src="./icons/icon128.png" alt="Twitch Sidebar Icon" />
+        <img
+          className="login-logo"
+          src="./icons/icon128.png"
+          alt="Twitch Sidebar Icon"
+          width="128"
+          height="128"
+        />
         <h1 className="login-title">Twitch Sidebar</h1>
         <p className="login-subtitle">{t("login.subtitle")}</p>
         {(error || initialError) && (

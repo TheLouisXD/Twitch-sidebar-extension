@@ -17,7 +17,7 @@
  * @typedef {object} Preferences
  * @property {number} pollIntervalMinutes
  * @property {boolean} rememberSession
- * @property {"default"|"gx"} theme
+ * @property {"default"|"gx"|"aero"} theme
  * @property {AccentColor|null} accentColor
  *
  * @typedef {"red"|"blue"|"purple"|"yellow"|"orange"|"green"|"sky"} AccentColor

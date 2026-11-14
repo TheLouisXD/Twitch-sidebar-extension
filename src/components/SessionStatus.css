@@ -31,3 +31,13 @@
   background: var(--tw-surface);
   color: var(--tw-text-primary);
 }
+
+[data-theme="aero"] .session-status {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--tw-accent) 18%, var(--tw-bg)) 0%,
+    var(--tw-bg-mid) 40%,
+    var(--tw-bg-bot) 100%
+  );
+  color: var(--tw-text-primary);
+}

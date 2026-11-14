@@ -1,6 +1,6 @@
 import { useState, useRef } from "react"
 import { localSet, sendMessage } from "../platform.js"
-import { POLL_INTERVAL_OPTIONS } from "../preferences.js"
+import { POLL_INTERVAL_OPTIONS, THEMES } from "../preferences.js"
 import { usePreferences } from "../hooks/usePreferences.js"
 import { useProfile } from "../hooks/useProfile.js"
 import AccountProfile from "../components/AccountProfile.jsx"
@@ -117,7 +117,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
           onClick={onBack}
           aria-label={t("settings.back")}
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
           </svg>
         </button>
@@ -162,6 +162,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
                 strokeWidth="2.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                aria-hidden="true"
               >
                 <circle cx="12" cy="12" r="10" />
                 <path d="M12 2a10 10 0 0 1 0 20v-20z" fill="var(--tw-text-secondary)" />
@@ -170,7 +171,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
             </span>
             <div className="settings-item-value-row">
               <span className="settings-preference-hint">
-                {theme === "gx" ? t("settings.themeGx") : t("settings.themeDefault")}
+                {t(THEMES.find((item) => item.id === theme)?.nameKey ?? "settings.themeDefault")}
               </span>
               <svg
                 width="16"
@@ -178,6 +179,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
                 viewBox="0 0 24 24"
                 fill="currentColor"
                 className="settings-chevron"
+                aria-hidden="true"
               >
                 <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
               </svg>
@@ -253,6 +255,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
                 strokeWidth="2.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                aria-hidden="true"
               >
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
               </svg>
@@ -264,6 +267,7 @@ export default function SettingsPage({ onLogout, onBack, showOffline, onNotifica
               viewBox="0 0 24 24"
               fill="currentColor"
               className="settings-chevron"
+              aria-hidden="true"
             >
               <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
             </svg>

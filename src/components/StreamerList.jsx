@@ -24,64 +24,58 @@ export default function StreamerList({
     }
   }
 
-  const hasFavorites = favoriteChannels.length > 0
-  const hasRegularLive = regularLiveChannels.length > 0
-  const hasAnyLive = hasFavorites || hasRegularLive
+  const liveChannels = [...favoriteChannels, ...regularLiveChannels]
+  const hasAnyLive = liveChannels.length > 0
   const hasVisibleOffline = Boolean(showOffline) && filteredOffline.length > 0
   const hasVisibleResults = hasAnyLive || hasVisibleOffline
 
   return (
     <div className="main-scroll">
       {!hasVisibleResults ? (
-        <EmptyState icon="🎮" message={query ? t("main.noResults", query) : t("main.noLive")} />
+        <EmptyState
+          icon={
+            <svg
+              width="34"
+              height="34"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="2" y="6" width="20" height="12" rx="4" />
+              <path d="M6 12h4M8 10v4" />
+              <circle cx="15.5" cy="11" r="0.8" fill="currentColor" />
+              <circle cx="17.5" cy="13" r="0.8" fill="currentColor" />
+            </svg>
+          }
+          message={query ? t("main.noResults", query) : t("main.noLive")}
+        />
       ) : (
-        <>
-          {hasFavorites && (
-            <div className="main-favorites-section">
-              <div className="main-section-row main-section-row--favorites">
-                <span className="main-section-title">{t("main.favorites")}</span>
-                <span className="main-badge main-badge--favorites" title={t("main.favoritesCount")}>
-                  {favoriteChannels.length}
-                </span>
-              </div>
-              <div className="main-grid">
-                {favoriteChannels.map((ch) => (
-                  <TwitchCard
-                    key={ch.user_id}
-                    channel={ch}
-                    isLive
-                    isFavorite={notifiedIds.has(ch.user_id)}
-                    onToggleFavorite={handleToggleNotify}
-                    onClick={handleCardClick}
-                  />
-                ))}
-              </div>
+        hasAnyLive && (
+          <div className="main-live-section">
+            <div className="main-section-row">
+              <span className="main-section-title">{t("main.live")}</span>
+              <span className="main-badge" title={t("main.liveCount")}>
+                {liveChannels.length}
+              </span>
             </div>
-          )}
-
-          {hasRegularLive && (
-            <div className="main-live-section">
-              <div className="main-section-row">
-                <span className="main-section-title">{t("main.live")}</span>
-                <span className="main-badge" title={t("main.liveCount")}>
-                  {regularLiveChannels.length}
-                </span>
-              </div>
-              <div className="main-grid">
-                {regularLiveChannels.map((ch) => (
-                  <TwitchCard
-                    key={ch.user_id}
-                    channel={ch}
-                    isLive
-                    isFavorite={notifiedIds.has(ch.user_id)}
-                    onToggleFavorite={handleToggleNotify}
-                    onClick={handleCardClick}
-                  />
-                ))}
-              </div>
+            <div className="main-grid">
+              {liveChannels.map((ch) => (
+                <TwitchCard
+                  key={ch.user_id}
+                  channel={ch}
+                  isLive
+                  isFavorite={notifiedIds.has(ch.user_id)}
+                  onToggleFavorite={handleToggleNotify}
+                  onClick={handleCardClick}
+                />
+              ))}
             </div>
-          )}
-        </>
+          </div>
+        )
       )}
 
       {hasVisibleOffline && (

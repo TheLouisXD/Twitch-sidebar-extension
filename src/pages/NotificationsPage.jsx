@@ -50,7 +50,7 @@ export default function NotificationsPage({ onBack }) {
           onClick={onBack}
           aria-label={t("settings.back")}
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
           </svg>
         </button>
@@ -65,6 +65,7 @@ export default function NotificationsPage({ onBack }) {
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
+          aria-hidden="true"
         >
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
         </svg>
@@ -78,11 +79,25 @@ export default function NotificationsPage({ onBack }) {
 
       {loading ? (
         <div className="notif-loading">
-          <div className="notif-spinner" />
+          <div className="notif-spinner" role="status" aria-label={t("main.loading")} />
         </div>
       ) : streamers.length === 0 ? (
         <EmptyState
-          icon="⭐"
+          icon={
+            <svg
+              width="34"
+              height="34"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
+          }
           message={t("notifications.empty")}
           hint={t("notifications.emptyHint")}
         />
@@ -96,6 +111,8 @@ export default function NotificationsPage({ onBack }) {
                     className="notif-avatar"
                     src={formatAvatarUrl(ch.profile_image_url)}
                     alt={ch.user_name}
+                    width="40"
+                    height="40"
                     loading="lazy"
                     decoding="async"
                   />
@@ -127,6 +144,7 @@ export default function NotificationsPage({ onBack }) {
                   strokeWidth="1"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  aria-hidden="true"
                 >
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                 </svg>

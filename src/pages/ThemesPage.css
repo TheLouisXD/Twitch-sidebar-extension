@@ -15,9 +15,9 @@
 
 .themes-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  padding: 14px 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 14px;
   align-content: start;
 }
 
@@ -167,12 +167,17 @@
   color: #fa1e4e;
 }
 
+.theme-card-placeholder--aero {
+  background: linear-gradient(180deg, #9bd3f5 0%, #dbeffb 48%, #f5fafe 100%);
+  color: #0369a1;
+}
+
 .theme-card-placeholder-label {
   font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .theme-card-badge {
@@ -231,4 +236,45 @@
     linear-gradient(var(--tw-gx-panel), var(--tw-gx-panel)) padding-box,
     linear-gradient(var(--tw-accent), var(--tw-accent-dark)) border-box;
   box-shadow: 0 0 12px var(--tw-accent-glow);
+}
+
+[data-theme="aero"] .themes-header-icon {
+  color: var(--tw-accent-deep);
+}
+
+[data-theme="aero"] .themes-back-btn:focus-visible {
+  outline-color: var(--tw-accent-dark);
+}
+
+[data-theme="aero"] .theme-card,
+[data-theme="aero"] .accent-panel {
+  background: var(--tw-surface);
+  border: 1px solid var(--tw-border);
+  border-radius: 10px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 2px 8px var(--tw-shadow);
+}
+
+[data-theme="aero"] .theme-card--active {
+  border-color: var(--tw-accent-dark);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 0 0 2px var(--tw-accent-glow);
+}
+
+[data-theme="aero"] .theme-card--active .theme-card-status {
+  color: color-mix(in srgb, var(--tw-accent-deep) 55%, var(--tw-accent-dark));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-card,
+  .accent-option {
+    transition: none;
+  }
+
+  .theme-card:hover,
+  .accent-option:hover:not(:disabled) {
+    transform: none;
+  }
 }
