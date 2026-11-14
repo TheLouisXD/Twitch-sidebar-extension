@@ -8,7 +8,7 @@ export const DEFAULT_POLL_INTERVAL = 3
 export const DEFAULT_THEME = "default"
 export const DEFAULT_ACCENT = null
 export const POLL_INTERVAL_OPTIONS = [1, 2, 3, 5, 10, 15, 30, 60]
-export const THEME_OPTIONS = ["default", "gx"]
+export const THEME_OPTIONS = ["default", "gx", "aero"]
 export const ACCENT_OPTIONS = ["red", "blue", "purple", "yellow", "orange", "green", "sky"]
 
 export const THEMES = [
@@ -21,11 +21,16 @@ export const THEMES = [
     id: "gx",
     nameKey: "settings.themeGx",
     previewUrl: ""
+  },
+  {
+    id: "aero",
+    nameKey: "settings.themeAero",
+    previewUrl: ""
   }
 ]
 
 // Until the user picks a color, each theme keeps the accent it already had.
-export const DEFAULT_ACCENTS = { default: "purple", gx: "red" }
+export const DEFAULT_ACCENTS = { default: "purple", gx: "red", aero: "sky" }
 
 function accentVars(base, hover, light, dark, onAccent, glow, deep) {
   return {

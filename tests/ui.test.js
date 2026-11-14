@@ -464,13 +464,16 @@ test("accent save errors use the preferences error banner", async () => {
   }
 })
 
-test("settings profile renders cached avatar and followers, and does not render account type or creation date", async () => {
+test("settings profile renders cached avatar and inline followers without @username or separate Account section", async () => {
   mount(SettingsPage, { showOffline: false })
   assert.ok(await screen.findByText("Tester"))
   const img = screen.getByAltText("Tester")
   assert.ok(img)
   assert.equal(img.src, "https://static-cdn.jtvnw.net/tester.png")
-  assert.ok(screen.getByText("Followers"))
+  assert.ok(screen.getByText("-- followers"))
+  assert.equal(dom.window.document.querySelector(".settings-login"), null)
+  assert.equal(screen.queryByText("@tester"), null)
+  assert.equal(screen.queryByText("Account"), null)
   assert.equal(screen.queryByText("Type"), null)
   assert.equal(screen.queryByText("Tipo"), null)
   assert.equal(screen.queryByText("Created"), null)
@@ -498,11 +501,11 @@ test("settings profile uses cached profile instantly without showing a loading s
   assert.ok(await screen.findByText("CachedUser"))
   const img = screen.getByAltText("CachedUser")
   assert.equal(img.src, "https://static-cdn.jtvnw.net/cached.png")
-  assert.ok(screen.getByText("1234"))
+  assert.ok(screen.getByText("1234 followers"))
   assert.equal(screen.queryByLabelText("Loading channels..."), null)
 })
 
-test("favorite live channels appear in a dedicated Favorites section and are excluded from regular live list", async () => {
+test("favorite live channels share the unified Live section sorted before non-favorites", async () => {
   const channel2 = {
     user_id: "2",
     user_login: "channel2",
@@ -513,36 +516,54 @@ test("favorite live channels appear in a dedicated Favorites section and are exc
     viewer_count: 50
   }
   local.twitch_channels_cache = {
-    data: { live: [channel, channel2], offline: [] },
+    data: { live: [channel2, channel], offline: [] },
     ts: Date.now()
   }
   local.notification_streamers = ["1"]
 
   mount(App)
-  assert.ok(await screen.findByText("Favorites"))
-  const favoritesSection = dom.window.document.querySelector(".main-favorites-section")
-  assert.ok(favoritesSection)
-  assert.ok(favoritesSection.textContent.includes("Channel One"))
-  assert.ok(!favoritesSection.textContent.includes("Channel Two"))
+  assert.ok(await screen.findByText("Live"))
+  assert.equal(dom.window.document.querySelector(".main-favorites-section"), null)
+  assert.equal(screen.queryByText("Favorites"), null)
 
   const liveSection = dom.window.document.querySelector(".main-live-section")
   assert.ok(liveSection)
-  assert.ok(liveSection.textContent.includes("Channel Two"))
-  assert.ok(!liveSection.textContent.includes("Channel One"))
+  const cardNames = () =>
+    Array.from(liveSection.querySelectorAll(".tc-name")).map((node) => node.textContent)
+  assert.deepEqual(cardNames(), ["Channel One", "Channel Two"])
+  assert.equal(liveSection.querySelector(".main-badge")?.textContent, "2")
 
   await act(async () => {
     changeStorage({ notification_streamers: [] })
   })
-  assert.equal(screen.queryByText("Favorites"), null)
-  const fullLiveSection = dom.window.document.querySelector(".main-live-section")
-  assert.ok(fullLiveSection.textContent.includes("Channel One"))
-  assert.ok(fullLiveSection.textContent.includes("Channel Two"))
+  assert.deepEqual(cardNames(), ["Channel Two", "Channel One"])
 
   await act(async () => {
     changeStorage({ notification_streamers: ["1", "2"] })
   })
-  assert.ok(screen.getByText("Favorites"))
-  assert.equal(screen.queryByText("Live"), null)
+  assert.ok(screen.getByText("Live"))
+  assert.equal(screen.queryByText("Favorites"), null)
+  assert.deepEqual(cardNames(), ["Channel Two", "Channel One"])
+})
+
+test("ThemesPage offers Aero and applies Aero default sky accent and data-theme", async () => {
+  mount(App)
+  const rootElement = dom.window.document.documentElement
+  await act(async () => {
+    changeStorage({ theme: "aero" })
+  })
+  await waitFor(() => assert.equal(rootElement.getAttribute("data-theme"), "aero"))
+  await waitFor(() => assert.equal(rootElement.style.getPropertyValue("--tw-accent"), "#0ea5e9"))
+  cleanup()
+
+  mount(ThemesPage)
+  const aeroCard = await screen.findByRole("radio", { name: /Aero/i })
+  assert.equal(aeroCard.getAttribute("aria-checked"), "true")
+  const gxCard = screen.getByRole("radio", { name: /GX/i })
+  await userEvent.click(gxCard)
+  assert.equal(local.theme, "gx")
+  await userEvent.click(aeroCard)
+  assert.equal(local.theme, "aero")
 })
 
 test("login page renders English texts, the privacy note and the author link", async () => {
@@ -610,7 +631,7 @@ test("settings profile updates seamlessly in background when cache changes witho
   assert.ok(await screen.findByText("CachedUser"))
   const img = screen.getByAltText("CachedUser")
   assert.equal(img.src, "data:image/png;base64,AAA")
-  assert.ok(screen.getByText("100"))
+  assert.ok(screen.getByText("100 followers"))
   assert.equal(screen.queryByRole("status"), null)
 
   await act(async () => {
@@ -632,7 +653,7 @@ test("settings profile updates seamlessly in background when cache changes witho
   assert.ok(screen.getByText("UpdatedUser"))
   const updatedImg = screen.getByAltText("UpdatedUser")
   assert.equal(updatedImg.src, "data:image/png;base64,BBB")
-  assert.ok(screen.getByText("5000"))
+  assert.ok(screen.getByText("5000 followers"))
   assert.equal(screen.queryByRole("status"), null)
 })
 
@@ -749,10 +770,19 @@ test("settings stays functional without a gradient when every avatar source fail
     const root = dom.window.document.querySelector(".settings-root")
     assert.equal(root.style.getPropertyValue("--profile-tint"), "")
     assert.equal(root.style.getPropertyValue("--profile-dark"), "")
-    assert.ok(screen.getByText("Followers"))
+    assert.ok(screen.getByText("3 followers"))
   } finally {
     globalThis.Image = originalImage
   }
+})
+
+test("TwitchCard places star button inside .tc-media outside .tc-info", () => {
+  mount(TwitchCard, { channel, isLive: true, isFavorite: false, onClick: () => {} })
+  const media = dom.window.document.querySelector(".tc-media")
+  const info = dom.window.document.querySelector(".tc-info")
+  const starBtn = screen.getByRole("button", { name: "Add to favorites: Channel One" })
+  assert.ok(media.contains(starBtn))
+  assert.equal(info.contains(starBtn), false)
 })
 
 test("settings root applies profile dynamic tint and dark colors from profile", async () => {

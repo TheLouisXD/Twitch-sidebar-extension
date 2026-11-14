@@ -24,33 +24,28 @@ export default function AccountProfile({ user, loading, error }) {
       </div>
     )
   return (
-    <>
-      <div className="settings-profile">
-        <div className="settings-avatar-wrap">
-          {avatarSrc ? (
-            <img
-              className="settings-avatar"
-              src={avatarSrc}
-              alt={user?.display_name ?? ""}
-              decoding="async"
-              onError={() => setFailedAvatars((current) => new Set(current).add(avatarSrc))}
-            />
-          ) : (
-            <div className="settings-avatar-placeholder" />
-          )}
-        </div>
-        <span className="settings-username">{user?.display_name ?? "—"}</span>
-        <span className="settings-login">@{user?.login ?? "—"}</span>
+    <div className="settings-profile">
+      <div className="settings-avatar-wrap aero-glass-frame">
+        {avatarSrc ? (
+          <img
+            className="settings-avatar"
+            src={avatarSrc}
+            alt={user?.display_name ?? ""}
+            width="120"
+            height="120"
+            decoding="async"
+            onError={() => setFailedAvatars((current) => new Set(current).add(avatarSrc))}
+          />
+        ) : (
+          <div className="settings-avatar-placeholder" />
+        )}
       </div>
-      <div className="settings-section">
-        <div className="settings-section-title">{t("settings.account")}</div>
-        <div className="settings-info-list">
-          <div className="settings-info-item">
-            <span className="settings-info-label">{t("settings.followers")}</span>
-            <span className="settings-info-value">{user?.followers ?? "—"}</span>
-          </div>
-        </div>
-      </div>
-    </>
+      <span className="settings-username">{user?.display_name ?? "--"}</span>
+      <span className="settings-followers">
+        {user?.followers != null
+          ? t("settings.followersCount", user.followers)
+          : `-- ${t("settings.followers").toLowerCase()}`}
+      </span>
+    </div>
   )
 }

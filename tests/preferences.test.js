@@ -40,6 +40,7 @@ test("stored intervals use supported choices with a three-minute default", () =>
 test("stored themes use supported choices with a default fallback", () => {
   assert.equal(normalizeTheme("default"), "default")
   assert.equal(normalizeTheme("gx"), "gx")
+  assert.equal(normalizeTheme("aero"), "aero")
   for (const value of [undefined, null, "", "dark", "light", 123])
     assert.equal(normalizeTheme(value), "default")
 })
@@ -75,6 +76,8 @@ test("accent definitions cover every option with the full set of CSS variables",
 test("the effective accent falls back to each theme's current color", () => {
   assert.equal(getEffectiveAccent(null, "default"), "purple")
   assert.equal(getEffectiveAccent(undefined, "gx"), "red")
+  assert.equal(getEffectiveAccent(null, "aero"), "sky")
   assert.equal(getEffectiveAccent("blue", "default"), "blue")
   assert.equal(getEffectiveAccent("blue", "gx"), "blue")
+  assert.equal(getEffectiveAccent("blue", "aero"), "blue")
 })

@@ -58,7 +58,7 @@ export default function ThemesPage({ onBack }) {
           onClick={onBack}
           aria-label={t("settings.back")}
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
           </svg>
         </button>
@@ -73,6 +73,7 @@ export default function ThemesPage({ onBack }) {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
+          aria-hidden="true"
         >
           <circle cx="12" cy="12" r="10" />
           <path d="M12 2a10 10 0 0 1 0 20v-20z" fill="currentColor" />
@@ -118,6 +119,7 @@ export default function ThemesPage({ onBack }) {
                       strokeWidth="1.7"
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      aria-hidden="true"
                     >
                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                       <circle cx="8.5" cy="8.5" r="1.5" />
@@ -137,6 +139,7 @@ export default function ThemesPage({ onBack }) {
                       strokeWidth="3.2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      aria-hidden="true"
                     >
                       <polyline points="20 6 9 17 4 12" />
                     </svg>

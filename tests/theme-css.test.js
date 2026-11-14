@@ -36,3 +36,34 @@ test("every accent defines a distinct deep tone for GX gradients", () => {
   assert.equal(new Set(deepTones).size, ACCENTS.length)
   for (const tone of deepTones) assert.match(tone, /^#[0-9a-f]{6}$/i)
 })
+
+test("Aero theme styles cover core views and respect light color-scheme", () => {
+  const indexCss = readCss("index.css")
+  assert.match(indexCss, /\[data-theme="aero"\]\s*\{[\s\S]*color-scheme:\s*light;/)
+
+  for (const file of [
+    "pages/MainPage.css",
+    "pages/SettingsPage.css",
+    "pages/ThemesPage.css",
+    "pages/NotificationsPage.css",
+    "pages/LoginPage.css",
+    "components/SearchBar.css",
+    "components/TwitchCard.css",
+    "components/SessionStatus.css"
+  ]) {
+    const css = readCss(file)
+    assert.match(css, /\[data-theme="aero"\]/, `${file} is missing Aero theme rules`)
+  }
+})
+
+test("favorite star button is top-right and hover-to-reveal while keeping active favorites visible", () => {
+  const cardCss = readCss("components/TwitchCard.css")
+  assert.match(
+    cardCss,
+    /\.tc-star-btn\s*\{[\s\S]*position:\s*absolute;[\s\S]*top:\s*4px;[\s\S]*right:\s*4px;/
+  )
+  assert.match(cardCss, /\.tc-star-btn\s*\{[\s\S]*opacity:\s*0;/)
+  assert.match(cardCss, /\.tc-card:hover\s+\.tc-star-btn/)
+  assert.match(cardCss, /\.tc-card:focus-within\s+\.tc-star-btn/)
+  assert.match(cardCss, /\.tc-star-btn--active\s*\{[\s\S]*opacity:\s*1;/)
+})
