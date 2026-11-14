@@ -404,9 +404,9 @@
 }
 
 [data-theme="aero"] .settings-avatar-wrap {
-  width: 148px;
-  height: 148px;
-  padding: 14px;
+  width: 200px;
+  height: 200px;
+  padding: 15px;
   border-radius: 0;
   overflow: visible;
   box-shadow: none;
